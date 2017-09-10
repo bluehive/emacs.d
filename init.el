@@ -880,9 +880,17 @@
 (use-package magit-gh-pulls
   :no-require t
   :ensure t
-  :gonfig
+  :config
   (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls)
  )
+
+
+(use-package browse-at-remote
+  :no-require t
+  :ensure t
+  :bind (("C-c g g" . browse-at-remote))
+ )
+
 
 ;;;; magithub (obsolete)
 ;; magit の仕様変更に追随できない場合が多いので使用停止。
