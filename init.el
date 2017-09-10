@@ -1020,107 +1020,107 @@
 (global-set-key (kbd "C-x k") #'kill-buffer-now)
 (global-set-key (kbd "C-x C-k") #'kill-buffer-now)
 
-;; Python
-(require 'python)
-(setq python-shell-interpreter "python3")
-(global-set-key (kbd "<f9>") #'run-python)
+;; ;; Python
+;; (require 'python)
+;; (setq python-shell-interpreter "python3")
+;; (global-set-key (kbd "<f9>") #'run-python)
 
-;; SQL
-(require 'sql)
+;; ;; SQL
+;; (require 'sql)
 
-(defun project-config ()
-  "Read and return JSON project config."
-  (json-read-file (projectile-expand-root "erezlife/config.json")))
+;; (defun project-config ()
+;;   "Read and return JSON project config."
+;;   (json-read-file (projectile-expand-root "erezlife/config.json")))
 
-(defun database ()
-  "Return the name of the database for the current project."
-  (ignore-errors
-    (let* ((config (project-config))
-           (database-config (cdr (assoc 'database config)))
-           (database (cdr (assoc 'name database-config))))
-      database)))
+;; (defun database ()
+;;   "Return the name of the database for the current project."
+;;   (ignore-errors
+;;     (let* ((config (project-config))
+;;            (database-config (cdr (assoc 'database config)))
+;;            (database (cdr (assoc 'name database-config))))
+;;       database)))
 
-(defun project-sql (product)
-  "Run PRODUCT database with default database for current project."
-  (let ((default-directory (expand-file-name "~"))
-        (sql-database (database)))
-    (sql-product-interactive product)))
+;; (defun project-sql (product)
+;;   "Run PRODUCT database with default database for current project."
+;;   (let ((default-directory (expand-file-name "~"))
+;;         (sql-database (database)))
+;;     (sql-product-interactive product)))
 
-(defun project-sql-postgres ()
-  "Run PostgreSQL with default database for current project."
-  (interactive)
-  (project-sql 'postgres))
-(global-set-key (kbd "<f12>") #'project-sql-postgres)
+;; (defun project-sql-postgres ()
+;;   "Run PostgreSQL with default database for current project."
+;;   (interactive)
+;;   (project-sql 'postgres))
+;; (global-set-key (kbd "<f12>") #'project-sql-postgres)
 
-(defun init-sqli-mode ()
-  "Initialize SQLi-MODE.
-Turn off LINUM-MODE, as the buffer can be extremely large."
-  (linum-mode 0))
-(add-hook 'sql-interactive-mode-hook #'init-sqli-mode)
+;; (defun init-sqli-mode ()
+;;   "Initialize SQLi-MODE.
+;; Turn off LINUM-MODE, as the buffer can be extremely large."
+;;   (linum-mode 0))
+;; (add-hook 'sql-interactive-mode-hook #'init-sqli-mode)
 
-(defun init-sql-mode ()
-  "Initialize SQL-MODE."
-  (setq sql-buffer (get-buffer "*SQL*")))
-(add-hook 'sql-mode-hook #'init-sql-mode)
+;; (defun init-sql-mode ()
+;;   "Initialize SQL-MODE."
+;;   (setq sql-buffer (get-buffer "*SQL*")))
+;; (add-hook 'sql-mode-hook #'init-sql-mode)
 
-(defun unfill-paragraph ()
-  "Unfill paragraph at or after point."
-  (interactive)
-  (let ((fill-column (point-max)))
-    (fill-paragraph nil)))
+;; (defun unfill-paragraph ()
+;;   "Unfill paragraph at or after point."
+;;   (interactive)
+;;   (let ((fill-column (point-max)))
+;;     (fill-paragraph nil)))
 
-(defun unfill-region ()
-  "Unfill each of the paragraphs in the region."
-  (interactive)
-  (let ((fill-column (point-max)))
-    (fill-region (region-beginning) (region-end) nil)))
+;; (defun unfill-region ()
+;;   "Unfill each of the paragraphs in the region."
+;;   (interactive)
+;;   (let ((fill-column (point-max)))
+;;     (fill-region (region-beginning) (region-end) nil)))
 
-(global-set-key (kbd "M-Q") #'unfill-paragraph)
-(global-set-key (kbd "C-M-Q") #'unfill-region)
+;; (global-set-key (kbd "M-Q") #'unfill-paragraph)
+;; (global-set-key (kbd "C-M-Q") #'unfill-region)
 
-(defun insert-file-name ()
-  "Insert the buffer's file name sans final extension at point."
-  (interactive)
-  (when (buffer-file-name)
-    (insert (file-name-base (buffer-file-name)))))
+;; (defun insert-file-name ()
+;;   "Insert the buffer's file name sans final extension at point."
+;;   (interactive)
+;;   (when (buffer-file-name)
+;;     (insert (file-name-base (buffer-file-name)))))
 
-;; Speed up large files such as SQL backups
-(defun init-large-buffer ()
-  "Setup large buffers to better handle large buffers."
-  (when (> (buffer-size) large-file-warning-threshold)
-    (setq buffer-read-only t)
-    (buffer-disable-undo)
-    (linum-mode 0)))
-(add-hook 'find-file-hook #'init-large-buffer)
+;; ;; Speed up large files such as SQL backups
+;; (defun init-large-buffer ()
+;;   "Setup large buffers to better handle large buffers."
+;;   (when (> (buffer-size) large-file-warning-threshold)
+;;     (setq buffer-read-only t)
+;;     (buffer-disable-undo)
+;;     (linum-mode 0)))
+;; (add-hook 'find-file-hook #'init-large-buffer)
 
-(defvar kill-all-global-buffers
-  '("*compilation*"))
+;; (defvar kill-all-global-buffers
+;;   '("*compilation*"))
 
-(defun kill-all-buffers ()
-  "Kill all buffers except global buffers."
-  (interactive)
-  (dolist (buffer (buffer-list))
-    (unless (and (string-match "^\\*.*\\*$" (buffer-name buffer))
-                 (not (member (buffer-name buffer) kill-all-global-buffers)))
-      (kill-buffer buffer)))
-  (grep-a-lot-clear-stack))
+;; (defun kill-all-buffers ()
+;;   "Kill all buffers except global buffers."
+;;   (interactive)
+;;   (dolist (buffer (buffer-list))
+;;     (unless (and (string-match "^\\*.*\\*$" (buffer-name buffer))
+;;                  (not (member (buffer-name buffer) kill-all-global-buffers)))
+;;       (kill-buffer buffer)))
+;;   (grep-a-lot-clear-stack))
 
 ;; Third party libraries.
-(require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
-(package-initialize)
+;; (require 'package)
+;; (add-to-list 'package-archives
+;;              '("melpa" . "https://melpa.org/packages/"))
+;; (package-initialize)
 
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+;; (unless (package-installed-p 'use-package)
+;;   (package-refresh-contents)
+;;   (package-install 'use-package))
 
-(require 'use-package)
-(setq use-package-always-ensure t
-      use-package-verbose t)
+;; (require 'use-package)
+;; (setq use-package-always-ensure t
+;;       use-package-verbose t)
 
-(use-package apache-mode
-  :mode ("\\.conf\\'" . apache-mode))
+;; (use-package apache-mode
+;;   :mode ("\\.conf\\'" . apache-mode))
 
 ;; (use-package crontab-mode
 ;;   :mode (("\\.cron\\(tab\\)?\\'" . crontab-mode)
@@ -1151,17 +1151,17 @@ Turn off LINUM-MODE, as the buffer can be extremely large."
                         flycheck-disabled-checkers '(php-phpmd php-phpcs)))
   :config (global-flycheck-mode 1))
 
-(defun init-git-commit-mode ()
-  "Initialize GIT-COMMIT-MODE."
-  (setq fill-column 72))
+;; (defun init-git-commit-mode ()
+;;   "Initialize GIT-COMMIT-MODE."
+;;   (setq fill-column 72))
 
-(use-package git-commit
-  :config (progn
-            (global-git-commit-mode 1)
-            (add-hook 'git-commit-mode-hook #'init-git-commit-mode)))
+;; (use-package git-commit
+;;   :config (progn
+;;             (global-git-commit-mode 1)
+;;             (add-hook 'git-commit-mode-hook #'init-git-commit-mode)))
 
-(use-package grep-a-lot
-  :config (grep-a-lot-setup-keys))
+;; (use-package grep-a-lot
+;;   :config (grep-a-lot-setup-keys))
 
 ;;(use-package groovy-mode)
 
@@ -1172,26 +1172,26 @@ Turn off LINUM-MODE, as the buffer can be extremely large."
 
 (use-package pony-mode)
 
-(use-package projectile
-  :config (progn
-            (add-to-list 'projectile-globally-ignored-directories "_build")
-            (add-to-list 'projectile-globally-ignored-directories "bower_components")
-            (add-to-list 'projectile-globally-ignored-directories "legacy/vendor")
-            (add-to-list 'projectile-globally-ignored-directories "vendor")
-            (add-to-list 'projectile-globally-ignored-directories "node_modules")
-            (add-to-list 'projectile-globally-ignored-directories "venv")
-            (add-to-list 'projectile-globally-ignored-file-suffixes ".d")
-            (add-to-list 'projectile-globally-ignored-file-suffixes ".map")
-            (add-to-list 'projectile-globally-ignored-file-suffixes ".min.css")
-            (add-to-list 'projectile-globally-ignored-file-suffixes ".min.js")
-            (add-to-list 'projectile-globally-ignored-file-suffixes ".svg")
-            (add-to-list 'projectile-globally-ignored-files "ansible.log")
-            (add-to-list 'projectile-globally-ignored-files "urlconf.php")
-            (projectile-mode 1)))
+;; (use-package projectile
+;;   :config (progn
+;;             (add-to-list 'projectile-globally-ignored-directories "_build")
+;;             (add-to-list 'projectile-globally-ignored-directories "bower_components")
+;;             (add-to-list 'projectile-globally-ignored-directories "legacy/vendor")
+;;             (add-to-list 'projectile-globally-ignored-directories "vendor")
+;;             (add-to-list 'projectile-globally-ignored-directories "node_modules")
+;;             (add-to-list 'projectile-globally-ignored-directories "venv")
+;;             (add-to-list 'projectile-globally-ignored-file-suffixes ".d")
+;;             (add-to-list 'projectile-globally-ignored-file-suffixes ".map")
+;;             (add-to-list 'projectile-globally-ignored-file-suffixes ".min.css")
+;;             (add-to-list 'projectile-globally-ignored-file-suffixes ".min.js")
+;;             (add-to-list 'projectile-globally-ignored-file-suffixes ".svg")
+;;             (add-to-list 'projectile-globally-ignored-files "ansible.log")
+;;             (add-to-list 'projectile-globally-ignored-files "urlconf.php")
+;;             (projectile-mode 1)))
 
-(use-package s)
+;; (use-package s)
 
-(use-package systemd)
+;; (use-package systemd)
 
 (use-package undo-tree
   :config (global-undo-tree-mode 1))
