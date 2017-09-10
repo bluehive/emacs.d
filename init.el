@@ -1168,9 +1168,9 @@
 ;;(use-package less-css-mode)
 
 
-(use-package pip-requirements)
+;(use-package pip-requirements)
 
-(use-package pony-mode)
+;(use-package pony-mode)
 
 ;; (use-package projectile
 ;;   :config (progn
