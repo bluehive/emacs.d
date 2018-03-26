@@ -1,46 +1,13 @@
-;;jdufresne/emacs-init
-;@jdufresne jdufresne Remove custom shit
+;;; init.el --- Emacs initialization file -*- lical-binding: t -*-
 
-;;; init.el --- Emacs initialization file -*- lexical-binding: t -*-
-
-;; Author: Jon Dufresne <jon@jondufresne.org>
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; thankyou :: Jon Dufresne <jon@jondufresne.org>
 
 ;;; Commentary:
-
-;; Initialize Emacs the way I like it.
-
-;;; Code:
-
-;;
-;; keep it simple !!
-;;
-
-					;use-packege ; init.el
-
-;;; .emacs --- dot emacs file
-;; This file is NOT part of GNU Emacs.gti
-
-;;; Commentary:
-
 ;;;; Emacsおよび関連ソフトのインストール方法
 ;;;;; Ubuntu
-;;    % sudo add-apt-repository ppa:cassou/emacs
-;;    % sudo apt-get update
-;;    % sudo apt-get install emacs-snapshot
-;;    % emacs-snapshot
+;;sudo add-apt-repository ppa:kelleyk/emacs
+;;sudo apt-get update
+;;    % sudo apt-get install emacs25
 
 ;;;;; Windows ;;;;;;;;;;;;;;;;;;;
 ;; Chocolateyを使った環境構築の時のメモ - Qiita
@@ -51,36 +18,8 @@
 ;; NTEmacs64(64bit 版 version 25.1)
 ;; GitHub - chuntaro/NTEmacs64: Windows 版 Emacs (通称 NTEmacs) の 64bit 版
 ;; - https://github.com/chuntaro/NTEmacs64
-;; 起動方法
-;; emacs-25.1-IME-patched.zip を展開すると emacs-25.1/ フォルダが出来るので emacs-25.1/bin/runemacs.exe を実行します。
-;; Emacsのパスを通す
-;; Git BashはWindows側で通したパスにある実行ファイルも直接実行できます。
-;; ですので、ここでEmacsの実行ファイルがあるディレクトリ
-;; (最初は(解凍して出てきたディレクトリ)\bin)にパスを通します。
-;; システム環境変数側の「Path」を選択し、「編集(I)」を押します。
-;; 変数値のパスの後ろにEmacsの実行ファイルがあるパスを追記します。(前のパスとは「;」で区切る)
-;; Unix系のパスは「:」で区切りますが、Windowsでは「;」で区切ることに注意してください。
-;; 追記したらOKを押して、環境変数・システムのプロパティダイアログもOKで閉じます。
-;; これでパスが通りました。
-;; これ以降コマンドプロンプト・PowershellからEmacsを別ウインドウで起動したいときは、
-;; と入力すると起動できます。(Unix系のemacs &に相当)
-;; emacs -nwは文字コードの面から非推奨です。
-
-;; 注意事項
-;;     DDSKK はバージョン 16.1 以降を使用してください
-;;     ダイナミックモジュールの機能は、一旦有効にしてビルドすると設定ファイルで無効にする事が出来ません
-;;     load-path 上に DLL があるか気になる方は以下のコードを実行すると確認出来ます (あると警告が表示されます)
-  ;; (dolist (dir load-path)
-  ;;   (dolist (dll (directory-files dir t "\\.dll$"))
-  ;;     (warn dll)))
 ;;
 ;; - MSYS2 homepage - http://www.msys2.org/
-;; Cygwin は POSIX 互換を目指しているため機能盛りだくさんで、
-;; 「Cygwin はちょっと重い、でかすぎる・・・」という方もいるかと思います。
-;; そういう場合は MSYS2 を使うのが良いでしょう。MSYS2 は、プログラム開発に
-;; 必要なだけの機能を取り入れた、いわば Cygwin のコンパクト版です。
-;; と言っても、普通にWindows 上で使う分には充分な機能を持っています。
-;; 初期化ファイル（.emacs や .emacs.d/init.el）に、下記の設定を追加する。
 ;; 下記の例は C:\Programs\ の下に MSYS2 をインストールした場合です。
 ;; このパスは、ご自身のインストールパスに合わせて変更してください。
 ;; ;; MSYS2 のコマンドを使えるようにする.
@@ -89,7 +28,8 @@
 ;; ;; 下記の行に MSYS2 のコマンドの実行可能ファイルがある場所を設定してください. スラッシュが2つ連続することに注意！
 ;; "C:\\Programs\\msys64\\usr\\bin;"
 ;; (getenv "PATH")))
- ;; Update the package database and core system packages with:
+
+;; Msys2 Update the package database and core system packages with:
  ;; - pacman -Syu
  ;; If needed, close MSYS2, run it again from Start menu. Update the rest with:
  ;; - pacman -Su
@@ -104,41 +44,8 @@
 ;;  $ pacman -Suu
 ;; でも問題ありません。
 
-
-;; Emacs日本語info設定:
-;;
-;; 25.1のバグフィクス版です。
-;; https://ayatakesi.github.io/emacs/25.1/emacs-ja.info
-;; ダウンロードしてください。
-;; たとえばwgetで ~/info/emacs251-ja.info という
-;; ファイル名でダウンロードするならば
-;; ================================================================
-;; $ mkdir -p ~/info
-;; $ wget -O ~/info/emacs251-ja.info https://ayatakesi.github.io/emacs/25.1/emacs-ja.info
-;; ================================================================
-
-
-
-;;; Code:
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;
-;;;; 初期化 https://github.com/kawabata/dotfiles/blob/master/.emacs.d/init.el
-;;;
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;; Emacsは init.el 読み込み後に各パッケージへのload-path設定を行い
-;; XXX-autoloads.el を読み込む。このままでは init の段階では
-;; require/locate-library ができないため、(package-initialize) を事前
-;; に実行する。
-;
-;# (eval-when-compile (require 'cl))
-;# (setq init-file-debug t)
-;# (cd "~/") ; ホームディレクトリにcd
-;# (setq force-load-messages t)
-;# (message (format "Startup time: %s" (format-time-string "%Y/%m/%d %H:%M:%S")))
+;;;;;;;;;;;;;;;;;;;;;;;;
+;; package initialize ;;
 ;(require 'autoinsert) ; abc-mode-autoloads.el 対策。
 (package-initialize)
 (setq package-enable-at-startup nil) ; 初期化済みなので自動初期化は停止。
@@ -168,40 +75,6 @@
                 ;; org-mode
                 ("org"   . "http://orgmode.org/elpa/")
                 ))
-;; ローカルレポジトリを追加
-;; (when (file-exists-p "~/.emacs.d/local-packages/archive-contents")
-;;   (pushnew '("local" . "~/.emacs.d/local-packages/")
-;;               package-archives :test 'equal))
-
-
-;; ;;;;;;;;;;;;;;;;;;;;;; try
-;; Magit を使ってみる
-;; - Qiita - http://qiita.com/ignorant/items/86d353e3ada299f12836
-;; インストール下準備init.el に下記の設定を追加して，
-;; package.el と use-package を使用できるようにする．
-;; try は，M-x try Enter package 名 で package をインストールして手軽に
-;; 試せます．Emacs を再起動すると try から導入した package は使えなくなります．;; いらないパッケージが残らないので精神衛生上助かりますね．
-;;ちなみに，TEMP フォルダに展開されるので，気になるなら消しましょう．私は，そこまでは気にならないので，自動削除される日までほっときます．
-
-;; ;;; package.el
-;; (require 'package)
-;; (setq package-enable-at-startup nil)
-;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-
-;; ;;(package-refresh-contents)
-;; (package-initialize)
-
-;; ;;; Bootstrap 'use-package
-;; (unless (package-installed-p 'use-package)
-;; (package-refresh-contents)
-;; (package-install 'use-package))
-;; (use-package try
-;; :ensure t)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;; 関数のコマンド化
-;(defmacro command (&rest body)
-;  `(lambda () (interactive) ,@body))
 
 ;;;; 大きすぎるファイルでは適用しないモードの判定
 (defun tkw-large-file-p (&optional char-size)
@@ -209,6 +82,12 @@
 デフォルト値は 100,000."
   (< (or char-size 100000) (point-max)))
 
+;;;; 重要
+;;;;This vulnerability was introduced in Emacs 19.29. To work around that in Emacs versions before 25.3, append the following to your ~/.emacs init file:
+
+(eval-after-load "enriched"
+  '(defun enriched-decode-display-prop (start end &optional param)
+     (list start end)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ use-packageで可読性の高いinit.elを書く -
@@ -262,53 +141,51 @@
          (setq locale-coding-system 'utf-8-hfs))
 
 
-;; (set-language-environment "Japanese")
-;; (let ((ws window-system))
-;;   (cond ((eq ws 'w32)
-;;          (prefer-coding-system 'shift_jis)
-;;          (set-default-coding-systems 'shift_jis)
-;;          (setq file-name-coding-system 'shift_jis)
-;;          (setq default-file-name-coding-system 'shift_jis)
-;;          (setq locale-coding-system 'shift_jis))
-;;         ((eq ws 'ns)
-;;          (require 'ucs-normalize)
-;;          (prefer-coding-system 'utf-8-hfs)
-;;          (setq file-name-coding-system 'utf-8-hfs)
-;;          (setq locale-coding-system 'utf-8-hfs))))
+;; ;;; @ screen - minibuffer                                           ;;;
+;; ;; minibufferのアクティブ時、IMEを無効化
+ (add-hook 'minibuffer-setup-hook
+           (lambda ()
+             (deactivate-input-method)))
+ (wrap-function-to-control-ime 'y-or-n-p nil nil)
+ (wrap-function-to-control-ime 'map-y-or-n-p nil nil)
+ (wrap-function-to-control-ime 'read-char nil nil)
 
-;(setenv "LANG" "ja_JP.UTF-8")
-;(set-language-environment "Japanese")
-;(let ((ws window-system))
-;  (cond ((eq ws 'w32)
-;         (prefer-coding-system 'utf-8-unix)
-;         (set-default-coding-systems 'utf-8-unix)
-;         (setq file-name-coding-system 'sjis)
-;         (setq default-file-name-coding-system 'shift_jis)
-;         (setq locale-coding-system 'utf-8))
-;        ((eq ws 'ns)
-;         (require 'ucs-normalize)
-;         (prefer-coding-system 'utf-8-hfs)
-;         (setq file-name-coding-system 'utf-8-hfs)
-;         (setq locale-coding-system 'utf-8-hfs))))
-
-;; ;; ;;; @ screen - minibuffer                                           ;;;
-;; ;; ;; minibufferのアクティブ時、IMEを無効化
-;;  (add-hook 'minibuffer-setup-hook
-;;            (lambda ()
-;;              (deactivate-input-method)))
-;;  (wrap-function-to-control-ime 'y-or-n-p nil nil)
-;;  (wrap-function-to-control-ime 'map-y-or-n-p nil nil)
-;;  (wrap-function-to-control-ime 'read-char nil nil)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ anything                                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
-(use-package anything :no-require t :defer t :ensure t)
+(use-package anything
+;  :no-require t
+  :defer t :ensure t)
 (require 'anything-config)
 (setq anything-enable-shortcuts 'prefix)
 (define-key anything-map (kbd "@") 'anything-select-with-prefix-shortcut)
 (global-set-key (kbd "C-x b") 'anything-mini)
+
+;;
+(defun my-anything ()
+  (interactive)
+  (anything-other-buffer
+   '( ;anything-c-source-buffers
+     anything-c-source-file-name-history
+     anything-c-source-info-pages
+     anything-c-source-info-elisp
+     anything-c-source-man-pages
+     anything-c-source-locate
+     anything-c-source-emacs-commands)
+   " *my-anything*"))
+
+
+;; Then type M-x my-anything to use sources.
+;;
+;; Defining own command is better than setup `anything-sources'
+;; directly, because you can define multiple anything commands with
+;; different sources. Each anything command should have own anything
+;; buffer, because M-x anything-resume revives anything command.
+
+
+(global-set-key (kbd "C-:") 'my-anything)
 
 ;; ;少し複雑な設定例として
 ;; 1. 場所elinitは~/.emacs.d/のみ
@@ -318,22 +195,53 @@
 ;; 3. 場所memoは~/sync/think/と~/memo/
 ;;    - andgrepスクリプトを2つのディレクトリで動かす
 
-;================================================================
-(setq anything-grep-alist
-      '(("elinit"
-         ("rg -n --colors match:fg:red --smart-case --no-heading -g '*.el' %s" "~/.emacs.d/"))
-        ("drorg"
-;         ("rg -n --colors match:fg:red --smart-case --no-heading -g '*.org' %s" "/c/Users/bluehive/Dropbox/org/")
-	 )
-        ("junk"
-         ("ruby ~/.emacs.d/bin/andgrep --with-title %s" "~/junk/2017/")
-         ("ruby ~/.emacs.d/bin/andgrep --with-title %s" "~/junk/2017/08/"))))
-;================================================================
-;設定が終わったら
-;M-x anything-grep-by-nameを実行します。
-;するとクエリと場所を聞かれるのでそれぞれ入力します。
+;; ;================================================================
+;; (setq anything-grep-alist
+;;       '(("elinit"
+;;          ("rg -n --colors match:fg:red --smart-case --no-heading -g '*.el' %s" "~/.emacs.d/"))
+;;         ("drorg"
+;; ;         ("rg -n --colors match:fg:red --smart-case --no-heading -g '*.org' %s" "/c/Users/bluehive/Dropbox/org/")
+;; 	 )
+;;         ("junk"
+;;          ("ruby ~/.emacs.d/bin/andgrep --with-title %s" "~/junk/2017/")
+;;          ("ruby ~/.emacs.d/bin/andgrep --with-title %s" "~/junk/2017/08/"))))
+;; ;================================================================
+;; ;設定が終わったら
+;; ;M-x anything-grep-by-nameを実行します。
+;; ;するとクエリと場所を聞かれるのでそれぞれ入力します。
 
+;;;;;; http://emacs.rubikitch.com/global-hl-line-mode-timer/
+;; 遅い場合は以下
 
+(require 'hl-line)
+;;; hl-lineを無効にするメジャーモードを指定する
+(defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
+(defun global-hl-line-timer-function ()
+  (unless (memq major-mode global-hl-line-timer-exclude-modes)
+    (global-hl-line-unhighlight-all)
+    (let ((global-hl-line-mode t))
+      (global-hl-line-highlight))))
+(setq global-hl-line-timer
+      (run-with-idle-timer 0.03 t 'global-hl-line-timer-function))
+;; (cancel-timer global-hl-line-timer)
+
+;;;;;
+;;スクロールを鮮やかにする
+;;https://github.com/k-talo/smooth-scroll.el
+;(require 'smooth-scroll)
+;(smooth-scroll-mode t)
+
+ ;; スクロールした際のカーソルの移動行数
+ (setq scroll-conservatively 1)
+
+ ;; スクロール開始のマージンの行数
+ (setq scroll-margin 10)
+
+ ;; 1 画面スクロール時に重複させる行数
+ (setq next-screen-context-lines 10)
+
+ ;; 1 画面スクロール時にカーソルの画面上の位置をなるべく変えない
+ (setq scroll-preserve-screen-position t)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ windows                                                     ;;;
@@ -350,8 +258,9 @@
 (when (equal system-type 'windows-nt)
   (setenv "PATH"
           (concat
-   ;; 下記の行に MSYS2 のコマンドの実行可能ファイルがある場所を設定してください. スラッシュが2つ連続することに注意！
-           "C:\\msys64\\usr\\bin;"
+	   ;; 下記の行に MSYS2 のコマンドの実行可能ファイルがある場所を設定してください. スラッシュが2つ連続することに注意！
+           "C:\\strawberry\\perl\\bin;"
+           "C:\\tools\\msys64\\usr\\bin;"
            "C:\\Users\\bluehive\\AppData\\Roaming\\.emacs.d\\elpa\\anything-20161127.2357;"
            (getenv "PATH")))
 )
@@ -359,42 +268,38 @@
 ;;日本語grep対策　
 (when (equal system-type 'windows-nt)
   (setq
-   find-program "C:\\msys64\\usr\\bin\\find.exe"
-   grep-program "C:\\msys64\\usr\\bin\\grep.exe")
+   find-program "C:\\tools\\msys64\\usr\\bin\\find.exe"
+;;   grep-program "C:\\tools\\msys64\\usr\\bin\\grep.exe"
+      grep-program "C:\\tools\\msys64\\usr\\bin\\rg.exe")
 )
+
+;; 重要　gitなどパスを通す　Windows
+(setq exec-path (cons "C:\\tools\\msys64\\usr\\bin" exec-path))
 
 ;;;;ripgrep.el
 ;;;;[url=http://emacs.rubikitch.com/ripgrep/]ripgrep.el :
 ;;;【agより、ずっとはやい!!】超音速grepとEmacsインターフェース(Windows安心)[/url]
 ;;; rgバイナリの位置
-;; (setq ripgrep-executable  "C:\\msys64\\usr\\bin\\rg")
-;; ;;; rgに渡すオプション
-;; (setq ripgrep-arguments '("-S"))
+ (setq ripgrep-executable  "C:\\tools\\msys64\\usr\\bin\\rg")
+;;; rgに渡すオプション
+ (setq ripgrep-arguments '("-S"))
 
-;; ;;; @ language - fontset                                            ;;;
-;; ;; ;; デフォルト フォント
-;; (set-face-attribute 'default nil :family "Migu 1M" :height 110)
-;; ;; (set-face-font 'default "Migu 1M-11:antialias=standard")
+;;; @ language - fontset                                            ;;;
+;; ;; デフォルト フォント
+(set-face-attribute 'default nil :family "Migu 1M" :height 110)
+;; (set-face-font 'default "Migu 1M-11:antialias=standard")
 
-;; ;; ;; プロポーショナル フォント
-;; (set-face-attribute 'variable-pitch nil :family "Migu 1M" :height 110)
-;; ;; (set-face-font 'variable-pitch "Migu 1M-11:antialias=standard")
+;; ;; プロポーショナル フォント
+(set-face-attribute 'variable-pitch nil :family "Migu 1M" :height 110)
+;; (set-face-font 'variable-pitch "Migu 1M-11:antialias=standard")
 
-;; ;; ;; 等幅フォント
-;; (set-face-attribute 'fixed-pitch nil :family "Migu 1M" :height 110)
-;; ;; (set-face-font 'fixed-pitch "Migu 1M-11:antialias=standard")
+;; ;; 等幅フォント
+(set-face-attribute 'fixed-pitch nil :family "Migu 1M" :height 110)
+;; (set-face-font 'fixed-pitch "Migu 1M-11:antialias=standard")
 
-;; ;; ;; ツールチップ表示フォント
-;; (set-face-attribute 'tooltip nil :family "Migu 1M" :height 90)
-;; ;; (set-face-font 'tooltip "Migu 1M-9:antialias=standard")
-
-;; ;;; fontset
-
-;; ;; ;; フォントサイズ調整
-;; ;; (global-set-key (kbd "C-<wheel-up>")   '(lambda() (interactive) (text-scale-increase 1)))
-;; ;; (global-set-key (kbd "C-=")            '(lambda() (interactive) (text-scale-increase 1)))
-;; ;; (global-set-key (kbd "C-<wheel-down>") '(lambda() (interactive) (text-scale-decrease 1)))
-;; ;; (global-set-key (kbd "C--")            '(lambda() (interactive) (text-scale-decrease 1)))
+;; ;; ツールチップ表示フォント
+(set-face-attribute 'tooltip nil :family "Migu 1M" :height 90)
+;; (set-face-font 'tooltip "Migu 1M-9:antialias=standard")
 
 ;; ;; ;; フォントサイズ リセット
 (global-set-key (kbd "M-0") '(lambda() (interactive) (text-scale-set 0)))
@@ -408,14 +313,12 @@
 ;(set-language-environment "UTF-8") ;; UTF-8 でも問題ないので適宜コメントアウトしてください
   (setq default-input-method "W32-IME")
   (setq-default w32-ime-mode-line-state-indicator "[--]")
-(setq w32-ime-mode-line-state-indicator-list '("[--]" "[あ]" "[--]"))
+  (setq w32-ime-mode-line-state-indicator-list '("[--]" "[あ]" "[--]"))
   (w32-ime-initialize)
   ;; 日本語入力時にカーソルの色を変える設定 (色は適宜変えてください)
   (add-hook 'w32-ime-on-hook '(lambda () (set-cursor-color "coral4")))
   (add-hook 'w32-ime-off-hook '(lambda () (set-cursor-color "black")))
-
-  ;; 以下はお好みで設定してください
-  ;; 全てバッファ内で日本語入力中に特定のコマンドを実行した際の日本語入力無効化処理です
+   ;; 全てバッファ内で日本語入力中に特定のコマンドを実行した際の日本語入力無効化処理です
   ;; ミニバッファに移動した際は最初に日本語入力が無効な状態にする
   (add-hook 'minibuffer-setup-hook 'deactivate-input-method)
 
@@ -425,36 +328,13 @@
                                   (setq w32-ime-composition-window (minibuffer-window))))
   (add-hook 'isearch-mode-end-hook '(lambda () (setq w32-ime-composition-window nil)))
 
-;;   ;; helm 使用中に日本語入力を無効にする
-;;   (advice-add 'helm :around '(lambda (orig-fun &rest args)
-;;                                (let ((select-window-functions nil)
-;;                                      (w32-ime-composition-window (minibuffer-window)))
-;;                                  (deactivate-input-method)
-;;                                  (apply orig-fun args))));; テーマ格納ディレクトリのパス追加
-;; (add-to-list 'custom-theme-load-path
-;;              (file-name-as-directory (concat user-emacs-directory "theme"))
-;;              )
-)
+;; ;; テーマ格納ディレクトリのパス追加
+;;   (add-to-list 'custom-theme-load-path
+;; 	       (file-name-as-directory (concat user-emacs-directory "theme"))
 
-;; ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; ;;; @ screen - エンコード                                           ;;;
-;; ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-
-;; ;; cp932エンコードの表記変更
-;; (coding-system-put 'cp932 :mnemonic ?P)
-;; (coding-system-put 'cp932-dos :mnemonic ?P)
-;; (coding-system-put 'cp932-unix :mnemonic ?P)
-;; (coding-system-put 'cp932-mac :mnemonic ?P)
-
-;; ;; UTF-8エンコードの表記変更
-;; (coding-system-put 'utf-8 :mnemonic ?U)
-;; (coding-system-put 'utf-8-with-signature :mnemonic ?u)
-
-;; ;; 改行コードの表記追加
-;; (setq eol-mnemonic-dos       ":Dos ")
-;; (setq eol-mnemonic-mac       ":Mac ")
-;; (setq eol-mnemonic-unix      ":Unx ")
-;; (setq eol-mnemonic-undecided ":??? ")
+  )
+;
+;; )
 
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -462,7 +342,7 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
 ;; バッファ画面外文字の切り詰め表示（有効：t、無効：nil）
-(setq truncate-lines nil)
+(setq truncate-lines t)
 
 ;; ウィンドウ縦分割時のバッファ画面外文字の切り詰め表示（有効：t、無効：nil）
 (setq truncate-partial-width-windows t)
@@ -474,9 +354,38 @@
 (setq uniquify-ignore-buffers-re "*[^*]+*")
 
 
+
+ '(org-agenda-files
+   (quote
+    ("c:/Users/bluehive/Dropbox/org/pc2-todo.org" "~/org/todo.org")))
+ '(org-capture-templates
+   (quote
+    (("t" "New TODO" entry
+      (file+headline "~/org/todo.org" "予定")
+      "* TODO %?
+
+")
+     ("m" "Memo" entry
+      (file+headline "~/org/memo.org" "メモ")
+      "* %U%? memo
+%i
+%a"))))
+ '(package-selected-packages
+   (quote
+    (exec-path-from-shell dired-quick-sort dired+ ace-window web-mode yaml-mode systemd projectile pony-mode pip-requirements grep-a-lot flycheck flx-ido diff-hl apache-mode auto-async-byte-compile paredit lispxmp open-junk-file ripgrep rg ht yasnippet rainbow-mode ## recentf-ext anything)))
+ '(send-mail-function (quote smtpmail-send-it))
+
+(add-hook 'cperl-mode-hook
+       (lambda ()
+         (local-set-key (kbd "C-h f") 'cperl-perldoc)))
+
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ アクティベーション                                            ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+
+;; 警告音の代わりに画面フラッシュ
+(setq visible-bell t)
 
 ;; ウィンドウの右端で改行をするかどうかを切り替えるための設定
 
@@ -507,66 +416,12 @@
 (global-set-key "\C-cb" 'org-iswitchb)
 
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-enabled-themes (quote (manoj-dark)))
- '(org-agenda-files (quote ("~/todo.org")))
- '(org-capture-templates
-   (quote
-    (("t" "New TODO" entry
-      (file+headline "~/todo.org" "予定")
-      "* TODO %?
-
-")
-     ("m" "Memo" entry
-      (file+headline "~/memo.org" "メモ")
-      "* %U%? memo
-%i
-%a"))) t)
- '(package-selected-packages
-   (quote
-    (auto-async-byte-compile paredit lispxmp open-junk-file ripgrep rg ht yasnippet ## recentf-ext anything))))
-;; custom-set-variables was added by Custom.
-;; If you edit it by hand, you could mess it up, so be careful.
-;; Your init file should contain only one such instance.
-;; If there is more than one, they won't work right.
-'(desktop-save-mode t)
-'(org-agenda-files
-   (quote
-    ("~/Dropbox/org/checklog2016-3.org" "~/Dropbox/org/Dtodo.org" "~/todo.org")))
-'(org-babel-load-languages (quote ((awk . t) (emacs-lisp . t) (perl . t))))
-;;  '(package-selected-packages (quote (##)))
-
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
-
-;;  ;; org-captureで2種類のメモを扱うようにする
-;; (setq org-capture-templates
-;;       '(("t" "New TODO" entry
-;;          (file+headline "~/org/todo.org" "予定")
-;;          "* TODO %?\n\n")
-;;         ("m" "Memo" entry
-;;          (file+headline "~/org/memo.org" "メモ")
-;;          "* %U%?\n%i\n%a")))
-;; ;; org-agendaでaを押したら予定表とTODOリストを表示
-;; (setq org-agenda-custom-commands
-;;       '(("a" "Agenda and TODO"
-;;          ((agenda "")
-;;           (alltodo "")))))
-;; ;; org-agendaで扱うファイルは複数可だが、
-;; ;; TODO・予定用のファイルのみ指定
-;; (setq org-agenda-files '("~/org/todo.org"))
-;; ;; TODOリストに日付つきTODOを表示しない
-;; ;; (setq org-agenda-todo-ignore-with-date t)
-;; ;; 今日から予定を表示させる
-;; (setq org-agenda-start-on-weekday nil)
+ '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ rubikichi                                                     ;;;
@@ -621,8 +476,9 @@
 (add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
 (add-hook 'lisp-mode-hook 'enable-paredit-mode)
 (add-hook 'ielm-mode-hook 'enable-paredit-mode)
+(add-hook 'cperl-mode-hook 'enable-paredit-mode)
 
-;; ;; 自動バイトコンパイルを無効にするファイル名の正規表現
+;; 自動バイトコンパイルを無効にするファイル名の正規表現
 ;; (require 'auto-async-byte-compile)
 ;; (setq auto-async-byte-compile-exclude-file-regexp "/junk/")
 ;; (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode)
@@ -630,9 +486,9 @@
 ;; (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
 ;; (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
 
-
 (setq eldoc-idle-delay 0.2) ; すぐに表示したい
 (setq eldoc-minor-mode-string "") ; モードラインにElDocと表示しない
+
 ;; 釣り合いのとれる括弧をハイライトにする
 (show-paren-mode 1)
 
@@ -642,58 +498,12 @@
 ;; find-functionをキー割り当てする
 (find-function-setup-keys)
 
-;; ;;;日本語info設定
-;; ;;; ~/info/以下をinfoファイル検索ディレクトリに加える
-;; (add-to-list 'Info-directory-list "~/info/")
-;; ;;; emacs→emacs251-jaにリダイレクトする
-;; (defun Info-find-node--info-ja (orig-fn filename &rest args)
-;;   (apply orig-fn
-;;          (pcase filename
-;;            ("emacs" "emacs251-ja")
-;;            (t filename))
-;;          args))
-;; (advice-add 'Info-find-node :around 'Info-find-node--info-ja)
-
-
-
-;; org-mode 仕事術用設定
+;; org-mode
 (require 'org)
 
-;; (unless (member "CLOCK" org-special-properties)
-;;   (defun org-get-CLOCK-property (&optional pom)
-;;   (org-with-wide-buffer
-;;    (org-with-point-at pom
-;;      (when (and (derived-mode-p 'org-mode)
-;;                 (ignore-errors (org-back-to-heading t))
-;;                 (search-forward org-clock-string
-;;                                 (save-excursion (outline-next-heading) (point))
-;;                                 t))
-;;        (skip-chars-forward " ")
-;;        (cons "CLOCK"  (buffer-substring-no-properties (point) (point-at-eol)))))))
-;;   (defadvice org-entry-properties (after with-CLOCK activate)
-;;     "special-propertyにCLOCKを復活させorg習慣仕事術を最新版orgで動かす"
-;;     (let ((it (org-get-CLOCK-property (ad-get-arg 0))))
-;;       (setq ad-return-value
-;;             (if it
-;;                 (cons it ad-return-value)
-;;               ad-return-value)))))
-
-
-
-
-
-;;;;
-
-
-;; ;;; Bootstrap 'use-package
-;; (unless (package-installed-p 'use-package)
-;;   (package-refresh-contents)
-;;   (package-install 'use-package))
-
-;; (use-package try
-;;   :ensure t)
-
-
+;; 日本語info設定
+;;; ~/info/以下をinfoファイル検索ディレクトリに加える
+(add-to-list 'Info-directory-list "~/info/")
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ LogFile                                                       ;;;
@@ -704,7 +514,6 @@
   (unless logger-process
     (setq logger-process (start-process-shell-command "logger" nil (concat "cat >> ~/log.txt"))))
 (process-send-string logger-process (concat (apply 'format msg) "\n")))
-
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ cperl-mode
@@ -720,29 +529,272 @@
 (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
 (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
 
-;; (cperl-set-style "PerlStyle")
-;; (custom-set-variables
-;;  '(cperl-indent-parens-as-block t)
-;;  '(cperl-close-paren-offset -4)
-;;  '(cperl-indent-subs-specially nil))
+					;(cperl-set-style "PerlStyle")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;; custom
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(cperl-close-paren-offset -4)
+ '(cperl-indent-parens-as-block t)
+ '(cperl-indent-subs-specially nil)
+ '(custom-enabled-themes (quote (tango-dark)))
+ '(desktop-save-mode t)
+ '(org-agenda-files
+   (quote
+    ("c:/Users/bluehive/Dropbox/org/pc2-todo.org" "~/org/todo.org")))
+ '(org-babel-load-languages (quote ((emacs-lisp . t) (awk . t) (perl . t) (shell . t))))
+ '(package-selected-packages
+   (quote
+    (pcre2el projectile golden-ratio magit-gh-pulls magit yasnippet yaml-mode web-mode use-package ripgrep rg recentf-ext rainbow-mode pony-mode pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets open-junk-file lispxmp grep-a-lot flx-ido exec-path-from-shell evil dired-quick-sort dired+ diff-hl dash-functional browse-at-remote auto-async-byte-compile apache-mode anything adaptive-wrap ace-window)))
+ '(safe-local-variable-values (quote ((lical-binding . t)))))
+
+ ;;load cperl, then work around indent issue
+ (load-library "cperl-mode")
+ (defun cperl-backward-to-start-of-continued-exp (lim)
+   (goto-char (1+ lim))
+   (forward-sexp)
+   (beginning-of-line)
+   (skip-chars-forward " \t")
+ )
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (add-hook 'cperl-mode-hook
        (lambda ()
          (local-set-key (kbd "C-h f") 'cperl-perldoc)))
 
+;;; perl v path ;;;;
+(when (memq window-system '(mac ns))
+		(exec-path-from-shell-initialize)
+  exec-path	(split-string (getenv "PATH") ":")
+
+		; /home/kato/	.	plenv/versions/5.27.2/bin
+		(let ((path exec-path))
+		(format "  exec-path: %s\n" exec-path))
+;;exec-path-from-shell.el
+;;shell のパスをそのまま通す　重要 ;;
+		(use-package exec-path-from-shell
+  :no-require t
+  :defer t
+  :ensure t
+  :init		(exec-path-from-shell-initialize)
+  )
+)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ 非標準ライブラリ                                          ;;;
+;;  pcre2el rxt-mode http://emacs.rubikitch.com/pcre2el/
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
-;;;; s
-;(use-package s :no-require t :defer t :ensure t)
+;; 正規表現変換・解説
+;; M-x rxt-mode でRegular eXpression Translationマイナーモード
+;; C-c / /
+;;     rxt-explain 正規表現を解説
 
-;;;; f
-;(use-package f :no-require t :defer t :ensure t)
+;;; regexp perl
+(require 'pcre2el)
+(add-hook 'prog-mode-hook 'rxt-mode)
+(setq reb-re-syntax 'pcre)
 
-;;;; ht
-;(use-package ht :no-require t :defer t :ensure t)
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; Basic config;;; @
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+
+;; Global minor modes
+(setq column-number-mode t)
+(show-paren-mode 1)
+(delete-selection-mode 1)
+(global-linum-mode 1)
+(global-subword-mode 1)
+(setq comment-auto-fill-only-comments t)
+;(add-hook 'text-mode-hook #'turn-on-flyspell)
+;(add-hook 'prog-mode-hook #'flyspell-prog-mode)
+
+;; Auto revert mode
+(require 'autorevert)
+(setq global-auto-revert-non-file-buffers t)
+(setq auto-revert-verbose nil)
+(global-auto-revert-mode 1)
+
+;; Save place mode
+(require 'saveplace)
+(setq-default save-place t)
+(savehist-mode 1)
+
+;; Buffer clean up
+(prefer-coding-system 'utf-8)
+(require 'whitespace)
+(defun cleanup-buffer ()
+  "Set the preferred style upon save."
+  (set-buffer-file-coding-system 'utf-8)
+  (let ((whitespace-style '(empty trailing)))
+    (whitespace-cleanup)))
+(add-hook 'before-save-hook #'cleanup-buffer)
+
+;; Fix ibuffer to use ido-find-file
+(require 'ibuffer)
+(define-key ibuffer-mode-map (kbd "C-x C-f") #'ido-find-file)
+;; Always use ibuffer
+(global-set-key [remap list-buffers] #'ibuffer)
+
+;; Always kill the current buffer without asking
+(defun kill-buffer-now (&optional buffer-or-name)
+  "Kill the buffer specified by BUFFER-OR-NAME without asking."
+  (interactive)
+  (let ((kill-buffer-query-functions nil))
+    (kill-buffer buffer-or-name)))
+(global-set-key (kbd "C-x k") #'kill-buffer-now)
+(global-set-key (kbd "C-x C-k") #'kill-buffer-now)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;バッファを3分割しても4分割しても編集したいバッファだけ黄金比にしてくれる
+
+(use-package golden-ratio
+:ensure t
+:config (golden-ratio-mode 1))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; https://projectile.readthedocs.io/en/latest/
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package projectile
+  :ensure t
+  :config (progn
+            (add-to-list 'projectile-globally-ignored-directories "_build")
+            (add-to-list 'projectile-globally-ignored-directories "bower_components")
+            (add-to-list 'projectile-globally-ignored-directories "legacy/vendor")
+            (add-to-list 'projectile-globally-ignored-directories "vendor")
+            (add-to-list 'projectile-globally-ignored-directories "node_modules")
+            (add-to-list 'projectile-globally-ignored-directories "venv")
+            (add-to-list 'projectile-globally-ignored-file-suffixes ".d")
+            (add-to-list 'projectile-globally-ignored-file-suffixes ".map")
+            (add-to-list 'projectile-globally-ignored-file-suffixes ".min.css")
+            (add-to-list 'projectile-globally-ignored-file-suffixes ".min.js")
+            (add-to-list 'projectile-globally-ignored-file-suffixes ".svg")
+            (add-to-list 'projectile-globally-ignored-files "ansible.log")
+            (add-to-list 'projectile-globally-ignored-files "urlconf.php")
+            (projectile-mode 1)))
+
+
+(use-package diff-hl :ensure t
+  :config (global-diff-hl-mode 1))
+
+(use-package flx-ido
+  :ensure t
+  :init (setq ido-auto-merge-work-directories-length -1
+              ido-create-new-buffer 'never
+              ido-enable-flex-matching t
+              ido-enable-last-directory-history t
+              ido-use-faces nil)
+  :config (progn
+            (ido-mode 1)
+            (ido-everywhere 1)
+            (flx-ido-mode 1)))
+
+;;;;; jump use avy
+(use-package avy
+  :ensure t
+  :demand
+  :commands (avy-goto-char
+             avy-goto-char-2
+             avy-goto-word-1)
+  :config
+  ;; Darken background
+  (setq avy-background t)
+  ;;
+  ;;
+  (global-set-key (kbd "C-M-;") 'avy-goto-char-timer)
+  )
+
+;; (use-package s)
+
+;; (use-package systemd)
+
+(use-package undo-tree :ensure t
+  :config (global-undo-tree-mode 1))
+
+ (use-package yaml-mode :ensure t)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (use-package web-mode
+    :ensure t
+    :config
+	   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+	   (add-to-list 'auto-mode-alist '("\\.vue?\\'" . web-mode))
+	   (setq web-mode-engines-alist
+		 '(("django"    . "\\.html\\'")))
+	   (setq web-mode-ac-sources-alist
+	   '(("css" . (ac-source-css-property))
+	   ("vue" . (ac-source-words-in-buffer ac-source-abbrev))
+         ("html" . (ac-source-words-in-buffer ac-source-abbrev))))
+(setq web-mode-enable-auto-closing t))
+(setq web-mode-enable-auto-quoting t) ; this fixes the quote problem I mentioned
+
+
+(use-package ace-window
+:ensure t
+:init
+(progn
+(setq aw-scope 'frame)
+(global-set-key (kbd "C-x O") 'other-frame)
+  (global-set-key [remap other-window] 'ace-window)
+  (custom-set-faces
+   '(aw-leading-char-face
+     ((t (:inherit ace-jump-face-foreground :height 3.0)))))
+  ))
+
+(use-package dired+
+  :ensure t
+  :config (require 'dired+)
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;; Writing Mail  via emacswiki ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+					; Gnus:
+(setq mail-user-agent 'message-user-agent)
+
+					; Rmail:
+;(setq mail-user-agent 'sendmail-user-agent)
+
+					; MH-E:
+;(setq mail-user-agent 'mh-e-user-agent)
+
+					; Gnus is using MessageMode part:
+(setq message-send-mail-function 'smtpmail-send-it)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;; message mode configuration ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; ;
+;; (setq user-mail-address "me@****.com"
+;;       user-full-name "me")
+
+;(setq smtpmail-smtp-server "smtp.somewhere.jp.com")
+(setq message-send-mail-function 'message-smtpmail-send-it)
+
+(add-hook 'message-mode-hook 'toggle-input-method)
+(setq smtpmail-debug-info t)
+(setq message-default-mail-headers "Cc: \nBcc:\n")
+(setq message-auto-save-directory "~/Mail/drafts")
+
+(use-package dired-quick-sort
+  :ensure t
+  :config
+ ; (dired-quick-sort-setup)
+  )
+
+;; Additional extensions.
+;;(require 'myproject)
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ yasnippet
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
 ;;;; yasnippet
 ;; TODO: 重要 yasnippet 読み込み時にエラーが出たら、とりあえず
@@ -764,27 +816,26 @@
 ;; これらは、yas-minor-mode を実行すると、yasnippet がロードされ、その
 ;; 結果、eval-after-load で、そのバッファからsnippetを読み込もうとして
 ;; エラーになる。なぜ何度も yasnippet がロードされようとするのかは不明。
-;; (yas-global-mode)
-(use-package yasnippet :no-require t :ensure t
+ (yas-global-mode)
+;;
+;
+;
+(  use-package yasnippet
+;  :no-require t
+  :ensure t
   :commands snippet-mode
-;;  :config
-;;  ;; 他スニペットのダウンロード (~/.emacs.d/snippets-3rd-party/)
-;;  (dolist (snip-dir (directory-files
-;;                     (locate-user-emacs-file "snippets-3rd-party") t "^[^.]"))
-;;    (when (file-directory-p snip-dir)
-;;      (add-to-list 'yas-snippet-dirs snip-dir t)
-;;      ;;(yas-load-directory snip-dir)
-  ;;      )))
-)
+   :config
+ ;;  ;; 他スニペットのダウンロード (~/.emacs.d/snippets-3rd-party/)
+ ;;  (dolist (snip-dir (directory-files
+ ;;      (locate-user-emacs-file "snippets-3rd-party") t "^[^.]"))
+ ;;    (when (file-directory-p snip-dir)
+ ;;      (add-to-list 'yas-snippet-dirs snip-dir t)
+ ;;      ;;(yas-load-directory snip-dir)
+ ;;      )))
+ )
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ magit                                                         ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;;; magit
-;;;;; Unicodeファイル名問題
-;; % git config --global core.precomposeunicode true
-;;;;; 1.4.0 の仕様変更
-;; https://raw.githubusercontent.com/magit/magit/next/Documentation/RelNotes/1.4.0.txt
-;;;;; ドキュメント ([[info:magit#Top]] 参照)
 ;; http://matome.naver.jp/odai/2136491451473222801 が一番良いまとめ
 ;; - ワークツリー <-(checkout) ステージングエリア <-(reset) Gitレポジトリ
 ;; - HEAD :: Gitのレポジトリが見ている最新のcommit位置。
@@ -818,48 +869,6 @@
 ;; |----------+---------------------------------+-------------------------------------------------------------------------------|
 ;; | v        | Show Commit                     |                                                                               |
 ;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | d        | git diff <rev>                  | git diff HEAD                                                                 |
-;; | D        | git diff ???                    | s (set) d (set default) c (save default) r (reset to default) h (toggle hunk) |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | t        | Tagging                         | t (lightweight)  a (annotation)                                               |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | X        | git reset --hard HEAD <file>    | ステージ前の状態に戻す。                                                      |
-;; | x        | git reset --soft HEAD <file>    |                                                                               |
-;; |          | git revert <commit>             |                                                                               |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | z        | Stashing                        | z (save) s (snapshot)                                                         |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | P P      | git push <remote> <refspec>     | git push origin master                                                        |
-;; | P t/T    | git push <remote> tag(s)        |                                                                               |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | f f      | git fetch <remote> <refspec>    | f (current) a (all) o (other)                                                 |
-;; | F F      | git pull <remote> <refspec>     | git pull origin master -r (--rebase)                                          |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | b v      | git branch -a                   |                                                                               |
-;; | b c      | git branch <branch>             | ブランチを作成                                                                |
-;; | b b      | git checkout <branch>           | ブランチを切り替え。(HEADを<branch>へ移動)                                    |
-;; |          | git checkout -b <new> <old>     | ブランチの作成＋切り替え                                                      |
-;; | b r      |                                 | ブランチ名を変更                                                              |
-;; | b k      |                                 | ブランチの削除                                                                |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | m m      | git merge <branch>              | -ff (fast-forward) -nf (non fast-forward)                                     |
-;; |          | git rebase <branch>             |                                                                               |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | M a      | git remote add <name> <url>     |                                                                               |
-;; | y        | git cherry-pick                 | 狙ったコミットの変更内容だけを現在のブランチに取り込む操作                    |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | B        | Bisecting                       | b (bad) g (good) k (skip) r (reset) s (start) r (reset) u (run)               |
-;; | c        | Committing                      | c (commit) a (amend) e (extend) r (reword) f (fixup) s (squash)               |
-;; | g        | Refresh Buffers                 |                                                                               |
-;; | o        | Submoduling                     |                                                                               |
-;; | r        | Rewriting                       |                                                                               |
-;; | s        | Show Status                     |                                                                               |
-;; | S        | Stage all                       |                                                                               |
-;; | U        | Unstage all                     |                                                                               |
-;; | V        | Show File                       |                                                                               |
-;; | w        | Wazzup                          |                                                                               |
-;; | !        | Running                         |                                                                               |
-;; | $        | Show Process                    |                                                                               |
 
 ;; - git remote add origin https://github.com/kawabata/hoge.git ..
 ;;  "origin" という名前で "http://.../" をアップストリームリポジトリに
@@ -869,7 +878,9 @@
 ;; - タグの追加とPush
 ;;   + t <tag_name>
 ;;   + P t <tag_name>
-(use-package magit :no-require t :ensure t
+(use-package magit
+ ; :no-require t
+  :ensure t
   :bind (("M-g s" . magit-status)
          ("M-g b" . magit-blame-mode))
   :config
@@ -877,328 +888,24 @@
                 '(magit-process-password-auth-source))
   )
 
-(use-package magit-gh-pulls
-  :no-require t
-  :ensure t
-  :config
-  (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls)
- )
-
-
-(use-package browse-at-remote
-  :no-require t
-  :ensure t
-  :bind (("C-c g g" . browse-at-remote))
- )
-
-
-;;;; magithub (obsolete)
-;; magit の仕様変更に追随できない場合が多いので使用停止。
-;;(lazyload () "magit-key-mode"
-;;  (set-variable 'magit-log-edit-confirm-cancellation nil))
-
-;;;; malyon
-;; Z-Machine Interpreter for Emacs
-;; M-x malyon で Z仮想機械ファイルを指定してゲーム開始。
-;;(use-package malyon :no-require t :defer t)
-
-;;;; mark-multiple (obsolete)
-;; → multipel-cursors に名称変更。
-
-;;;; mdfind-dired
-;; https://gist.github.com/Kouzuka/900452
-;; TODO check
-
-;;;; melpa (obsolete)
-;; パッケージ管理システム。ブラックリストパッケージの管理等。
-;;(lazyload () "melpa"
-;;  (add-to-list 'package-archive-exclude-alist '(("melpa" bbdb-vcard))))
-;;(require 'melpa nil :no-error)
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @                                                          ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @                                                          ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @                                                          ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-
-
-
-
-;;; (provide 'init)
-;;; init.el ends here
-
-;; Local Variables:
-;; coding: utf-8
-;; mode: emacs-lisp
-;; End:
-
-
-
-;; Basic config
-
-;;   (require 'color-theme)
-;;   (setq my-color-themes (list 'color-theme-billw 'color-theme-jsc-dark
-;;                               'color-theme-sitaramv-solaris 'color-theme-resolve
-;;                               'color-theme-classic 'color-theme-jonadabian-slate
-;;                               'color-theme-kingsajz 'color-theme-shaman
-;;                               'color-theme-subtle-blue 'color-theme-snowish
-;;                               'color-theme-sitaramv-nt 'color-theme-wheat))
-;; ;;;;
-
-
-(require 'sort)
-(setq sort-fold-case t)
-
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'forward)
-
-;; Default dictionary
-(require 'ispell)
-(setq ispell-dictionary "english")
-
-;; Enable functions
-(put 'downcase-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
-
-;; Global minor modes
-(setq column-number-mode t)
-(show-paren-mode 1)
-(delete-selection-mode 1)
-(global-linum-mode 1)
-(global-subword-mode 1)
-(setq comment-auto-fill-only-comments t)
-(add-hook 'text-mode-hook #'turn-on-flyspell)
-(add-hook 'prog-mode-hook #'flyspell-prog-mode)
-
-;; Auto revert mode
-(require 'autorevert)
-(setq global-auto-revert-non-file-buffers t)
-(setq auto-revert-verbose nil)
-(global-auto-revert-mode 1)
-
-;; Save place mode
-(require 'saveplace)
-(setq-default save-place t)
-(savehist-mode 1)
-
-;; Buffer clean up
-(prefer-coding-system 'utf-8)
-(require 'whitespace)
-(defun cleanup-buffer ()
-  "Set the preferred style upon save."
-  (set-buffer-file-coding-system 'utf-8)
-  (let ((whitespace-style '(empty trailing)))
-    (whitespace-cleanup)))
-(add-hook 'before-save-hook #'cleanup-buffer)
-
-;; Fix ibuffer to use ido-find-file
-(require 'ibuffer)
-(define-key ibuffer-mode-map (kbd "C-x C-f") #'ido-find-file)
-;; Always use ibuffer
-(global-set-key [remap list-buffers] #'ibuffer)
-
-(require 'nxml-mode)
-(setq nxml-child-indent 4)
-
-;; Remove annoying keys
-;(global-unset-key (kbd "<insert>"))
-;(global-unset-key (kbd "C-z"))
-;(global-unset-key (kbd "C-x C-z"))
-
-;; Always kill the current buffer without asking
-(defun kill-buffer-now (&optional buffer-or-name)
-  "Kill the buffer specified by BUFFER-OR-NAME without asking."
-  (interactive)
-  (let ((kill-buffer-query-functions nil))
-    (kill-buffer buffer-or-name)))
-(global-set-key (kbd "C-x k") #'kill-buffer-now)
-(global-set-key (kbd "C-x C-k") #'kill-buffer-now)
-
-;; ;; Python
-;; (require 'python)
-;; (setq python-shell-interpreter "python3")
-;; (global-set-key (kbd "<f9>") #'run-python)
-
-;; ;; SQL
-;; (require 'sql)
-
-;; (defun project-config ()
-;;   "Read and return JSON project config."
-;;   (json-read-file (projectile-expand-root "erezlife/config.json")))
-
-;; (defun database ()
-;;   "Return the name of the database for the current project."
-;;   (ignore-errors
-;;     (let* ((config (project-config))
-;;            (database-config (cdr (assoc 'database config)))
-;;            (database (cdr (assoc 'name database-config))))
-;;       database)))
-
-;; (defun project-sql (product)
-;;   "Run PRODUCT database with default database for current project."
-;;   (let ((default-directory (expand-file-name "~"))
-;;         (sql-database (database)))
-;;     (sql-product-interactive product)))
-
-;; (defun project-sql-postgres ()
-;;   "Run PostgreSQL with default database for current project."
-;;   (interactive)
-;;   (project-sql 'postgres))
-;; (global-set-key (kbd "<f12>") #'project-sql-postgres)
-
-;; (defun init-sqli-mode ()
-;;   "Initialize SQLi-MODE.
-;; Turn off LINUM-MODE, as the buffer can be extremely large."
-;;   (linum-mode 0))
-;; (add-hook 'sql-interactive-mode-hook #'init-sqli-mode)
-
-;; (defun init-sql-mode ()
-;;   "Initialize SQL-MODE."
-;;   (setq sql-buffer (get-buffer "*SQL*")))
-;; (add-hook 'sql-mode-hook #'init-sql-mode)
-
-;; (defun unfill-paragraph ()
-;;   "Unfill paragraph at or after point."
-;;   (interactive)
-;;   (let ((fill-column (point-max)))
-;;     (fill-paragraph nil)))
-
-;; (defun unfill-region ()
-;;   "Unfill each of the paragraphs in the region."
-;;   (interactive)
-;;   (let ((fill-column (point-max)))
-;;     (fill-region (region-beginning) (region-end) nil)))
-
-;; (global-set-key (kbd "M-Q") #'unfill-paragraph)
-;; (global-set-key (kbd "C-M-Q") #'unfill-region)
-
-;; (defun insert-file-name ()
-;;   "Insert the buffer's file name sans final extension at point."
-;;   (interactive)
-;;   (when (buffer-file-name)
-;;     (insert (file-name-base (buffer-file-name)))))
-
-;; ;; Speed up large files such as SQL backups
-;; (defun init-large-buffer ()
-;;   "Setup large buffers to better handle large buffers."
-;;   (when (> (buffer-size) large-file-warning-threshold)
-;;     (setq buffer-read-only t)
-;;     (buffer-disable-undo)
-;;     (linum-mode 0)))
-;; (add-hook 'find-file-hook #'init-large-buffer)
-
-;; (defvar kill-all-global-buffers
-;;   '("*compilation*"))
-
-;; (defun kill-all-buffers ()
-;;   "Kill all buffers except global buffers."
-;;   (interactive)
-;;   (dolist (buffer (buffer-list))
-;;     (unless (and (string-match "^\\*.*\\*$" (buffer-name buffer))
-;;                  (not (member (buffer-name buffer) kill-all-global-buffers)))
-;;       (kill-buffer buffer)))
-;;   (grep-a-lot-clear-stack))
-
-;; Third party libraries.
-;; (require 'package)
-;; (add-to-list 'package-archives
-;;              '("melpa" . "https://melpa.org/packages/"))
-;; (package-initialize)
-
-;; (unless (package-installed-p 'use-package)
-;;   (package-refresh-contents)
-;;   (package-install 'use-package))
-
-;; (require 'use-package)
-;; (setq use-package-always-ensure t
-;;       use-package-verbose t)
-
-;; (use-package apache-mode
-;;   :mode ("\\.conf\\'" . apache-mode))
-
-;; (use-package crontab-mode
-;;   :mode (("\\.cron\\(tab\\)?\\'" . crontab-mode)
-;;          ("cron\\(tab\\)?\\." . crontab-mode)))
-
-(use-package diff-hl
-  :config (global-diff-hl-mode 1))
-
-(use-package flx-ido
-  :init (setq ido-auto-merge-work-directories-length -1
-              ido-create-new-buffer 'never
-              ido-enable-flex-matching t
-              ido-enable-last-directory-history t
-              ido-use-faces nil)
-  :config (progn
-            (ido-mode 1)
-            (ido-everywhere 1)
-            (flx-ido-mode 1)))
-
-(use-package flycheck
-  :init (progn
-          (setq flycheck-highlighting-mode 'lines
-                flycheck-display-errors-function nil)
-          (setq-default flycheck-javascript-jshint-executable (expand-file-name "~/node_modules/.bin/jshint")
-                        flycheck-javascript-eslint-executable (expand-file-name "~/node_modules/.bin/eslint")
-                        flycheck-json-jsonlint-executable (expand-file-name "~/node_modules/.bin/jsonlint")
-                        flycheck-python-flake8-executable (expand-file-name "~/venv/bin/flake8")
-                        flycheck-disabled-checkers '(php-phpmd php-phpcs)))
-  :config (global-flycheck-mode 1))
-
-;; (defun init-git-commit-mode ()
-;;   "Initialize GIT-COMMIT-MODE."
-;;   (setq fill-column 72))
-
-;; (use-package git-commit
-;;   :config (progn
-;;             (global-git-commit-mode 1)
-;;             (add-hook 'git-commit-mode-hook #'init-git-commit-mode)))
-
-;; (use-package grep-a-lot
-;;   :config (grep-a-lot-setup-keys))
-
-;;(use-package groovy-mode)
-
-;;(use-package less-css-mode)
-
-
-;(use-package pip-requirements)
-
-;(use-package pony-mode)
-
-;; (use-package projectile
-;;   :config (progn
-;;             (add-to-list 'projectile-globally-ignored-directories "_build")
-;;             (add-to-list 'projectile-globally-ignored-directories "bower_components")
-;;             (add-to-list 'projectile-globally-ignored-directories "legacy/vendor")
-;;             (add-to-list 'projectile-globally-ignored-directories "vendor")
-;;             (add-to-list 'projectile-globally-ignored-directories "node_modules")
-;;             (add-to-list 'projectile-globally-ignored-directories "venv")
-;;             (add-to-list 'projectile-globally-ignored-file-suffixes ".d")
-;;             (add-to-list 'projectile-globally-ignored-file-suffixes ".map")
-;;             (add-to-list 'projectile-globally-ignored-file-suffixes ".min.css")
-;;             (add-to-list 'projectile-globally-ignored-file-suffixes ".min.js")
-;;             (add-to-list 'projectile-globally-ignored-file-suffixes ".svg")
-;;             (add-to-list 'projectile-globally-ignored-files "ansible.log")
-;;             (add-to-list 'projectile-globally-ignored-files "urlconf.php")
-;;             (projectile-mode 1)))
-
-;; (use-package s)
-
-;; (use-package systemd)
-
-(use-package undo-tree
-  :config (global-undo-tree-mode 1))
-
-(use-package yaml-mode)
-
-
-
-;; Additional extensions.
-;;(require 'myproject)
+;; (use-package magit-gh-pulls
+;;   :no-require t
+;;   :ensure t
+;;   :config
+
+;;   (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls)
+;;  )
+
+
+;; (use-package browse-at-remote
+;;   :no-require t
+;;   :ensure t
+;;   :bind (("C-c g g" . browse-at-remote))
+;;  )
+
+;; (use-package magithub
+;; :no-require t
+;;; :after magit
+;;   :ensure t
+;;   :config (magithub-feature-autoinject t)
+;;  )
