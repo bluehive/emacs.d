@@ -15,6 +15,7 @@
 ;; まずはこれで一括してインストール可能である
 ;; emacs25 Msys2 ripgrep etc
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; NTEmacs64(64bit 版 version 25.1)
 ;; GitHub - chuntaro/NTEmacs64: Windows 版 Emacs (通称 NTEmacs) の 64bit 版
 ;; - https://github.com/chuntaro/NTEmacs64
@@ -127,28 +128,119 @@
 ;; @ character code (文字コード)
 ;; Setenv
 (set-language-environment "Japanese")
-(when (equal system-type 'windows-nt)
-        (prefer-coding-system 'shift_jis)
-        (set-default-coding-systems 'shift_jis)
-        (setq file-name-coding-system 'shift_jis)
-        (setq default-file-name-coding-system 'shift_jis)
-        (setq locale-coding-system 'shift_jis))
-
-(when (equal system-type 'ns)
-         (require 'ucs-normalize)
-         (prefer-coding-system 'utf-8-hfs)
-         (setq file-name-coding-system 'utf-8-hfs)
-         (setq locale-coding-system 'utf-8-hfs))
+;; (when (equal system-type 'windows-nt)
+;;         (prefer-coding-system 'shift_jis)
+;;         (set-default-coding-systems 'shift_jis)
+;;         (setq file-name-coding-system 'shift_jis)
+;;         (setq default-file-name-coding-system 'shift_jis)
+;;         (setq locale-coding-system 'shift_jis))
 
 
-;; ;;; @ screen - minibuffer                                           ;;;
-;; ;; minibufferのアクティブ時、IMEを無効化
- (add-hook 'minibuffer-setup-hook
-           (lambda ()
-             (deactivate-input-method)))
- (wrap-function-to-control-ime 'y-or-n-p nil nil)
- (wrap-function-to-control-ime 'map-y-or-n-p nil nil)
- (wrap-function-to-control-ime 'read-char nil nil)
+;; (when (equal system-type 'ns)
+;;   (require 'ucs-normalize)
+;;   (prefer-coding-system 'utf-8-hfs)
+;;   (setq file-name-coding-system 'utf-8-hfs)
+;;   (setq locale-coding-system 'utf-8-hfs)
+;; 					;         (prefer-coding-system 'shift_jis)
+;;   (set-default-coding-systems 'utf-8-hfs)
+;; 					;         (setq file-name-coding-system 'shift_jis) (setq
+;; 					;         default-file-name-coding-system 'shift_jis)
+;;   (setq default-process-coding-system '(utf-8-hfs . cp932)) ;agで日本語検索させるためのおまじない
+;;   )
+
+
+;;;;;;;;;
+;; 日本語環境 windows
+;; https://qiita.com/ignorant/items/76e4c162cedc47336e75#%E5%85%B1%E9%80%9A%E3%81%AE%E8%A8%AD%E5%AE%9A
+;; https://extra-vision.blogspot.jp/2016/01/ntemacs-ag-silver-searcher.html
+;;;;;;;;;
+
+;; (when (equal system-type 'ns)
+;;   (require 'ucs-normalize)
+;;   (set-language-environment "Japanese")
+;;   (prefer-coding-system 'utf-8-dos)
+;;   (set-file-name-coding-system 'cp932)
+;;   (set-keyboard-coding-system 'cp932)
+;;   (set-terminal-coding-system 'cp932)
+;;   (setq default-process-coding-system '(utf-8-dos . cp932)) ;agで日本語検索させるためのおまじない
+;; )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; 重要　日本語Windowsの文字コード対策
+;; https://www49.atwiki.jp/ntemacs/pages/16.html 
+
+(require 'cl-lib)
+
+(setenv "LANG" "ja_JP.UTF-8")
+
+;; IME の設定をした後には実行しないこと
+;; (set-language-environment 'Japanese)
+
+(prefer-coding-system 'utf-8-unix)
+(set-file-name-coding-system 'cp932)
+(setq locale-coding-system 'utf-8)
+
+;; プロセスが出力する文字コードを判定して、process-coding-system の DECODING の設定値を決定する
+(setq default-process-coding-system '(undecided-dos . utf-8-unix))
+
+;; ldd の結果のキャッシュ
+(defvar ldd-cache nil)
+
+;; filename が cygwin のプログラムかどうか判定する
+(defun cygwin-program-p (filename)
+  (let ((target (and filename (executable-find filename))))
+    (when target
+      (cdr (or (assoc target ldd-cache)
+               (car (push (cons target
+                                (with-temp-buffer
+                                  (let ((w32-quote-process-args nil)) ; advice 中で再帰しないよう nil
+                                    ;; cygwin のライブラリをロードしているか判定
+                                    (when (eq (call-process "ldd" nil t nil (concat "\"" target "\"")) 0)
+                                      (goto-char (point-min))
+                                      (number-or-marker-p
+                                       (re-search-forward "cygwin[0-9]+\.dll" nil t))))))
+                          ldd-cache)))))))
+
+;; サブプロセスに渡すパラメータに SJIS のダメ文字対策を行い、さらに文字コードを cp932 にする
+(defun convert-process-args (orig-fun prog-pos args-pos args)
+  (let ((cygwin-quote (and w32-quote-process-args ; cygwin-program-p の再帰防止
+                           (cygwin-program-p (nth prog-pos args)))))
+    (setf (nthcdr args-pos args)
+          (mapcar (lambda (arg)
+                    (when w32-quote-process-args
+                      (setq arg
+                            (concat "\""
+                                    (if cygwin-quote
+                                        (replace-regexp-in-string "[\"\\\\]"
+                                                                  "\\\\\\&"
+                                                                  arg)
+                                      (replace-regexp-in-string "\\(\\(\\\\\\)*\\)\\(\"\\)"
+                                                                "\\1\\1\\\\\\3"
+                                                                arg))
+                                    "\"")))
+                    (if (multibyte-string-p arg)
+                        (encode-coding-string arg 'cp932)
+                      arg))
+                  (nthcdr args-pos args))))
+
+  (let ((w32-quote-process-args nil))
+    (apply orig-fun args)))
+
+(cl-loop for (func prog-pos args-pos) in '((call-process        0 4)
+                                           (call-process-region 2 6)
+                                           (start-process       2 3))
+         do (eval `(advice-add ',func
+                               :around (lambda (orig-fun &rest args)
+                                         (convert-process-args orig-fun
+                                                               ,prog-pos ,args-pos
+                                                               args))
+                               '((depth . 99)))))
+
+;; end of 日本語文字コード　設定
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -156,7 +248,7 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
 (use-package anything
-;  :no-require t
+					;  :no-require t
   :defer t :ensure t)
 (require 'anything-config)
 (setq anything-enable-shortcuts 'prefix)
@@ -276,6 +368,24 @@
 ;; 重要　gitなどパスを通す　Windows
 (setq exec-path (cons "C:\\tools\\msys64\\usr\\bin" exec-path))
 
+;; Ag.el
+;; https://agel.readthedocs.io/en/latest/installation.html#emacs
+;; Afterwards, you can install ag.el from MELPA (the recommended approach).
+;;:: Functions are autoloaded, so (require 'ag) is unnecessary.
+;; silver_searcher https://github.com/ggreer/the_silver_searcher\
+; ag
+;(require 'ag)
+;(setq ag-highlight-search nil)  ; 検索キーワードをハイライト
+;(setq ag-reuse-buffers nil)     ; 検索用バッファを使い回す (検索ごとに新バッファを作らない)
+
+;; ; wgrep
+;; (add-hook 'ag-mode-hook '(lambda ()
+;;                            (require 'wgrep-ag)
+;;                            (setq wgrep-auto-save-buffer t)  ; 編集完了と同時に保存
+;;                            (setq wgrep-enable-key "r")      ; "r" キーで編集モードに
+;;                            (wgrep-ag-setup)))
+
+
 ;;;;ripgrep.el
 ;;;;[url=http://emacs.rubikitch.com/ripgrep/]ripgrep.el :
 ;;;【agより、ずっとはやい!!】超音速grepとEmacsインターフェース(Windows安心)[/url]
@@ -308,6 +418,15 @@
 ;; ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; ;;;     IMEを有効にするには以下の設定が必要です                     ;;;
 ;; ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; ;;; @ screen - minibuffer                                           ;;;
+;; ;; minibufferのアクティブ時、IMEを無効化
+ (add-hook 'minibuffer-setup-hook
+           (lambda ()
+             (deactivate-input-method)))
+ (wrap-function-to-control-ime 'y-or-n-p nil nil)
+ (wrap-function-to-control-ime 'map-y-or-n-p nil nil)
+ (wrap-function-to-control-ime 'read-char nil nil)
+
 
 (when (equal system-type 'windows-nt)
 ;(set-language-environment "UTF-8") ;; UTF-8 でも問題ないので適宜コメントアウトしてください
@@ -551,7 +670,7 @@
  '(org-babel-load-languages (quote ((emacs-lisp . t) (awk . t) (perl . t) (shell . t))))
  '(package-selected-packages
    (quote
-    (pcre2el projectile golden-ratio magit-gh-pulls magit yasnippet yaml-mode web-mode use-package ripgrep rg recentf-ext rainbow-mode pony-mode pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets open-junk-file lispxmp grep-a-lot flx-ido exec-path-from-shell evil dired-quick-sort dired+ diff-hl dash-functional browse-at-remote auto-async-byte-compile apache-mode anything adaptive-wrap ace-window)))
+    (systemd ag aggressive-indent pcre2el projectile golden-ratio magit-gh-pulls magit yasnippet yaml-mode web-mode use-package ripgrep rg recentf-ext rainbow-mode pony-mode pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets open-junk-file lispxmp grep-a-lot flx-ido exec-path-from-shell evil dired-quick-sort dired+ diff-hl dash-functional browse-at-remote auto-async-byte-compile apache-mode anything adaptive-wrap ace-window)))
  '(safe-local-variable-values (quote ((lical-binding . t)))))
 
  ;;load cperl, then work around indent issue
@@ -570,26 +689,24 @@
 
 ;;; perl v path ;;;;
 (when (memq window-system '(mac ns))
-		(exec-path-from-shell-initialize)
+  (exec-path-from-shell-initialize)
   exec-path	(split-string (getenv "PATH") ":")
 
-		; /home/kato/	.	plenv/versions/5.27.2/bin
-		(let ((path exec-path))
-		(format "  exec-path: %s\n" exec-path))
-;;exec-path-from-shell.el
-;;shell のパスをそのまま通す　重要 ;;
-		(use-package exec-path-from-shell
-  :no-require t
-  :defer t
-  :ensure t
-  :init		(exec-path-from-shell-initialize)
+					; /home/kato/	.	plenv/versions/5.27.2/bin
+  (let ((path exec-path))
+    (format "  exec-path: %s\n" exec-path))
+  ;;exec-path-from-shell.el
+  ;;shell のパスをそのまま通す　重要 ;;
+  (use-package exec-path-from-shell
+    :no-require t
+    :defer t
+    :ensure t
+    :init		(exec-path-from-shell-initialize)
+    )
   )
-)
-
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;  pcre2el rxt-mode http://emacs.rubikitch.com/pcre2el/
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-
 ;; 正規表現変換・解説
 ;; M-x rxt-mode でRegular eXpression Translationマイナーモード
 ;; C-c / /
@@ -626,14 +743,14 @@
 (savehist-mode 1)
 
 ;; Buffer clean up
-(prefer-coding-system 'utf-8)
-(require 'whitespace)
-(defun cleanup-buffer ()
-  "Set the preferred style upon save."
-  (set-buffer-file-coding-system 'utf-8)
-  (let ((whitespace-style '(empty trailing)))
-    (whitespace-cleanup)))
-(add-hook 'before-save-hook #'cleanup-buffer)
+;; (prefer-coding-system 'utf-8)
+;; (require 'whitespace)
+;; (defun cleanup-buffer ()
+;;   "Set the preferred style upon save."
+;;   (set-buffer-file-coding-system 'utf-8)
+;;   (let ((whitespace-style '(empty trailing)))
+;;     (whitespace-cleanup)))
+;; (add-hook 'before-save-hook #'cleanup-buffer)
 
 ;; Fix ibuffer to use ido-find-file
 (require 'ibuffer)
@@ -654,8 +771,8 @@
 ;;バッファを3分割しても4分割しても編集したいバッファだけ黄金比にしてくれる
 
 (use-package golden-ratio
-:ensure t
-:config (golden-ratio-mode 1))
+  :ensure t
+  :config (golden-ratio-mode 1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; https://projectile.readthedocs.io/en/latest/
@@ -670,7 +787,15 @@
             (add-to-list 'projectile-globally-ignored-directories "vendor")
             (add-to-list 'projectile-globally-ignored-directories "node_modules")
             (add-to-list 'projectile-globally-ignored-directories "venv")
+	    (add-to-list 'projectile-globally-ignored-directories "lib")
+	    (add-to-list 'projectile-globally-ignored-directories "xs")
+	    (add-to-list 'projectile-globally-ignored-directories "t")
+            (add-to-list 'projectile-globally-ignored-directories "daiku")
             (add-to-list 'projectile-globally-ignored-file-suffixes ".d")
+	    (add-to-list 'projectile-globally-ignored-file-suffixes ".t")
+	    (add-to-list 'projectile-globally-ignored-file-suffixes ".pl")
+	    (add-to-list 'projectile-globally-ignored-file-suffixes ".pm")
+            (add-to-list 'projectile-globally-ignored-file-suffixes ".el")
             (add-to-list 'projectile-globally-ignored-file-suffixes ".map")
             (add-to-list 'projectile-globally-ignored-file-suffixes ".min.css")
             (add-to-list 'projectile-globally-ignored-file-suffixes ".min.js")
@@ -678,7 +803,6 @@
             (add-to-list 'projectile-globally-ignored-files "ansible.log")
             (add-to-list 'projectile-globally-ignored-files "urlconf.php")
             (projectile-mode 1)))
-
 
 (use-package diff-hl :ensure t
   :config (global-diff-hl-mode 1))
@@ -710,9 +834,9 @@
   (global-set-key (kbd "C-M-;") 'avy-goto-char-timer)
   )
 
-;; (use-package s)
+ (use-package s :ensure t)
 
-;; (use-package systemd)
+ (use-package systemd :ensure t)
 
 (use-package undo-tree :ensure t
   :config (global-undo-tree-mode 1))
@@ -772,7 +896,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; ;
-;; (setq user-mail-address "me@****.com"
+;; (setq user-mail-address "me@######.com"
 ;;       user-full-name "me")
 
 ;(setq smtpmail-smtp-server "smtp.somewhere.jp.com")
