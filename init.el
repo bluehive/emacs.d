@@ -1,3 +1,4 @@
+-*- coding: utf-8; -*-
 ;;; init.el --- Emacs initialization file -*- lical-binding: t -*-
 
 ;; thankyou :: Jon Dufresne <jon@jondufresne.org>
@@ -120,6 +121,9 @@
 ;;;;; 形式的宣言
 (use-package use-package :no-require t :ensure t :defer t)
 
+;;We can control the amount of output use-package generates by setting use-package-verbose to true.
+(setq use-package-verbose t)
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ language - coding system                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -128,42 +132,19 @@
 ;; @ character code (文字コード)
 ;; Setenv
 (set-language-environment "Japanese")
-;; (when (equal system-type 'windows-nt)
-;;         (prefer-coding-system 'shift_jis)
-;;         (set-default-coding-systems 'shift_jis)
-;;         (setq file-name-coding-system 'shift_jis)
-;;         (setq default-file-name-coding-system 'shift_jis)
-;;         (setq locale-coding-system 'shift_jis))
-
 
 ;; (when (equal system-type 'ns)
 ;;   (require 'ucs-normalize)
-;;   (prefer-coding-system 'utf-8-hfs)
-;;   (setq file-name-coding-system 'utf-8-hfs)
-;;   (setq locale-coding-system 'utf-8-hfs)
+;;   (prefer-coding-system 'utf-8)
+;;   (setq file-name-coding-system 'utf-8)
+;;   (setq locale-coding-system 'utf-8)
 ;; 					;         (prefer-coding-system 'shift_jis)
-;;   (set-default-coding-systems 'utf-8-hfs)
+;;   (set-default-coding-systems 'utf-8)
 ;; 					;         (setq file-name-coding-system 'shift_jis) (setq
 ;; 					;         default-file-name-coding-system 'shift_jis)
 ;;   (setq default-process-coding-system '(utf-8-hfs . cp932)) ;agで日本語検索させるためのおまじない
 ;;   )
 
-
-;;;;;;;;;
-;; 日本語環境 windows
-;; https://qiita.com/ignorant/items/76e4c162cedc47336e75#%E5%85%B1%E9%80%9A%E3%81%AE%E8%A8%AD%E5%AE%9A
-;; https://extra-vision.blogspot.jp/2016/01/ntemacs-ag-silver-searcher.html
-;;;;;;;;;
-
-;; (when (equal system-type 'ns)
-;;   (require 'ucs-normalize)
-;;   (set-language-environment "Japanese")
-;;   (prefer-coding-system 'utf-8-dos)
-;;   (set-file-name-coding-system 'cp932)
-;;   (set-keyboard-coding-system 'cp932)
-;;   (set-terminal-coding-system 'cp932)
-;;   (setq default-process-coding-system '(utf-8-dos . cp932)) ;agで日本語検索させるためのおまじない
-;; )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -346,53 +327,18 @@
 
 ;; MSYS2 のコマンドを使えるようにする.
 ;[url=https://www.emacswiki.org/emacs/GrepMode#toc5][Home] Grep Mode[/url]
-
+; etag.exe ctag.exe path
 (when (equal system-type 'windows-nt)
   (setenv "PATH"
           (concat
 	   ;; 下記の行に MSYS2 のコマンドの実行可能ファイルがある場所を設定してください. スラッシュが2つ連続することに注意！
            "C:\\strawberry\\perl\\bin;"
            "C:\\tools\\msys64\\usr\\bin;"
-           "C:\\Users\\bluehive\\AppData\\Roaming\\.emacs.d\\elpa\\anything-20161127.2357;"
-           (getenv "PATH")))
+           "C:\\Users\\****e\\AppData\\Roaming\\.emacs.d\\elpa\\anything-20161127.2357;"
+	   "C:\\Users\\****e\\emacs-25.2-IME-patched\\emacs-25.2\\bin;"  
+	   (getenv "PATH")))
 )
 
-;;日本語grep対策　
-(when (equal system-type 'windows-nt)
-  (setq
-   find-program "C:\\tools\\msys64\\usr\\bin\\find.exe"
-;;   grep-program "C:\\tools\\msys64\\usr\\bin\\grep.exe"
-      grep-program "C:\\tools\\msys64\\usr\\bin\\rg.exe")
-)
-
-;; 重要　gitなどパスを通す　Windows
-(setq exec-path (cons "C:\\tools\\msys64\\usr\\bin" exec-path))
-
-;; Ag.el
-;; https://agel.readthedocs.io/en/latest/installation.html#emacs
-;; Afterwards, you can install ag.el from MELPA (the recommended approach).
-;;:: Functions are autoloaded, so (require 'ag) is unnecessary.
-;; silver_searcher https://github.com/ggreer/the_silver_searcher\
-; ag
-;(require 'ag)
-;(setq ag-highlight-search nil)  ; 検索キーワードをハイライト
-;(setq ag-reuse-buffers nil)     ; 検索用バッファを使い回す (検索ごとに新バッファを作らない)
-
-;; ; wgrep
-;; (add-hook 'ag-mode-hook '(lambda ()
-;;                            (require 'wgrep-ag)
-;;                            (setq wgrep-auto-save-buffer t)  ; 編集完了と同時に保存
-;;                            (setq wgrep-enable-key "r")      ; "r" キーで編集モードに
-;;                            (wgrep-ag-setup)))
-
-
-;;;;ripgrep.el
-;;;;[url=http://emacs.rubikitch.com/ripgrep/]ripgrep.el :
-;;;【agより、ずっとはやい!!】超音速grepとEmacsインターフェース(Windows安心)[/url]
-;;; rgバイナリの位置
- (setq ripgrep-executable  "C:\\tools\\msys64\\usr\\bin\\rg")
-;;; rgに渡すオプション
- (setq ripgrep-arguments '("-S"))
 
 ;;; @ language - fontset                                            ;;;
 ;; ;; デフォルト フォント
@@ -476,7 +422,7 @@
 
  '(org-agenda-files
    (quote
-    ("c:/Users/bluehive/Dropbox/org/pc2-todo.org" "~/org/todo.org")))
+    ("c:/Users/****e/Dropbox/organized/pc2-todo.org" "~/org/todo.org")))
  '(org-capture-templates
    (quote
     (("t" "New TODO" entry
@@ -523,8 +469,17 @@
 
 ;;; 最近使ったファイルをメニューに表示
 (recentf-mode 1)
-(setq recentf-max-menu-items 10)
-(setq recentf-max-saved-items 10)
+(setq recentf-max-menu-items 20)
+
+;; 最近のファイル500個を保存する
+(setq recentf-max-saved-items 500)
+
+(use-package recentf
+  :config
+  ;; 最近使ったファイルに加えないファイルを正規表現で指定する
+  (setq recentf-exclude '("/TAGS$" "/var/tmp/"))
+  )
+(use-package recentf-ext :ensure t)    ;; recentf-ext 自体はこの１行でOK
 
 
 ;; コマンド（org-store-link, org-capture, org-agenda, org-iswitchb）、グローバルキーを割り当
@@ -542,6 +497,67 @@
  ;; If there is more than one, they won't work right.
  '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
 
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; dired edit                                                    ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+
+; https://www.emacswiki.org/emacs/DiredPlus
+;; (use-package dired+
+;;   :ensure t
+;;   :init
+;;   ;; diredを2つのウィンドウで開いている時に、デフォルトの移動orコピー先をもう一方のdiredで開いているディレクトリにする
+;;   (setq dired-dwim-target t)
+;; ; (diredp-hide-details-initially-flag nil)
+;;   :config (require 'dired+)
+;;   ;; .zipで終わるファイルをZキーで展開できるように
+;;   (add-to-list 'dired-compress-file-suffixes '("\\.zip\\'" ".zip" "unzip"))
+;;   )
+
+;; dired-hacks
+;; https://qiita.com/ballforest/items/0ddbdfeaa9749647b488
+(use-package dash
+; this lib need to dired-hacks 
+  :ensure t
+  )
+
+;; / n 	名前でフィルタリング (dired-filter-by-name)
+;; / r 	正規表現でフィルタリング (dired-filter-by-regexp)
+;; / . 	拡張子でフィルタリング (dired-filter-by-extension)
+;; / h 	ドットで始まるファイルを隠す (dired-filter-by-dot-files)
+;; / f 	ファイルだけ表示 (dired-filter-by-file)
+;; / d 	ディレクトリだけ表示 (dired-filter-by-directory)
+(use-package dired-filter
+  :ensure t
+  :config
+  )
+
+; 
+;diredデフォルトではiを押すことでサブディレクトリを展開するが，
+;別ディレクトリとしてdiredバッファの下側に中身が表示される．
+(use-package dired-subtree
+  :ensure t
+  :config
+  )
+
+(use-package dired-open
+  :ensure t
+  :config
+  )
+
+;; diredを2つのウィンドウで開いている時に、デフォルトの移動orコピー先をもう一方のdiredで開いているディレクトリにする
+(setq dired-dwim-target t)
+;; ディレクトリを再帰的にコピーする
+(setq dired-recursive-copies 'always)
+;; diredバッファでC-sした時にファイル名だけにマッチするように
+(setq dired-isearch-filenames t)
+  ;; .zipで終わるファイルをZキーで展開できるように
+ (add-to-list 'dired-compress-file-suffixes '("\\.zip\\'" ".zip" "unzip"))
+
+; Use dired-jump, which is bound to C-x C-j by default to show the current file in a dired buffer. 
+(require 'dired-x)
+
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ rubikichi                                                     ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -549,14 +565,6 @@
 ;;;== List2:C-x C-bを置き換える
 ;;(global-set-key (kbd "C-x C-b") 'bs-show)
 
-;;;== List5:recentfの設定
-;; 最近のファイル500個を保存する
-(setq recentf-max-saved-items 500)
-;; 最近使ったファイルに加えないファイルを
-;; 正規表現で指定する
-(setq recentf-exclude
-      '("/TAGS$" "/var/tmp/"))
-;;(require 'recentf-ext)
 
 ;; eww google
 (setq eww-search-prefix "http://www.google.co.jp/search?q=")
@@ -624,6 +632,9 @@
 ;;; ~/info/以下をinfoファイル検索ディレクトリに加える
 (add-to-list 'Info-directory-list "~/info/")
 
+;; Emacs M-x toggle-truncate-lines: 長い行の折り返し表示を切り換える
+(global-set-key (kbd "C-c t") 'toggle-truncate-lines)
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ LogFile                                                       ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -663,14 +674,17 @@
  '(cperl-indent-parens-as-block t)
  '(cperl-indent-subs-specially nil)
  '(custom-enabled-themes (quote (tango-dark)))
+ '(custom-safe-themes
+   (quote
+    ("966bcad960f896669dfc21a7a37a748fa" "c74ec5b1f02c917e3dbb454fca931223" "a27c009ede09a8b90c6955ae6a390eb1c1e" default)))
  '(desktop-save-mode t)
  '(org-agenda-files
    (quote
-    ("c:/Users/bluehive/Dropbox/org/pc2-todo.org" "~/org/todo.org")))
+    ("c:/Users/******e/Dropbox/organized/pc2-todo.org" "~/org/todo.org")))
  '(org-babel-load-languages (quote ((emacs-lisp . t) (awk . t) (perl . t) (shell . t))))
  '(package-selected-packages
    (quote
-    (systemd ag aggressive-indent pcre2el projectile golden-ratio magit-gh-pulls magit yasnippet yaml-mode web-mode use-package ripgrep rg recentf-ext rainbow-mode pony-mode pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets open-junk-file lispxmp grep-a-lot flx-ido exec-path-from-shell evil dired-quick-sort dired+ diff-hl dash-functional browse-at-remote auto-async-byte-compile apache-mode anything adaptive-wrap ace-window)))
+    (smart-mode-line dired-open dired-subtree dired-filter systemd ag aggressive-indent pcre2el projectile golden-ratio magit-gh-pulls magit yasnippet yaml-mode web-mode use-package ripgrep rg recentf-ext rainbow-mode pony-mode pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets open-junk-file lispxmp grep-a-lot flx-ido exec-path-from-shell evil dired+ dash-functional browse-at-remote auto-async-byte-compile apache-mode anything adaptive-wrap ace-window)))
  '(safe-local-variable-values (quote ((lical-binding . t)))))
 
  ;;load cperl, then work around indent issue
@@ -692,7 +706,7 @@
   (exec-path-from-shell-initialize)
   exec-path	(split-string (getenv "PATH") ":")
 
-					; /home/kato/	.	plenv/versions/5.27.2/bin
+					; /home//	.	plenv/versions/5.27.2/bin
   (let ((path exec-path))
     (format "  exec-path: %s\n" exec-path))
   ;;exec-path-from-shell.el
@@ -712,32 +726,105 @@
 ;; C-c / /
 ;;     rxt-explain 正規表現を解説
 
+
 ;;; regexp perl
 (require 'pcre2el)
 (add-hook 'prog-mode-hook 'rxt-mode)
 (setq reb-re-syntax 'pcre)
 
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; 日本語grep対策　
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+
+(when (equal system-type 'windows-nt)
+  (setq
+   find-program "C:\\tools\\msys64\\usr\\bin\\find.exe"
+;;   grep-program "C:\\tools\\msys64\\usr\\bin\\grep.exe"
+      grep-program "C:\\tools\\msys64\\usr\\bin\\rg.exe")
+)
+
+;; 重要　gitなどパスを通す　Windows
+(setq exec-path (cons "C:\\tools\\msys64\\usr\\bin" exec-path))
+
+;; Ag.el
+;; https://agel.readthedocs.io/en/latest/installation.html#emacs
+;; Afterwards, you can install ag.el from MELPA (the recommended approach).
+;;:: Functions are autoloaded, so (require 'ag) is unnecessary.
+;; silver_searcher https://github.com/ggreer/the_silver_searcher\
+; ag
+;(require 'ag)
+;(setq ag-highlight-search nil)  ; 検索キーワードをハイライト
+;(setq ag-reuse-buffers nil)     ; 検索用バッファを使い回す (検索ごとに新バッファを作らない)
+
+;; ; wgrep
+;; (add-hook 'ag-mode-hook '(lambda ()
+;;                            (require 'wgrep-ag)
+;;                            (setq wgrep-auto-save-buffer t)  ; 編集完了と同時に保存
+;;                            (setq wgrep-enable-key "r")      ; "r" キーで編集モードに
+;;                            (wgrep-ag-setup)))
+
+
+;;;;ripgrep.el
+;;;;[url=http://emacs.rubikitch.com/ripgrep/]ripgrep.el :
+;;;【agより、ずっとはやい!!】超音速grepとEmacsインターフェース(Windows安心)[/url]
+;;; rgバイナリの位置
+ (setq ripgrep-executable  "C:\\tools\\msys64\\usr\\bin\\rg")
+;;; rgに渡すオプション
+ (setq ripgrep-arguments '("-S"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 日本語環境 windows grep対策
+;; https://qiita.com/ignorant/items/76e4c162cedc47336e75#%E5%85%B1%E9%80%9A%E3%81%AE%E8%A8%AD%E5%AE%9A
+;; https://extra-vision.blogspot.jp/2016/01/ntemacs-ag-silver-searcher.html
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when (equal system-type 'ns)
+ ; (require 'ucs-normalize)
+ ; (set-language-environment "Japanese")
+ ; (prefer-coding-system 'utf-8-unix)
+ ; (set-file-name-coding-system 'cp932)
+  (set-keyboard-coding-system 'cp932)
+  (set-terminal-coding-system 'cp932)
+;  (setq default-process-coding-system '(utf-8-unix . cp932)) ;agで日本語検索させるためのおまじないだが効果なし
+  )
+
+;; 重要
+;;Emacs でファイルの文字コードを変換するときの覚書Add Stargito2morygonzalez
+;; 基本
+;; 以下の2つを覚えておけばまず大丈夫。
+;;     文字化けしてるとき (UTF-8 のファイルなのに SJIS で開いちゃったとき)
+;;         「C-x RET r utf-8」
+;;     文字化けしてないとき (SJIS のファイルを UTF-8 で保存したいとき)
+;;         「C-x RET f utf-8」
+
+;; "-*-"（ハイフンとアスタリスクとハイフン）という文字列で囲んで、文字コードを指定することができます。 （emacsのマニュアルであればspecify codingの章に記載があります。）
+;; 以下のような文字列をファイルの先頭に記載しておくことで、 文字化けを防ぐことが出来ます。
+;; -*- coding: utf-8 -*-
+;; http://emacs.clickyourstyle.com/articles/299
+
+;; todo:: ripgrepで日本語検索可能だが、ファイル文字コードがshit-jisだと読まれない
+;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; Basic config;;; @
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
 ;; Global minor modes
-(setq column-number-mode t)
-(show-paren-mode 1)
-(delete-selection-mode 1)
-(global-linum-mode 1)
-(global-subword-mode 1)
-(setq comment-auto-fill-only-comments t)
+;(setq column-number-mode t)
+(delete-selection-mode 1) ;テキスト入力するとモードが取り消されるらしい
+(global-linum-mode 1) ; 行番号の表示
+;(global-subword-mode 1)
+;(setq comment-auto-fill-only-comments t)
 ;(add-hook 'text-mode-hook #'turn-on-flyspell)
 ;(add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
-;; Auto revert mode
+;; Auto revert mode バッファの自動再読み込み　必要
 (require 'autorevert)
 (setq global-auto-revert-non-file-buffers t)
 (setq auto-revert-verbose nil)
 (global-auto-revert-mode 1)
 
-;; Save place mode
+;; Save place mode 同じファイルにアクセスしたときの最後の場所にポイントが移動します。
 (require 'saveplace)
 (setq-default save-place t)
 (savehist-mode 1)
@@ -782,11 +869,6 @@
   :ensure t
   :config (progn
             (add-to-list 'projectile-globally-ignored-directories "_build")
-            (add-to-list 'projectile-globally-ignored-directories "bower_components")
-            (add-to-list 'projectile-globally-ignored-directories "legacy/vendor")
-            (add-to-list 'projectile-globally-ignored-directories "vendor")
-            (add-to-list 'projectile-globally-ignored-directories "node_modules")
-            (add-to-list 'projectile-globally-ignored-directories "venv")
 	    (add-to-list 'projectile-globally-ignored-directories "lib")
 	    (add-to-list 'projectile-globally-ignored-directories "xs")
 	    (add-to-list 'projectile-globally-ignored-directories "t")
@@ -797,17 +879,16 @@
 	    (add-to-list 'projectile-globally-ignored-file-suffixes ".pm")
             (add-to-list 'projectile-globally-ignored-file-suffixes ".el")
             (add-to-list 'projectile-globally-ignored-file-suffixes ".map")
-            (add-to-list 'projectile-globally-ignored-file-suffixes ".min.css")
-            (add-to-list 'projectile-globally-ignored-file-suffixes ".min.js")
             (add-to-list 'projectile-globally-ignored-file-suffixes ".svg")
             (add-to-list 'projectile-globally-ignored-files "ansible.log")
             (add-to-list 'projectile-globally-ignored-files "urlconf.php")
             (projectile-mode 1)))
 
-(use-package diff-hl :ensure t
-  :config (global-diff-hl-mode 1))
+;; (use-package diff-hl :ensure t
+;;   :config (global-diff-hl-mode 1))
 
 (use-package flx-ido
+;idoのあいまいマッチを改善する
   :ensure t
   :init (setq ido-auto-merge-work-directories-length -1
               ido-create-new-buffer 'never
@@ -871,10 +952,6 @@
      ((t (:inherit ace-jump-face-foreground :height 3.0)))))
   ))
 
-(use-package dired+
-  :ensure t
-  :config (require 'dired+)
-  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;; Writing Mail  via emacswiki ;;
@@ -896,7 +973,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; ;
-;; (setq user-mail-address "me@######.com"
+;; (setq user-mail-address "me@japan***.com"
 ;;       user-full-name "me")
 
 ;(setq smtpmail-smtp-server "smtp.somewhere.jp.com")
@@ -907,14 +984,28 @@
 (setq message-default-mail-headers "Cc: \nBcc:\n")
 (setq message-auto-save-directory "~/Mail/drafts")
 
-(use-package dired-quick-sort
-  :ensure t
-  :config
- ; (dired-quick-sort-setup)
-  )
 
 ;; Additional extensions.
 ;;(require 'myproject)
+
+
+
+;;;  
+;; You don't need to unset a key before you rebind it to something else. This should do what you want:
+
+;; ;; create a new prefix map
+;; (define-prefix-command 'my-keymap)
+;; ;; bind the new keymap to C-e 
+;; (global-set-key "\C-e" my-keymap)
+;; ;; bind the individual commands:
+;; (define-key my-keymap "e" 'move-end-of-line)
+;; (define-key my-keymap "r" 'end-of-buffer)
+
+;; Now hitting C-e is a prefix, and C-e e calls end-of-line etc.
+
+;; unset key 
+(global-unset-key (kbd "C-z"))
+(global-unset-key (kbd "C-x C-c"))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ yasnippet
@@ -967,38 +1058,6 @@
 ;; - master :: デフォルトのブランチ名
 ;; M-x magit-status (.git がなければ git init をすることが可能)
 ;; C-u で、ファイル名入力などが可能。
-;; | コマンド | gitコマンド・その他             |                                                                               |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | -status  | git init, git status            |                                                                               |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | 1,2,3,4  | 表示レベル                      |                                                                               |
-;; | M-1,2,.. | 全ファイルで対象                |                                                                               |
-;; | M-H      | 全て隠す                        |                                                                               |
-;; | TAB      | ファイルのdiff表示              |                                                                               |
-;; | S-TAB    | diffレベルの切り替え            |                                                                               |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | s        | git add <file>                  | ステージング                                                                  |
-;; | C-u S    | git add .                       | 全ステージの登録                                                              |
-;; | u        | git -- reset <file>             | アンステージング                                                              |
-;; | i        | .gitignore へ追加（無視）       |                                                                               |
-;; | C-- i    | .gitignore へワイルドカード追加 |                                                                               |
-;; | I        | .git/info/exclude へ追加        |                                                                               |
-;; | k        | rm / git rm <file>              |                                                                               |
-;; |          | git mv <file>                   |                                                                               |
-;; | c        | git commit <file>               |                                                                               |
-;; | C        | git commit <file> / changelog   |                                                                               |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | l        | git log                         | l (short) L (Long) f (File log) rl (ranged short)  rL (long)                  |
-;; |          | Reflogs                         | h (Head Reflog)                                                               |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-;; | v        | Show Commit                     |                                                                               |
-;; |----------+---------------------------------+-------------------------------------------------------------------------------|
-
-;; - git remote add origin https://github.com/kawabata/hoge.git ..
-;;  "origin" という名前で "http://.../" をアップストリームリポジトリに
-;;   追加
-;; - git push -u origin master
-;;;;; その他
 ;; - タグの追加とPush
 ;;   + t <tag_name>
 ;;   + P t <tag_name>
@@ -1007,29 +1066,31 @@
   :ensure t
   :bind (("M-g s" . magit-status)
          ("M-g b" . magit-blame-mode))
-  :config
-  (set-variable 'magit-process-find-password-functions
-                '(magit-process-password-auth-source))
+;  :config
+;
+  ;; (set-variable 'magit-process-find-password-functions
+  ;;               '(magit-process-password-auth-source))
   )
 
-;; (use-package magit-gh-pulls
-;;   :no-require t
-;;   :ensure t
-;;   :config
+;smart-mode-lineは，特にMode Line用に色々とlispを書かずともいい感じにMode Lineを見やすく&使いやすくしてくれるpackageです！
 
-;;   (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls)
-;;  )
+(use-package smart-mode-line
+					; :no-require t
+  :ensure t
+  :init
+  )
+(require 'smart-mode-line)
+(defvar sml/no-confirm-load-theme t )
+  (defvar sml/shorten-directory -1) ;; directory pathはフルで表示されたいので
+
+;;; これを入れないとsmart-mode-lineを読み込むたびに
+;;; Loading a theme can run Lisp code.  Really load? (y or n)
+;;; と聞いてくる。
+(setq sml/no-confirm-load-theme t)
+(sml/setup)
+(sml/apply-theme 'respectful)
+;;; その他のthemeを設定
+(sml/apply-theme 'dark)
+ 
 
 
-;; (use-package browse-at-remote
-;;   :no-require t
-;;   :ensure t
-;;   :bind (("C-c g g" . browse-at-remote))
-;;  )
-
-;; (use-package magithub
-;; :no-require t
-;;; :after magit
-;;   :ensure t
-;;   :config (magithub-feature-autoinject t)
-;;  )
