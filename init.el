@@ -1,4 +1,3 @@
--*- coding: utf-8; -*-
 ;;; init.el --- Emacs initialization file -*- lical-binding: t -*-
 
 ;; thankyou :: Jon Dufresne <jon@jondufresne.org>
@@ -170,118 +169,161 @@
 (defvar ldd-cache nil)
 
 ;; filename が cygwin のプログラムかどうか判定する
-(defun cygwin-program-p (filename)
-  (let ((target (and filename (executable-find filename))))
-    (when target
-      (cdr (or (assoc target ldd-cache)
-               (car (push (cons target
-                                (with-temp-buffer
-                                  (let ((w32-quote-process-args nil)) ; advice 中で再帰しないよう nil
-                                    ;; cygwin のライブラリをロードしているか判定
-                                    (when (eq (call-process "ldd" nil t nil (concat "\"" target "\"")) 0)
-                                      (goto-char (point-min))
-                                      (number-or-marker-p
-                                       (re-search-forward "cygwin[0-9]+\.dll" nil t))))))
-                          ldd-cache)))))))
+;; (defun cygwin-program-p (filename)
+;;   (let ((target (and filename (executable-find filename))))
+;;     (when target
+;;       (cdr (or (assoc target ldd-cache)
+;;                (car (push (cons target
+;;                                 (with-temp-buffer
+;;                                   (let ((w32-quote-process-args nil)) ; advice 中で再帰しないよう nil
+;;                                     ;; cygwin のライブラリをロードしているか判定
+;;                                     (when (eq (call-process "ldd" nil t nil (concat "\"" target "\"")) 0)
+;;                                       (goto-char (point-min))
+;;                                       (number-or-marker-p
+;;                                        (re-search-forward "cygwin[0-9]+\.dll" nil t))))))
+;;                           ldd-cache)))))))
 
-;; サブプロセスに渡すパラメータに SJIS のダメ文字対策を行い、さらに文字コードを cp932 にする
-(defun convert-process-args (orig-fun prog-pos args-pos args)
-  (let ((cygwin-quote (and w32-quote-process-args ; cygwin-program-p の再帰防止
-                           (cygwin-program-p (nth prog-pos args)))))
-    (setf (nthcdr args-pos args)
-          (mapcar (lambda (arg)
-                    (when w32-quote-process-args
-                      (setq arg
-                            (concat "\""
-                                    (if cygwin-quote
-                                        (replace-regexp-in-string "[\"\\\\]"
-                                                                  "\\\\\\&"
-                                                                  arg)
-                                      (replace-regexp-in-string "\\(\\(\\\\\\)*\\)\\(\"\\)"
-                                                                "\\1\\1\\\\\\3"
-                                                                arg))
-                                    "\"")))
-                    (if (multibyte-string-p arg)
-                        (encode-coding-string arg 'cp932)
-                      arg))
-                  (nthcdr args-pos args))))
+;; ;; サブプロセスに渡すパラメータに SJIS のダメ文字対策を行い、さらに文字コードを cp932 にする
+;; (defun convert-process-args (orig-fun prog-pos args-pos args)
+;;   (let ((cygwin-quote (and w32-quote-process-args ; cygwin-program-p の再帰防止
+;;                            (cygwin-program-p (nth prog-pos args)))))
+;;     (setf (nthcdr args-pos args)
+;;           (mapcar (lambda (arg)
+;;                     (when w32-quote-process-args
+;;                       (setq arg
+;;                             (concat "\""
+;;                                     (if cygwin-quote
+;;                                         (replace-regexp-in-string "[\"\\\\]"
+;;                                                                   "\\\\\\&"
+;;                                                                   arg)
+;;                                       (replace-regexp-in-string "\\(\\(\\\\\\)*\\)\\(\"\\)"
+;;                                                                 "\\1\\1\\\\\\3"
+;;                                                                 arg))
+;;                                     "\"")))
+;;                     (if (multibyte-string-p arg)
+;;                         (encode-coding-string arg 'cp932)
+;;                       arg))
+;;                   (nthcdr args-pos args))))
 
-  (let ((w32-quote-process-args nil))
-    (apply orig-fun args)))
+;;   (let ((w32-quote-process-args nil))
+;;     (apply orig-fun args)))
 
-(cl-loop for (func prog-pos args-pos) in '((call-process        0 4)
-                                           (call-process-region 2 6)
-                                           (start-process       2 3))
-         do (eval `(advice-add ',func
-                               :around (lambda (orig-fun &rest args)
-                                         (convert-process-args orig-fun
-                                                               ,prog-pos ,args-pos
-                                                               args))
-                               '((depth . 99)))))
+;; (cl-loop for (func prog-pos args-pos) in '((call-process        0 4)
+;;                                            (call-process-region 2 6)
+;;                                            (start-process       2 3))
+;;          do (eval `(advice-add ',func
+;;                                :around (lambda (orig-fun &rest args)
+;;                                          (convert-process-args orig-fun
+;;                                                                ,prog-pos ,args-pos
+;;                                                                args))
+;;                                '((depth . 99)))))
 
 ;; end of 日本語文字コード　設定
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ helm                                                          ;;;
+;;; https://qiita.com/jabberwocky0139/items/86df1d3108e147c69e2c#%E3%82%AB%E3%83%BC%E3%82%BD%E3%83%AB%E4%BB%98%E8%BF%91%E3%81%AE%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+
+
+(use-package helm
+  :defer t
+  :ensure t)
+
+(require 'helm)
+(require 'helm-config)
+
+(global-set-key (kbd "C-x b") 'helm-mini)
+;あいまい一致を有効にするには以下を追加しましょう:
+(setq helm-buffers-fuzzy-matching t
+      helm-recentf-fuzzy-match    t)
+
+;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
+;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
+;; cannot change `helm-command-prefix-key' once `helm-config' is loaded.
+(global-set-key (kbd "C-c h") 'helm-command-prefix)
+(global-unset-key (kbd "C-x c"))
+
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
+(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+
+(when (executable-find "curl")
+  (setq helm-google-suggest-use-curl-p t))
+
+(setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+      helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+      helm-ff-file-name-history-use-recentf t
+      helm-echo-input-in-header-line t)
+
+(defun spacemacs//helm-hide-minibuffer-maybe ()
+  "Hide minibuffer in Helm session if we use the header line as input field."
+  (when (with-helm-buffer helm-echo-input-in-header-line)
+    (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
+      (overlay-put ov 'window (selected-window))
+      (overlay-put ov 'face
+                   (let ((bg-color (face-background 'default nil)))
+                     `(:background ,bg-color :foreground ,bg-color)))
+      (setq-local cursor-type nil))))
+
+
+(add-hook 'helm-minibuffer-set-up-hook
+          'spacemacs//helm-hide-minibuffer-maybe)
+
+(setq helm-autoresize-max-height 0)
+(setq helm-autoresize-min-height 20)
+(helm-autoresize-mode 1)
+
+(helm-mode 1)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ anything                                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
-(use-package anything
-					;  :no-require t
-  :defer t :ensure t)
-(require 'anything-config)
-(setq anything-enable-shortcuts 'prefix)
-(define-key anything-map (kbd "@") 'anything-select-with-prefix-shortcut)
-(global-set-key (kbd "C-x b") 'anything-mini)
+;; (use-package anything
+;;   :defer t
+;;   :ensure t)
+;; (require 'anything-config)
+;; (setq anything-enable-shortcuts 'prefix)
+;; (define-key anything-map (kbd "@") 'anything-select-with-prefix-shortcut)
+;; (global-set-key (kbd "C-x b") 'anything-mini)
 
-;;
-(defun my-anything ()
-  (interactive)
-  (anything-other-buffer
-   '( ;anything-c-source-buffers
-     anything-c-source-file-name-history
-     anything-c-source-info-pages
-     anything-c-source-info-elisp
-     anything-c-source-man-pages
-     anything-c-source-locate
-     anything-c-source-emacs-commands)
-   " *my-anything*"))
-
-
-;; Then type M-x my-anything to use sources.
-;;
-;; Defining own command is better than setup `anything-sources'
-;; directly, because you can define multiple anything commands with
-;; different sources. Each anything command should have own anything
-;; buffer, because M-x anything-resume revives anything command.
+;; ;;
+;; (defun my-anything ()
+;;   (interactive)
+;;   (anything-other-buffer
+;;    '( ;anything-c-source-buffers
+;;      anything-c-source-file-name-history
+;;      anything-c-source-info-pages
+;;      anything-c-source-info-elisp
+;;      anything-c-source-man-pages
+;;      anything-c-source-locate
+;;      anything-c-source-emacs-commands)
+;;    " *my-anything*"))
 
 
-(global-set-key (kbd "C-:") 'my-anything)
+;; ;; Then type M-x my-anything to use sources.
+;; ;;
+;; ;; Defining own command is better than setup `anything-sources'
+;; ;; directly, because you can define multiple anything commands with
+;; ;; different sources. Each anything command should have own anything
+;; ;; buffer, because M-x anything-resume revives anything command.
 
-;; ;少し複雑な設定例として
-;; 1. 場所elinitは~/.emacs.d/のみ
-;;    - ~/.emacs.d/以下でrgを動かす
-;; 2. 場所melmagは~/memo/emacs-melmag/のみ
-;;    - ~/memo/emacs-melmag/以下でrgを動かす
-;; 3. 場所memoは~/sync/think/と~/memo/
-;;    - andgrepスクリプトを2つのディレクトリで動かす
 
-;; ;================================================================
-;; (setq anything-grep-alist
-;;       '(("elinit"
-;;          ("rg -n --colors match:fg:red --smart-case --no-heading -g '*.el' %s" "~/.emacs.d/"))
-;;         ("drorg"
-;; ;         ("rg -n --colors match:fg:red --smart-case --no-heading -g '*.org' %s" "/c/Users/bluehive/Dropbox/org/")
-;; 	 )
-;;         ("junk"
-;;          ("ruby ~/.emacs.d/bin/andgrep --with-title %s" "~/junk/2017/")
-;;          ("ruby ~/.emacs.d/bin/andgrep --with-title %s" "~/junk/2017/08/"))))
-;; ;================================================================
-;; ;設定が終わったら
-;; ;M-x anything-grep-by-nameを実行します。
-;; ;するとクエリと場所を聞かれるのでそれぞれ入力します。
+;; (global-set-key (kbd "C-:") 'my-anything)
+
+;; ;; ;少し複雑な設定例として
+;; ;; 1. 場所elinitは~/.emacs.d/のみ
+;; ;;    - ~/.emacs.d/以下でrgを動かす
+;; ;; 2. 場所melmagは~/memo/emacs-melmag/のみ
+;; ;;    - ~/memo/emacs-melmag/以下でrgを動かす
+;; ;; 3. 場所memoは~/sync/think/と~/memo/
+;; ;;    - andgrepスクリプトを2つのディレクトリで動かす
+
 
 ;;;;;; http://emacs.rubikitch.com/global-hl-line-mode-timer/
 ;; 遅い場合は以下
@@ -316,90 +358,6 @@
  ;; 1 画面スクロール時にカーソルの画面上の位置をなるべく変えない
  (setq scroll-preserve-screen-position t)
 
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ windows                                                     ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-
-;;;; setup-cygwin
-;; Windows用のシンボリックリンクの設定など
-(when (equal system-type 'windows-nt)
-  (require 'setup-cygwin nil :no-error))
-
-;; MSYS2 のコマンドを使えるようにする.
-;[url=https://www.emacswiki.org/emacs/GrepMode#toc5][Home] Grep Mode[/url]
-; etag.exe ctag.exe path
-(when (equal system-type 'windows-nt)
-  (setenv "PATH"
-          (concat
-	   ;; 下記の行に MSYS2 のコマンドの実行可能ファイルがある場所を設定してください. スラッシュが2つ連続することに注意！
-           "C:\\strawberry\\perl\\bin;"
-           "C:\\tools\\msys64\\usr\\bin;"
-           "C:\\Users\\****e\\AppData\\Roaming\\.emacs.d\\elpa\\anything-20161127.2357;"
-	   "C:\\Users\\****e\\emacs-25.2-IME-patched\\emacs-25.2\\bin;"  
-	   (getenv "PATH")))
-)
-
-
-;;; @ language - fontset                                            ;;;
-;; ;; デフォルト フォント
-(set-face-attribute 'default nil :family "Migu 1M" :height 110)
-;; (set-face-font 'default "Migu 1M-11:antialias=standard")
-
-;; ;; プロポーショナル フォント
-(set-face-attribute 'variable-pitch nil :family "Migu 1M" :height 110)
-;; (set-face-font 'variable-pitch "Migu 1M-11:antialias=standard")
-
-;; ;; 等幅フォント
-(set-face-attribute 'fixed-pitch nil :family "Migu 1M" :height 110)
-;; (set-face-font 'fixed-pitch "Migu 1M-11:antialias=standard")
-
-;; ;; ツールチップ表示フォント
-(set-face-attribute 'tooltip nil :family "Migu 1M" :height 90)
-;; (set-face-font 'tooltip "Migu 1M-9:antialias=standard")
-
-;; ;; ;; フォントサイズ リセット
-(global-set-key (kbd "M-0") '(lambda() (interactive) (text-scale-set 0)))
-
-
-;; ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; ;;;     IMEを有効にするには以下の設定が必要です                     ;;;
-;; ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; ;;; @ screen - minibuffer                                           ;;;
-;; ;; minibufferのアクティブ時、IMEを無効化
- (add-hook 'minibuffer-setup-hook
-           (lambda ()
-             (deactivate-input-method)))
- (wrap-function-to-control-ime 'y-or-n-p nil nil)
- (wrap-function-to-control-ime 'map-y-or-n-p nil nil)
- (wrap-function-to-control-ime 'read-char nil nil)
-
-
-(when (equal system-type 'windows-nt)
-;(set-language-environment "UTF-8") ;; UTF-8 でも問題ないので適宜コメントアウトしてください
-  (setq default-input-method "W32-IME")
-  (setq-default w32-ime-mode-line-state-indicator "[--]")
-  (setq w32-ime-mode-line-state-indicator-list '("[--]" "[あ]" "[--]"))
-  (w32-ime-initialize)
-  ;; 日本語入力時にカーソルの色を変える設定 (色は適宜変えてください)
-  (add-hook 'w32-ime-on-hook '(lambda () (set-cursor-color "coral4")))
-  (add-hook 'w32-ime-off-hook '(lambda () (set-cursor-color "black")))
-   ;; 全てバッファ内で日本語入力中に特定のコマンドを実行した際の日本語入力無効化処理です
-  ;; ミニバッファに移動した際は最初に日本語入力が無効な状態にする
-  (add-hook 'minibuffer-setup-hook 'deactivate-input-method)
-
-  ;; isearch に移行した際に日本語入力を無効にする
-  (add-hook 'isearch-mode-hook '(lambda ()
-                                  (deactivate-input-method)
-                                  (setq w32-ime-composition-window (minibuffer-window))))
-  (add-hook 'isearch-mode-end-hook '(lambda () (setq w32-ime-composition-window nil)))
-
-;; ;; テーマ格納ディレクトリのパス追加
-;;   (add-to-list 'custom-theme-load-path
-;; 	       (file-name-as-directory (concat user-emacs-directory "theme"))
-
-  )
-;
-;; )
 
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -419,22 +377,6 @@
 (setq uniquify-ignore-buffers-re "*[^*]+*")
 
 
-
- '(org-agenda-files
-   (quote
-    ("c:/Users/****e/Dropbox/organized/pc2-todo.org" "~/org/todo.org")))
- '(org-capture-templates
-   (quote
-    (("t" "New TODO" entry
-      (file+headline "~/org/todo.org" "予定")
-      "* TODO %?
-
-")
-     ("m" "Memo" entry
-      (file+headline "~/org/memo.org" "メモ")
-      "* %U%? memo
-%i
-%a"))))
  '(package-selected-packages
    (quote
     (exec-path-from-shell dired-quick-sort dired+ ace-window web-mode yaml-mode systemd projectile pony-mode pip-requirements grep-a-lot flycheck flx-ido diff-hl apache-mode auto-async-byte-compile paredit lispxmp open-junk-file ripgrep rg ht yasnippet rainbow-mode ## recentf-ext anything)))
@@ -559,6 +501,23 @@
 
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ ddskk rubikichi                                               ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+				;	==
+;; Windows 環境だと [noconvert]
+(setq skk-sticky-key [muhenkan])
+;==
+(require 'skk-hint)
+
+;;　muhenkanなどのキー名はどうやって取得するのかというと、 <f1> c を使います。その後に無変換キーを押せば「<muhenkan> is undefined」と出てきます。
+
+(when (require 'skk nil t)
+  (global-set-key (kbd "C-x j") 'skk-auto-fill-mode) ;;良い感じに改行を自動入力してくれる機能
+  (setq default-input-method "japanese-skk")         ;;emacs上での日本語入力にskkをつかう
+  (require 'skk-study))                              ;;変換学習機能の追加
+
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ rubikichi                                                     ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
@@ -592,12 +551,21 @@
 ;; C-x C-zで試行錯誤ファイルを開く
 (global-set-key (kbd "C-x C-z") 'open-junk-file)
 
-;; 式の評価結果を注釈するための設定
-(require 'lispxmp)
+;; ;; 式の評価結果を注釈するための設定
+(use-package lispxmp
+  :ensure t
+  :config
+  )
+
+;(require 'lispxmp)
 ;; emacs-lisp-mode でC-c C-dを押すと注釈される
 (define-key emacs-lisp-mode-map (kbd "C-c C-d") 'lispxmp)
 
 ;; 括弧の対応を保持して編集する設定
+(use-package paredit
+  :ensure t
+  :config
+  )
 (require 'paredit)
 (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
 (add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
@@ -630,20 +598,10 @@
 
 ;; 日本語info設定
 ;;; ~/info/以下をinfoファイル検索ディレクトリに加える
-(add-to-list 'Info-directory-list "~/info/")
+;(add-to-list 'Info-directory-list "~/info/")
 
 ;; Emacs M-x toggle-truncate-lines: 長い行の折り返し表示を切り換える
 (global-set-key (kbd "C-c t") 'toggle-truncate-lines)
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ LogFile                                                       ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;;;; ログ・ファイル出力
-(defvar logger-process nil)
-(defun logger (&rest msg)
-  (unless logger-process
-    (setq logger-process (start-process-shell-command "logger" nil (concat "cat >> ~/log.txt"))))
-(process-send-string logger-process (concat (apply 'format msg) "\n")))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ cperl-mode
@@ -676,16 +634,58 @@
  '(custom-enabled-themes (quote (tango-dark)))
  '(custom-safe-themes
    (quote
-    ("966bcad960f896669dfc21a7a37a748fa" "c74ec5b1f02c917e3dbb454fca931223" "a27c009ede09a8b90c6955ae6a390eb1c1e" default)))
+    ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default)))
  '(desktop-save-mode t)
- '(org-agenda-files
-   (quote
-    ("c:/Users/******e/Dropbox/organized/pc2-todo.org" "~/org/todo.org")))
+ '(org-agenda-files (quote ("~/org/todo.org")))
  '(org-babel-load-languages (quote ((emacs-lisp . t) (awk . t) (perl . t) (shell . t))))
+ '(org-capture-templates
+   (quote
+    (("n" "etc notes" entry
+      (file "~/org/notes.org")
+      "" :prepend t :jump-to-captured t :clock-in t :clock-keep t)
+     ("t" "todo list" checkitem
+      (file "~/org/todo.org")
+      "" :empty-lines 1 :clock-in t))))
  '(package-selected-packages
    (quote
     (smart-mode-line dired-open dired-subtree dired-filter systemd ag aggressive-indent pcre2el projectile golden-ratio magit-gh-pulls magit yasnippet yaml-mode web-mode use-package ripgrep rg recentf-ext rainbow-mode pony-mode pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets open-junk-file lispxmp grep-a-lot flx-ido exec-path-from-shell evil dired+ dash-functional browse-at-remote auto-async-byte-compile apache-mode anything adaptive-wrap ace-window)))
- '(safe-local-variable-values (quote ((lical-binding . t)))))
+ '(safe-local-variable-values (quote ((lical-binding . t))))
+ '(skk-annotation-other-sources
+   (quote
+    (ja\.wikipedia en\.wiktionary simple\.wikipedia en\.wikipedia)))
+ '(skk-auto-insert-paren t)
+ '(skk-auto-okuri-process nil)
+ '(skk-auto-start-henkan nil)
+ '(skk-aux-large-jisyo "/home/blue/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
+ '(skk-cdb-large-jisyo nil)
+ '(skk-check-okurigana-on-touroku (quote ask))
+ '(skk-date-ad t)
+ '(skk-delete-implies-kakutei t)
+ '(skk-egg-like-newline t)
+ '(skk-extra-jisyo-file-list
+   (quote
+    ("/home/blue/.emacs.d/skk-get-jisyo/SKK-JISYO.jinmei" "/home/blue/.emacs.d/skk-get-jisyo/SKK-JISYO.geo" "/home/blue/.emacs.d/skk-get-jisyo/SKK-JISYO.pubdic+")))
+ '(skk-henkan-okuri-strictly nil)
+ '(skk-henkan-strict-okuri-precedence nil)
+ '(skk-itaiji-jisyo "/home/blue/.emacs.d/skk-get-jisyo/SKK-JISYO.itaiji")
+ '(skk-j-mode-function-key-usage nil)
+ '(skk-japanese-message-and-error t)
+ '(skk-kakutei-early t)
+ '(skk-preload t)
+ '(skk-share-private-jisyo nil)
+ '(skk-show-annotation (quote (not list)))
+ '(skk-show-candidates-always-pop-to-buffer nil)
+ '(skk-show-icon t)
+ '(skk-show-inline nil)
+ '(skk-show-japanese-menu t)
+ '(skk-show-tooltip nil)
+ '(skk-start-henkan-char 32)
+ '(skk-use-color-cursor t)
+ '(skk-use-face t)
+ '(skk-use-jisx0201-input-method nil)
+ '(skk-use-look t)
+ '(skk-use-numeric-conversion t)
+ '(skk-verbose t))
 
  ;;load cperl, then work around indent issue
  (load-library "cperl-mode")
@@ -702,22 +702,23 @@
          (local-set-key (kbd "C-h f") 'cperl-perldoc)))
 
 ;;; perl v path ;;;;
-(when (memq window-system '(mac ns))
+;(when (memq window-system '(mac ns))
   (exec-path-from-shell-initialize)
   exec-path	(split-string (getenv "PATH") ":")
+ ; /home/blue/.plenv/versions/5.28.0/lib/perl5/5.28.0/
 
-					; /home//	.	plenv/versions/5.27.2/bin
+   	; /home/kato/	.	plenv/versions/5.27.2/bin
   (let ((path exec-path))
     (format "  exec-path: %s\n" exec-path))
   ;;exec-path-from-shell.el
   ;;shell のパスをそのまま通す　重要 ;;
   (use-package exec-path-from-shell
-    :no-require t
+   ; :no-require t
     :defer t
     :ensure t
     :init		(exec-path-from-shell-initialize)
     )
-  )
+ ;; )
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;  pcre2el rxt-mode http://emacs.rubikitch.com/pcre2el/
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -727,10 +728,10 @@
 ;;     rxt-explain 正規表現を解説
 
 
-;;; regexp perl
-(require 'pcre2el)
-(add-hook 'prog-mode-hook 'rxt-mode)
-(setq reb-re-syntax 'pcre)
+;; ;;; regexp perl
+;; (require 'pcre2el)
+;; (add-hook 'prog-mode-hook 'rxt-mode)
+;; (setq reb-re-syntax 'pcre)
 
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -745,7 +746,7 @@
 )
 
 ;; 重要　gitなどパスを通す　Windows
-(setq exec-path (cons "C:\\tools\\msys64\\usr\\bin" exec-path))
+;; (setq exec-path (cons "C:\\tools\\msys64\\usr\\bin" exec-path))
 
 ;; Ag.el
 ;; https://agel.readthedocs.io/en/latest/installation.html#emacs
@@ -757,7 +758,7 @@
 ;(setq ag-highlight-search nil)  ; 検索キーワードをハイライト
 ;(setq ag-reuse-buffers nil)     ; 検索用バッファを使い回す (検索ごとに新バッファを作らない)
 
-;; ; wgrep
+; wgrep
 ;; (add-hook 'ag-mode-hook '(lambda ()
 ;;                            (require 'wgrep-ag)
 ;;                            (setq wgrep-auto-save-buffer t)  ; 編集完了と同時に保存
@@ -769,9 +770,9 @@
 ;;;;[url=http://emacs.rubikitch.com/ripgrep/]ripgrep.el :
 ;;;【agより、ずっとはやい!!】超音速grepとEmacsインターフェース(Windows安心)[/url]
 ;;; rgバイナリの位置
- (setq ripgrep-executable  "C:\\tools\\msys64\\usr\\bin\\rg")
-;;; rgに渡すオプション
- (setq ripgrep-arguments '("-S"))
+;;  (setq ripgrep-executable  "C:\\tools\\msys64\\usr\\bin\\rg")
+;; ;;; rgに渡すオプション
+;;  (setq ripgrep-arguments '("-S"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 日本語環境 windows grep対策
@@ -861,32 +862,6 @@
   :ensure t
   :config (golden-ratio-mode 1))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;; https://projectile.readthedocs.io/en/latest/
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package projectile
-  :ensure t
-  :config (progn
-            (add-to-list 'projectile-globally-ignored-directories "_build")
-	    (add-to-list 'projectile-globally-ignored-directories "lib")
-	    (add-to-list 'projectile-globally-ignored-directories "xs")
-	    (add-to-list 'projectile-globally-ignored-directories "t")
-            (add-to-list 'projectile-globally-ignored-directories "daiku")
-            (add-to-list 'projectile-globally-ignored-file-suffixes ".d")
-	    (add-to-list 'projectile-globally-ignored-file-suffixes ".t")
-	    (add-to-list 'projectile-globally-ignored-file-suffixes ".pl")
-	    (add-to-list 'projectile-globally-ignored-file-suffixes ".pm")
-            (add-to-list 'projectile-globally-ignored-file-suffixes ".el")
-            (add-to-list 'projectile-globally-ignored-file-suffixes ".map")
-            (add-to-list 'projectile-globally-ignored-file-suffixes ".svg")
-            (add-to-list 'projectile-globally-ignored-files "ansible.log")
-            (add-to-list 'projectile-globally-ignored-files "urlconf.php")
-            (projectile-mode 1)))
-
-;; (use-package diff-hl :ensure t
-;;   :config (global-diff-hl-mode 1))
-
 (use-package flx-ido
 ;idoのあいまいマッチを改善する
   :ensure t
@@ -915,12 +890,12 @@
   (global-set-key (kbd "C-M-;") 'avy-goto-char-timer)
   )
 
- (use-package s :ensure t)
+; (use-package s :ensure t)
 
- (use-package systemd :ensure t)
+; (use-package systemd :ensure t)
 
-(use-package undo-tree :ensure t
-  :config (global-undo-tree-mode 1))
+;; (use-package undo-tree :ensure t
+;;   :config (global-undo-tree-mode 1))
 
  (use-package yaml-mode :ensure t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -972,9 +947,6 @@
 ;;;;;;;; message mode configuration ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; ;
-;; (setq user-mail-address "me@japan***.com"
-;;       user-full-name "me")
 
 ;(setq smtpmail-smtp-server "smtp.somewhere.jp.com")
 (setq message-send-mail-function 'message-smtpmail-send-it)
@@ -1007,90 +979,152 @@
 (global-unset-key (kbd "C-z"))
 (global-unset-key (kbd "C-x C-c"))
 
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ yasnippet
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
-;;;; yasnippet
-;; TODO: 重要 yasnippet 読み込み時にエラーが出たら、とりあえず
-;; (set-variable 'clojure-snippets-dir nil) を実行してみること。
-;;
-;; official doc: https://capitaomorte.github.io/yasnippet
-;;   http://yasnippet-doc-jp.googlecode.com/svn/trunk/doc-jp/snippet-expansion.html
-;; - snippets を使うときは、M-x yas-minor-mode
-;;   + キーワードを入力して、<tab>キーを押す。
-;;   + キーワード一覧が分からなくなったときはメニューで確認。
-;; - snippets を編集したら、 M-x yas-reload-all でリロード。
-;; - snippets の呼び出しは、 M-x yas-insert-snippet (C-c & C-s)
-;; - snippets の展開は、M-x yas-expand (<tab>)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @vc-dir  https://joppot.info/2018/01/18/4112
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
-;; 日本語文章の入力においては、空白で区切ってキーワードを入力することができない。
-;; そのため、snippetは、bindingのショートカットキーで呼び出す。
-;; - helm との連携 ::  <先頭文字をタイプ>,  M-x helm-c-yasnippet (M-X y)
-;; clojure-snippet で出るエラーについて
-;; これらは、yas-minor-mode を実行すると、yasnippet がロードされ、その
-;; 結果、eval-after-load で、そのバッファからsnippetを読み込もうとして
-;; エラーになる。なぜ何度も yasnippet がロードされようとするのかは不明。
- (yas-global-mode)
-;;
-;
-;
-(  use-package yasnippet
-;  :no-require t
-  :ensure t
-  :commands snippet-mode
-   :config
- ;;  ;; 他スニペットのダウンロード (~/.emacs.d/snippets-3rd-party/)
- ;;  (dolist (snip-dir (directory-files
- ;;      (locate-user-emacs-file "snippets-3rd-party") t "^[^.]"))
- ;;    (when (file-directory-p snip-dir)
- ;;      (add-to-list 'yas-snippet-dirs snip-dir t)
- ;;      ;;(yas-load-directory snip-dir)
- ;;      )))
- )
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ magit                                                         ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; http://matome.naver.jp/odai/2136491451473222801 が一番良いまとめ
-;; - ワークツリー <-(checkout) ステージングエリア <-(reset) Gitレポジトリ
-;; - HEAD :: Gitのレポジトリが見ている最新のcommit位置。
-;; - original :: githubのリモートの典型的なレポジトリ名
-;; - master :: デフォルトのブランチ名
-;; M-x magit-status (.git がなければ git init をすることが可能)
-;; C-u で、ファイル名入力などが可能。
-;; - タグの追加とPush
-;;   + t <tag_name>
-;;   + P t <tag_name>
-(use-package magit
- ; :no-require t
-  :ensure t
-  :bind (("M-g s" . magit-status)
-         ("M-g b" . magit-blame-mode))
-;  :config
-;
-  ;; (set-variable 'magit-process-find-password-functions
-  ;;               '(magit-process-password-auth-source))
-  )
+
+(require 'vc-dir)
+;; In vc-git and vc-dir for git buffers, make (C-x v) a run git add, u run git
+;; reset, and r run git reset and checkout from head.
+(defun my-vc-git-command (verb fn)
+  (let* ((fileset-arg (or vc-fileset (vc-deduce-fileset nil t)))
+         (backend (car fileset-arg))
+         (files (nth 1 fileset-arg)))
+    (if (eq backend 'Git)
+        (progn (funcall fn files)
+               (message (concat verb " " (number-to-string (length files))
+                                " file(s).")))
+      (message "Not in a vc git buffer."))))
+ 
+(defun my-vc-git-add (&optional revision vc-fileset comment)
+  (interactive "P")
+  (my-vc-git-command "Staged" 'vc-git-register))
+ 
+(defun my-vc-git-reset (&optional revision vc-fileset comment)
+  (interactive "P")
+  (my-vc-git-command "Unstaged"
+    (lambda (files) (vc-git-command nil 0 files "reset" "-q" "--"))))
+ 
+(eval-after-load "vc-dir"
+  '(progn
+     (define-key vc-prefix-map [(r)] 'vc-revert-buffer)
+     (define-key vc-dir-mode-map [(r)] 'vc-revert-buffer)
+     (define-key vc-prefix-map [(a)] 'my-vc-git-add)
+     (define-key vc-dir-mode-map [(a)] 'my-vc-git-add)
+     (define-key vc-prefix-map [(u)] 'my-vc-git-reset)
+     (define-key vc-dir-mode-map [(u)] 'my-vc-git-reset)
+ 
+     ;; hide up to date files after refreshing in vc-dir
+     (define-key vc-dir-mode-map [(g)]
+       (lambda () (interactive) (vc-dir-refresh) (vc-dir-hide-up-to-date)))))
+
+
+;; - git remote add origin https://github.com/kawabata/hoge.git ..
+;;  "origin" という名前で "http://.../" をアップストリームリポジトリに
+;;   追加
+;; - git push -u origin master
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; modeline  https://www.emacswiki.org/emacs/HeaderLine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defconst my-header "some long header line string ...")
+    (setq header-line-format '(:eval (substring my-header
+                                                (min (length my-header)
+                                                     (window-hscroll)))))
+
+ ;; (setq mode-line-format
+ ;;          (list
+ ;;           ;; value of `mode-name'
+ ;;           "%m: "
+ ;;           ;; value of current buffer name
+ ;;           "buffer %b, "
+ ;;           ;; value of current line number
+ ;;           "line %l "
+ ;;           "-- user: "
+ ;;           ;; value of user
+ ;;           (getenv "USER")))
+
+;;display file path in header line
+
+  (defmacro with-face (str &rest properties)
+    `(propertize ,str 'face (list ,@properties)))
+
+  (defun sl/make-header ()
+    ""
+    (let* ((sl/full-header (abbreviate-file-name buffer-file-name))
+           (sl/header (file-name-directory sl/full-header))
+           (sl/drop-str "[...]"))
+      (if (> (length sl/full-header)
+             (window-body-width))
+          (if (> (length sl/header)
+                 (window-body-width))
+              (progn
+                (concat (with-face sl/drop-str
+                                   :background "blue"
+                                   :weight 'bold
+                                   )
+                        (with-face (substring sl/header
+                                              (+ (- (length sl/header)
+                                                    (window-body-width))
+                                                 (length sl/drop-str))
+                                              (length sl/header))
+                                   ;; :background "red"
+                                   :weight 'bold
+                                   )))
+            (concat (with-face sl/header
+                               ;; :background "red"
+                               :foreground "#8fb28f"
+                               :weight 'bold
+                               )))
+        (concat (with-face sl/header
+                           ;; :background "green"
+                           ;; :foreground "black"
+                           :weight 'bold
+                           :foreground "#8fb28f"
+                           )
+                (with-face (file-name-nondirectory buffer-file-name)
+                           :weight 'bold
+                           ;; :background "red"
+                           )))))
+
+  (defun sl/display-header ()
+    (setq header-line-format
+          '("" ;; invocation-name
+            (:eval (if (buffer-file-name)
+                       (sl/make-header)
+                     "%b")))))
+
+  (add-hook 'buffer-list-update-hook
+            'sl/display-header)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;smart-mode-lineは，特にMode Line用に色々とlispを書かずともいい感じにMode Lineを見やすく&使いやすくしてくれるpackageです！
 
-(use-package smart-mode-line
-					; :no-require t
-  :ensure t
-  :init
-  )
-(require 'smart-mode-line)
-(defvar sml/no-confirm-load-theme t )
-  (defvar sml/shorten-directory -1) ;; directory pathはフルで表示されたいので
+;; (use-package smart-mode-line
+;; 					; :no-require t
+;;   :ensure t
+;;   :init
+;;   )
+;; (require 'smart-mode-line)
+;; (defvar sml/no-confirm-load-theme t )
+;;   (defvar sml/shorten-directory -1) ;; directory pathはフルで表示されたいので
 
 ;;; これを入れないとsmart-mode-lineを読み込むたびに
 ;;; Loading a theme can run Lisp code.  Really load? (y or n)
 ;;; と聞いてくる。
-(setq sml/no-confirm-load-theme t)
-(sml/setup)
-(sml/apply-theme 'respectful)
+;(setq sml/no-confirm-load-theme t)
+;(sml/setup)
+;(sml/apply-theme 'respectful)
 ;;; その他のthemeを設定
-(sml/apply-theme 'dark)
+;(sml/apply-theme 'dark)
  
+;;;;;;;;;;;;;;;;
 
+(prefer-coding-system 'utf-8)
+(setq default-process-coding-system 'utf-8)
 
