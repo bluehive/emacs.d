@@ -851,8 +851,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; ;
-;; (setq user-mail-address "me@jkdom5.com"
-;;       user-full-name "jkdom5 me")
+;; (setq user-mail-address "me@jk.com"
+;;       user-full-name "jk me")
 
 					;(setq smtpmail-smtp-server "smtp.somewhere.jp.com")
 (setq message-send-mail-function 'message-smtpmail-send-it)
