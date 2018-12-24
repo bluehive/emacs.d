@@ -114,40 +114,40 @@
 ;; ldd の結果のキャッシュ
 (defvar ldd-cache nil)
 
-;; サブプロセスに渡すパラメータに SJIS のダメ文字対策を行い、さらに文字コードを cp932 にする
-(defun convert-process-args (orig-fun prog-pos args-pos args)
-  (let ((cygwin-quote (and w32-quote-process-args ; cygwin-program-p の再帰防止
-                           (cygwin-program-p (nth prog-pos args)))))
-    (setf (nthcdr args-pos args)
-          (mapcar (lambda (arg)
-                    (when w32-quote-process-args
-                      (setq arg
-                            (concat "\""
-                                    (if cygwin-quote
-                                        (replace-regexp-in-string "[\"\\\\]"
-                                                                  "\\\\\\&"
-                                                                  arg)
-                                      (replace-regexp-in-string "\\(\\(\\\\\\)*\\)\\(\"\\)"
-                                                                "\\1\\1\\\\\\3"
-                                                                arg))
-                                    "\"")))
-                    (if (multibyte-string-p arg)
-                        (encode-coding-string arg 'cp932)
-                      arg))
-                  (nthcdr args-pos args))))
+;; ;; サブプロセスに渡すパラメータに SJIS のダメ文字対策を行い、さらに文字コードを cp932 にする
+;; (defun convert-process-args (orig-fun prog-pos args-pos args)
+;;   (let ((cygwin-quote (and w32-quote-process-args ; cygwin-program-p の再帰防止
+;;                            (cygwin-program-p (nth prog-pos args)))))
+;;     (setf (nthcdr args-pos args)
+;;           (mapcar (lambda (arg)
+;;                     (when w32-quote-process-args
+;;                       (setq arg
+;;                             (concat "\""
+;;                                     (if cygwin-quote
+;;                                         (replace-regexp-in-string "[\"\\\\]"
+;;                                                                   "\\\\\\&"
+;;                                                                   arg)
+;;                                       (replace-regexp-in-string "\\(\\(\\\\\\)*\\)\\(\"\\)"
+;;                                                                 "\\1\\1\\\\\\3"
+;;                                                                 arg))
+;;                                     "\"")))
+;;                     (if (multibyte-string-p arg)
+;;                         (encode-coding-string arg 'cp932)
+;;                       arg))
+;;                   (nthcdr args-pos args))))
 
-  (let ((w32-quote-process-args nil))
-    (apply orig-fun args)))
+;;   (let ((w32-quote-process-args nil))
+;;     (apply orig-fun args)))
 
-(cl-loop for (func prog-pos args-pos) in '((call-process        0 4)
-                                           (call-process-region 2 6)
-                                           (start-process       2 3))
-         do (eval `(advice-add ',func
-                               :around (lambda (orig-fun &rest args)
-                                         (convert-process-args orig-fun
-                                                               ,prog-pos ,args-pos
-                                                               args))
-                               '((depth . 99)))))
+;; (cl-loop for (func prog-pos args-pos) in '((call-process        0 4)
+;;                                            (call-process-region 2 6)
+;;                                            (start-process       2 3))
+;;          do (eval `(advice-add ',func
+;;                                :around (lambda (orig-fun &rest args)
+;;                                          (convert-process-args orig-fun
+;;                                                                ,prog-pos ,args-pos
+;;                                                                args))
+;;                                '((depth . 99)))))
 
 ;; end of 日本語文字コード　設定
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -210,6 +210,8 @@
 (helm-autoresize-mode 1)
 
 (helm-mode 1)
+
+(global-set-key (kbd "C-c a") 'helm-do-ag)
 
 ;;;;;; http://emacs.rubikitch.com/global-hl-line-mode-timer/
 ;; 遅い場合は以下
@@ -541,7 +543,7 @@
  '(org-directory "C:\\Users\\goalw\\Dropbox\\organized")
  '(package-selected-packages
    (quote
-    (use-package-ensure-system-package wgrep-ag avy csv-mode multi-term smart-mode-line dired-open dired-subtree dired-filter ag aggressive-indent pcre2el golden-ratio magit-gh-pulls yaml-mode web-mode use-package ripgrep rg recentf-ext rainbow-mode pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets open-junk-file lispxmp grep-a-lot flx-ido exec-path-from-shell dired+ dash-functional auto-async-byte-compile apache-mode anything adaptive-wrap ace-window)))
+    (use-package-ensure-system-package wgrep-ag avy csv-mode multi-term smart-mode-line dired-open dired-subtree dired-filter ag aggressive-indent pcre2el golden-ratio yaml-mode web-mode use-package recentf-ext  pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets grep-a-lot flx-ido exec-path-from-shell dash-functional auto-async-byte-compile apache-mode anything adaptive-wrap ace-window)))
  '(safe-local-variable-values (quote ((lical-binding . t))))
  '(show-paren-mode t)
  '(skk-auto-insert-paren t)
@@ -628,11 +630,21 @@
 
 (when (equal system-type 'windows-nt)
   (setq
-   find-program "C:\\programdata\\tools\\msys64\\usr\\bin\\find.exe"
-   grep-program "C:\\programdata\\tools\\msys64\\usr\\bin\\grep.exe"
+   find-program "C:\\ProgramData\\tools\\msys64\\usr\\bin\\find.exe"
+   grep-program "C:\\ProgramData\\tools\\msys64\\usr\\bin\\grep.exe"
    ;;      grep-program "C:\\tools\\msys64\\usr\\bin\\rg.exe"
    )
   )
+;; Emacs Interface to Ack-like Tools
+;; This package brings the full power of ack to emacs by allowing you to run it seamlessly with its large set of options. Ack-like tools such as the silver searcher and git/hg/bzr grep are well supported too.
+
+(use-package ack
+  :ensure t
+  :config
+  (add-hook 'ack-minibuffer-setup-hook 'ack-skel-vc-grep t)
+  (add-hook 'ack-minibuffer-setup-hook 'ack-yank-symbol-at-point t)
+  )
+
 ;; Ag.el
 ;; https://agel.readthedocs.io/en/latest/installation.html#emacs
 ;; Afterwards, you can install ag.el from MELPA (the recommended approach).
@@ -647,15 +659,12 @@
   (setq ag-reuse-buffers nil)     ; 検索用バッファを使い回す (検索ごとに新バッファを作らない)
   )
 
-					; wgrep
-(add-hook 'ag-mode-hook '(lambda ()
-                           (require 'wgrep-ag)
-                           (setq wgrep-auto-save-buffer t)  ; 編集完了と同時に保存
-                           (setq wgrep-enable-key "r")      ; "r" キーで編集モードに
-                           (wgrep-ag-setup)))
-
-
-
+;; 					; wgrep
+;; (add-hook 'ag-mode-hook '(lambda ()
+;;                            (require 'wgrep-ag)
+;;                            (setq wgrep-auto-save-buffer t)  ; 編集完了と同時に保存
+;;                            (setq wgrep-enable-key "r")      ; "r" キーで編集モードに
+;;                            (wgrep-ag-setup)))
 ;;;;ripgrep.el
 ;;;;[url=http://emacs.rubikitch.com/ripgrep/]ripgrep.el :
 ;;;【agより、ずっとはやい!!】超音速grepとEmacsインターフェース(Windows安心)[/url]
@@ -670,15 +679,6 @@
 ;; https://extra-vision.blogspot.jp/2016/01/ntemacs-ag-silver-searcher.html
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (equal system-type 'ns)
-					; (require 'ucs-normalize)
-					; (set-language-environment "Japanese")
-					; (prefer-coding-system 'utf-8-unix)
-					; (set-file-name-coding-system 'cp932)
-;  (set-keyboard-coding-system 'cp932)
-;  (set-terminal-coding-system 'cp932)
-					;  (setq default-process-coding-system '(utf-8-unix . cp932)) ;agで日本語検索させるためのおまじないだが効果なし
-  )
 
 ;; 重要
 ;;Emacs でファイルの文字コードを変換するときの覚書Add Stargito2morygonzalez
@@ -846,7 +846,7 @@
 
 ;; ;
 ;; (setq user-mail-address "me@jk.com"
-;;       user-full-name "jk")
+;;       user-full-name "jk me")
 
 					;(setq smtpmail-smtp-server "smtp.somewhere.jp.com")
 (setq message-send-mail-function 'message-smtpmail-send-it)
