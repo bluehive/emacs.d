@@ -1,4 +1,4 @@
-;; -*- coding: utf-8 -*-
+;; -*- coding: utf-8-unix -*-
 
 ;; NTEmacs64
 
@@ -72,39 +72,44 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ language - coding system                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-
-;; ------------------------------------------------------------------------
-;; @ character code (文字コード)
-;; Setenv
-(set-language-environment "Japanese")
-
-;; (when (equal system-type 'ns)
-;;   (require 'ucs-normalize)
-;; 					; (prefer-coding-system 'utf-8)
-;;   (setq file-name-coding-system 'utf-8)
-;;   (setq locale-coding-system 'utf-8)
-;; 					;         (prefer-coding-system 'shift_jis)
-;; 					;  (set-default-coding-systems 'utf-8)
-;; 					;         (setq file-name-coding-system 'shift_jis) (setq
-;; 					;         default-file-name-coding-system 'shift_jis)
-;;   (setq default-process-coding-system '(utf-8-hfs . cp932)) ;agで日本語検索させるためのおまじない
-;;   )
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 重要　日本語Windowsの文字コード対策
 ;; https://www49.atwiki.jp/ntemacs/pages/16.html 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; ------------------------------------------------------------------------
+;; @ character code (文字コード)
+;; Setenv
+(set-language-environment "Japanese")
+
+(when (equal system-type 'ns)
+  (require 'ucs-normalize)
+  (prefer-coding-system 'utf-8-unix)
+  (setq locale-coding-system 'utf-8-unix)
+  (setq default-process-coding-system '(utf-8-unix . cp932)) ;agで日本語検索させるためのおまじない
+
+  (set-file-name-coding-system 'cp932)
+  (set-keyboard-coding-system 'cp932)
+  (set-terminal-coding-system 'cp932)
+)
 
 (require 'cl-lib)
 
 (setenv "LANG" "ja_JP.UTF-8")
 
 ;; IME の設定をした後には実行しないこと
-;; (set-language-environment 'Japanese)
+(set-language-environment 'Japanese)
 
-(prefer-coding-system 'utf-8-unix)
-(set-file-name-coding-system 'cp932)
-(setq locale-coding-system 'utf-8)
+;; ファイルのデフォルトの文字コード指定
+;; 開いているバッファーのファイルの文字コードを変更する場合には set-buffer-file-coding-system (C-x RET f)を使います。
+;; しかし、これを設定で書いても意味がありません。 バッファーごとの文字コード(buffer-file-coding-system) はバッファーローカルな値なので、 ロードしているバッファーの文字コードが変わるだけです。
+;; 新規作成時のファイルのデフォルトを変える場合には set-default 関数を使って buffer-file-coding-system のデフォルト値を変更します。
+;; ファイルのデフォルトを non-BOM UTF-8
+(set-default 'buffer-file-coding-system 'utf-8-unix)
+
+;; BOM なし UTF-8 でなければならない言語のファイル文字固定
+(modify-coding-system-alist 'file "\\.org\\'" 'utf-8-unix)               ;; org-mode
+(modify-coding-system-alist 'file "\\.p?\\'" 'utf-8-unix)              ;; perl
 
 (when (equal system-type 'ns)
 
@@ -643,6 +648,7 @@
   :config
   (add-hook 'ack-minibuffer-setup-hook 'ack-skel-vc-grep t)
   (add-hook 'ack-minibuffer-setup-hook 'ack-yank-symbol-at-point t)
+ ; (grep-apply-setting 'grep-command "ack --with-filename --nofilter --nogroup ")
   )
 
 ;; Ag.el
@@ -651,13 +657,13 @@
 ;;:: Functions are autoloaded, so (require 'ag) is unnecessary.
 ;; silver_searcher https://github.com/ggreer/the_silver_searcher\
 					; ag
-(use-package ag
-  :ensure t
-  :config
-					;(require 'ag)
-  (setq ag-highlight-search nil)  ; 検索キーワードをハイライト
-  (setq ag-reuse-buffers nil)     ; 検索用バッファを使い回す (検索ごとに新バッファを作らない)
-  )
+;; (use-package ag
+;;   :ensure t
+;;   :config
+;; 					;(require 'ag)
+;;   (setq ag-highlight-search nil)  ; 検索キーワードをハイライト
+;;   (setq ag-reuse-buffers nil)     ; 検索用バッファを使い回す (検索ごとに新バッファを作らない)
+;;   )
 
 ;; 					; wgrep
 ;; (add-hook 'ag-mode-hook '(lambda ()
@@ -691,7 +697,7 @@
 
 ;; "-*-"（ハイフンとアスタリスクとハイフン）という文字列で囲んで、文字コードを指定することができます。 （emacsのマニュアルであればspecify codingの章に記載があります。）
 ;; 以下のような文字列をファイルの先頭に記載しておくことで、 文字化けを防ぐことが出来ます。
-;; -*- coding: utf-8 -*-
+;; -*- coding: utf-8-unix -*-
 ;; http://emacs.clickyourstyle.com/articles/299
 
 ;; todo:: ripgrepで日本語検索可能だが、ファイル文字コードがshit-jisだと読まれない
@@ -845,8 +851,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; ;
-;; (setq user-mail-address "me@jk.com"
-;;       user-full-name "jk me")
+;; (setq user-mail-address "me@jkdom5.com"
+;;       user-full-name "jkdom5 me")
 
 					;(setq smtpmail-smtp-server "smtp.somewhere.jp.com")
 (setq message-send-mail-function 'message-smtpmail-send-it)
