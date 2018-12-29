@@ -119,43 +119,53 @@
 ;; ldd の結果のキャッシュ
 (defvar ldd-cache nil)
 
-;; ;; サブプロセスに渡すパラメータに SJIS のダメ文字対策を行い、さらに文字コードを cp932 にする
-;; (defun convert-process-args (orig-fun prog-pos args-pos args)
-;;   (let ((cygwin-quote (and w32-quote-process-args ; cygwin-program-p の再帰防止
-;;                            (cygwin-program-p (nth prog-pos args)))))
-;;     (setf (nthcdr args-pos args)
-;;           (mapcar (lambda (arg)
-;;                     (when w32-quote-process-args
-;;                       (setq arg
-;;                             (concat "\""
-;;                                     (if cygwin-quote
-;;                                         (replace-regexp-in-string "[\"\\\\]"
-;;                                                                   "\\\\\\&"
-;;                                                                   arg)
-;;                                       (replace-regexp-in-string "\\(\\(\\\\\\)*\\)\\(\"\\)"
-;;                                                                 "\\1\\1\\\\\\3"
-;;                                                                 arg))
-;;                                     "\"")))
-;;                     (if (multibyte-string-p arg)
-;;                         (encode-coding-string arg 'cp932)
-;;                       arg))
-;;                   (nthcdr args-pos args))))
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ Ido itself                                      ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;https://github.com/DarwinAwardWinner/ido-completing-read-plus
+					;; ido enhance
 
-;;   (let ((w32-quote-process-args nil))
-;;     (apply orig-fun args)))
+(ido-mode 1)
+(ido-everywhere 1)
 
-;; (cl-loop for (func prog-pos args-pos) in '((call-process        0 4)
-;;                                            (call-process-region 2 6)
-;;                                            (start-process       2 3))
-;;          do (eval `(advice-add ',func
-;;                                :around (lambda (orig-fun &rest args)
-;;                                          (convert-process-args orig-fun
-;;                                                                ,prog-pos ,args-pos
-;;                                                                args))
-;;                                '((depth . 99)))))
+(setq ido-enable-flex-matching t) ;; 中間/あいまい一致
 
-;; end of 日本語文字コード　設定
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Fix ibuffer to use ido-find-file
+(require 'ibuffer)
+(define-key ibuffer-mode-map (kbd "C-x C-f") #'ido-find-file)
+;; Always use ibuffer
+(global-set-key [remap list-buffers] #'ibuffer)
+
+
+(use-package flx-ido
+					;idoのあいまいマッチを改善する
+  :ensure t
+  :init (setq ido-auto-merge-work-directories-length -1
+              ido-create-new-buffer 'never
+              ido-enable-flex-matching t
+              ido-enable-last-directory-history t
+              ido-use-faces nil)
+  :config (progn
+            (ido-mode 1)
+         ;;   (ido-everywhere 0)
+            (flx-ido-mode 1)))
+
+;;
+(use-package smex
+  ;; ido のインターフェイスを利用してM-xを再定義
+  :ensure t
+  :init (smex-initialize)
+       ;; Can be omitted. This might cause a (minimal) delay
+                  ;; when Smex is auto-initialized on its first run.
+  :config (progn
+      (global-set-key (kbd "M-x") 'smex)
+      (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+      ;; This is your old M-x.
+      (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+      ))
+;;
+(use-package ido-completing-read+
+  :ensure t)
 
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -164,59 +174,61 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
 
-(use-package helm
-  :defer t
-  :ensure t)
+;; (use-package helm
+;;   :defer t
+;;   :ensure t)
 
-(require 'helm)
-(require 'helm-config)
+;; (require 'helm)
+;; (require 'helm-config)
 
-(global-set-key (kbd "C-x b") 'helm-mini)
-					;あいまい一致を有効にするには以下を追加しましょう:
-(setq helm-buffers-fuzzy-matching t
-      helm-recentf-fuzzy-match    t)
+;; (global-set-key (kbd "C-x b") 'helm-mini)
+;; 					;あいまい一致を有効にするには以下を追加しましょう:
+;; (setq helm-buffers-fuzzy-matching t
+;;       helm-recentf-fuzzy-match    t)
 
-;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
-;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
-;; cannot change `helm-command-prefix-key' once `helm-config' is loaded.
-(global-set-key (kbd "C-c h") 'helm-command-prefix)
-(global-unset-key (kbd "C-x c"))
+;; ;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
+;; ;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
+;; ;; cannot change `helm-command-prefix-key' once `helm-config' is loaded.
+;; (global-set-key (kbd "C-c h") 'helm-command-prefix)
+;; (global-unset-key (kbd "C-x c"))
 
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+;; (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+;; (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
+;; (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
 
-(when (executable-find "curl")
-  (setq helm-google-suggest-use-curl-p t))
+;; (when (executable-find "curl")
+;;   (setq helm-google-suggest-use-curl-p t))
 
-(setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
-      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-      helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-      helm-ff-file-name-history-use-recentf t
-      helm-echo-input-in-header-line t)
+;; (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+;;       helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+;;       helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+;;       helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+;;       helm-ff-file-name-history-use-recentf t
+;;       helm-echo-input-in-header-line t)
 
-(defun spacemacs//helm-hide-minibuffer-maybe ()
-  "Hide minibuffer in Helm session if we use the header line as input field."
-  (when (with-helm-buffer helm-echo-input-in-header-line)
-    (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
-      (overlay-put ov 'window (selected-window))
-      (overlay-put ov 'face
-                   (let ((bg-color (face-background 'default nil)))
-                     `(:background ,bg-color :foreground ,bg-color)))
-      (setq-local cursor-type nil))))
+;; (defun spacemacs//helm-hide-minibuffer-maybe ()
+;;   "Hide minibuffer in Helm session if we use the header line as input field."
+;;   (when (with-helm-buffer helm-echo-input-in-header-line)
+;;     (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
+;;       (overlay-put ov 'window (selected-window))
+;;       (overlay-put ov 'face
+;;                    (let ((bg-color (face-background 'default nil)))
+;;                      `(:background ,bg-color :foreground ,bg-color)))
+;;       (setq-local cursor-type nil))))
 
 
-(add-hook 'helm-minibuffer-set-up-hook
-          'spacemacs//helm-hide-minibuffer-maybe)
+;; (add-hook 'helm-minibuffer-set-up-hook
+;;           'spacemacs//helm-hide-minibuffer-maybe)
 
-(setq helm-autoresize-max-height 0)
-(setq helm-autoresize-min-height 20)
-(helm-autoresize-mode 1)
+;; (setq helm-autoresize-max-height 0)
+;; (setq helm-autoresize-min-height 20)
+;; (helm-autoresize-mode 1)
 
-(helm-mode 1)
+;; (helm-mode 1)
 
-(global-set-key (kbd "C-c a") 'helm-do-ag)
+;; (global-set-key (kbd "C-c a") 'helm-do-ag)
+
+
 
 ;;;;;; http://emacs.rubikitch.com/global-hl-line-mode-timer/
 ;; 遅い場合は以下
@@ -651,6 +663,17 @@
  ; (grep-apply-setting 'grep-command "ack --with-filename --nofilter --nogroup ")
   )
 
+;; (use-package helm-ack
+;;   :ensure t
+;;   :config
+;;   (custom-set-variables
+;;  ;; Does not insert '--type' option
+;;  '(helm-ack-auto-set-filetype nil)
+;;  ;; Insert "thing-at-point 'symbol" as search pattern
+;;  '(helm-ack-thing-at-point 'symbol)) 
+;;   )
+
+
 ;; Ag.el
 ;; https://agel.readthedocs.io/en/latest/installation.html#emacs
 ;; Afterwards, you can install ag.el from MELPA (the recommended approach).
@@ -768,11 +791,6 @@
 (setq-default save-place t)
 (savehist-mode 1)
 
-;; Fix ibuffer to use ido-find-file
-(require 'ibuffer)
-(define-key ibuffer-mode-map (kbd "C-x C-f") #'ido-find-file)
-;; Always use ibuffer
-(global-set-key [remap list-buffers] #'ibuffer)
 
 ;; Always kill the current buffer without asking
 (defun kill-buffer-now (&optional buffer-or-name)
@@ -789,20 +807,6 @@
 (use-package golden-ratio
   :ensure t
   :config (golden-ratio-mode 1))
-
-
-(use-package flx-ido
-					;idoのあいまいマッチを改善する
-  :ensure t
-  :init (setq ido-auto-merge-work-directories-length -1
-              ido-create-new-buffer 'never
-              ido-enable-flex-matching t
-              ido-enable-last-directory-history t
-              ido-use-faces nil)
-  :config (progn
-            (ido-mode 1)
-            (ido-everywhere 0)
-            (flx-ido-mode 1)))
 
 
 (use-package s
@@ -851,8 +855,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; ;
-;; (setq user-mail-address "me@jk.com"
-;;       user-full-name "jk me")
+;; (setq user-mail-address "me@jk***.com"
+;;       user-full-name "jk*** me")
 
 					;(setq smtpmail-smtp-server "smtp.somewhere.jp.com")
 (setq message-send-mail-function 'message-smtpmail-send-it)
@@ -1003,6 +1007,160 @@
 
 (add-hook 'buffer-list-update-hook
           'sl/display-header)
+
+
+;;;; hydra
+;; https://www.reddit.com/r/emacs/comments/8of6tx/tip_how_to_be_a_beast_with_hydra/
+(use-package hydra
+  :defer 2
+  :bind ("C-c c" . hydra-clock/body))
+
+(defhydra hydra-clock (:color blue)
+    "
+    ^
+    ^Clock^             ^Do^
+    ^─────^─────────────^──^─────────
+    _q_ quit            _c_ cancel
+    ^^                  _d_ display
+    ^^                  _e_ effort
+    ^^                  _i_ in
+    ^^                  _j_ jump
+    ^^                  _o_ out
+    ^^                  _r_ report
+    ^^                  ^^
+    "
+    ("q" nil)
+    ("c" org-clock-cancel :color pink)
+    ("d" org-clock-display)
+    ("e" org-clock-modify-effort-estimate)
+    ("i" org-clock-in)
+    ("j" org-clock-goto)
+    ("o" org-clock-out)
+    ("r" org-clock-report))
+;;
+(defhydra hydra-window
+                (:color red :hint nil)
+               "
+                               -- WINDOW MENU --
+
+"
+               ("z" ace-window "ace" :color blue :column "1-Switch")
+               ("h" windmove-left "← window")
+               ("j" windmove-down "↓ window")
+               ("k" windmove-up "↑ window")
+               ("l" windmove-right "→ window")
+               ("s" split-window-below "split window" :color blue :column "2-Split Management")
+               ("v" split-window-right "split window vertically" :color blue)
+               ("d" delete-window "delete current window")
+               ("f" follow-mode "toogle follow mode")
+               ("u" winner-undo "undo window conf" :column "3-Undo/Redo")
+               ("r" winner-redo "redo window conf")
+               ("b" balance-windows "balance window height" :column "4-Sizing")
+               ("m" maximize-window "maximize current window")
+               ("M" minimize-window "minimize current window")
+               ("q" nil "quit menu" :color blue :column nil))
+
+
+;;
+(defhydra hydra-helm (:hint nil :color pink)
+        "
+                                                                          ╭──────┐
+   Navigation   Other  Sources     Mark             Do             Help   │ Helm │
+  ╭───────────────────────────────────────────────────────────────────────┴──────╯
+        ^_k_^         _K_       _p_   [_m_] mark         [_v_] view         [_H_] helm help
+        ^^↑^^         ^↑^       ^↑^   [_t_] toggle all   [_d_] delete       [_s_] source help
+    _h_ ←   → _l_     _c_       ^ ^   [_u_] unmark all   [_f_] follow: %(helm-attr 'follow)
+        ^^↓^^         ^↓^       ^↓^    ^ ^               [_y_] yank selection
+        ^_j_^         _J_       _n_    ^ ^               [_w_] toggle windows
+  --------------------------------------------------------------------------------
+        "
+        ("<tab>" helm-keyboard-quit "back" :exit t)
+        ("<escape>" nil "quit")
+        ("\\" (insert "\\") "\\" :color blue)
+        ("h" helm-beginning-of-buffer)
+        ("j" helm-next-line)
+        ("k" helm-previous-line)
+        ("l" helm-end-of-buffer)
+        ("g" helm-beginning-of-buffer)
+        ("G" helm-end-of-buffer)
+        ("n" helm-next-source)
+        ("p" helm-previous-source)
+        ("K" helm-scroll-other-window-down)
+        ("J" helm-scroll-other-window)
+        ("c" helm-recenter-top-bottom-other-window)
+        ("m" helm-toggle-visible-mark)
+        ("t" helm-toggle-all-marks)
+        ("u" helm-unmark-all)
+        ("H" helm-help)
+        ("s" helm-buffer-help)
+        ("v" helm-execute-persistent-action)
+        ("d" helm-persistent-delete-marked)
+        ("y" helm-yank-selection)
+        ("w" helm-toggle-resplit-and-swap-windows)
+        ("f" helm-follow-mode))
+;;
+
+(eval-after-load 'gnus-group
+  '(progn
+     (defhydra hydra-gnus-group (:color blue)
+       "Do?"
+       ("a" gnus-group-list-active "REMOTE groups A A")
+       ("l" gnus-group-list-all-groups "LOCAL groups L")
+       ("c" gnus-topic-catchup-articles "Read all c")
+       ("G" gnus-group-make-nnir-group "Search server G G")
+       ("g" gnus-group-get-new-news "Refresh g")
+       ("s" gnus-group-enter-server-mode "Servers")
+       ("m" gnus-group-new-mail "Compose m OR C-x m")
+       ("#" gnus-topic-mark-topic "mark #")
+       ("q" nil "cancel"))
+     ;; y is not used by default
+     (define-key gnus-group-mode-map "y" 'hydra-gnus-group/body)))
+
+;; gnus-summary-mode
+(eval-after-load 'gnus-sum
+  '(progn
+     (defhydra hydra-gnus-summary (:color blue)
+       "Do?"
+       ("s" gnus-summary-show-thread "Show thread")
+       ("h" gnus-summary-hide-thread "Hide thread")
+       ("n" gnus-summary-insert-new-articles "Refresh / N")
+       ("f" gnus-summary-mail-forward "Forward C-c C-f")
+       ("!" gnus-summary-tick-article-forward "Mail -> disk !")
+       ("p" gnus-summary-put-mark-as-read "Mail <- disk")
+       ("c" gnus-summary-catchup-and-exit "Read all c")
+       ("e" gnus-summary-resend-message-edit "Resend S D e")
+       ("R" gnus-summary-reply-with-original "Reply with original R")
+       ("r" gnus-summary-reply "Reply r")
+       ("W" gnus-summary-wide-reply-with-original "Reply all with original S W")
+       ("w" gnus-summary-wide-reply "Reply all S w")
+       ("#" gnus-topic-mark-topic "mark #")
+       ("q" nil "cancel"))
+     ;; y is not used by default
+     (define-key gnus-summary-mode-map "y" 'hydra-gnus-summary/body)))
+
+;; gnus-article-mode
+(eval-after-load 'gnus-art
+  '(progn
+     (defhydra hydra-gnus-article (:color blue)
+       "Do?"
+       ("f" gnus-summary-mail-forward "Forward")
+       ("R" gnus-article-reply-with-original "Reply with original R")
+       ("r" gnus-article-reply "Reply r")
+       ("W" gnus-article-wide-reply-with-original "Reply all with original S W")
+       ("o" gnus-mime-save-part "Save attachment at point o")
+       ("w" gnus-article-wide-reply "Reply all S w")
+       ("q" nil "cancel"))
+     ;; y is not used by default
+     (define-key gnus-article-mode-map "y" 'hydra-gnus-article/body)))
+
+(eval-after-load 'message
+  '(progn
+     (defhydra hydra-message (:color blue)
+       "Do?"
+       ("ca" mml-attach-file "Attach C-c C-a")
+       ("cc" message-send-and-exit "Send C-c C-c")
+       ("q" nil "cancel"))
+     (global-set-key (kbd "C-c C-y") 'hydra-message/body)))
 
 
 ;;;;;;;;;;;;;;;; eof
