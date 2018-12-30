@@ -167,6 +167,38 @@
 (use-package ido-completing-read+
   :ensure t)
 
+;;ido-vertical-mode
+    ;; 横並びの選択候補を、縦並びにするパッケージ
+    ;; デフォルトは C-s/C-r が候補選択だが、見た目とずれてて使いづらいので C-n/C-p に変更するとよい
+
+(use-package ido-vertical-mode
+  :config
+  (ido-vertical-mode 1)
+  (setq ido-vertical-define-keys 'C-n-and-C-p-only)    ;; C-n/C-pで候補選択する
+  (setq ido-vertical-show-count t)
+  )
+
+;; Directory Caching on Windows
+;; On Windows operating systems it can be unreliable to cache directory listings: the directory may not appear to be modified even though files have been added or removed. Ido caches directory listings by default, which may cause confusion on Windows. You can disable caching:
+
+(when (equal system-type 'windows-nt)
+  (setq ido-max-dir-file-cache 0)) ; caching unreliable
+
+;; Specifying sort-order
+;; If you'd like to tweak the default file sorting, like making Org-files appear first, tell ido which files to give a higher sort priority:
+(setq ido-file-extensions-order '(".org" ".txt" ".pl" ".emacs" ".xml" ".el"
+				  ".ini" ".cfg" ".conf" ".pm" ".t" ))
+
+;; Access File Bookmarks from `C-x C-f'
+ (defun bookmark-to-abbrevs ()
+   "Create abbrevs based on `bookmark-alist'."
+   (dolist (bookmark bookmark-alist)
+   (let* ((name (car bookmark))
+          (file (bookmark-get-filename name)))
+     (define-abbrev global-abbrev-table name file))))
+
+
+;;(helm-mode nil ) ;; helm off
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ helm                                                          ;;;
