@@ -411,6 +411,9 @@
  ;; If there is more than one, they won't work right.
  '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
 
+;;eshellのときだけ行番号を表示しない
+(global-linum-mode 1)
+(add-hook 'eshell-mode-hook (lambda () (linum-mode -1)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; dired edit                                                    ;;;
@@ -855,18 +858,6 @@
   :defer t  	   )
 
 
-(use-package ace-window
-  :ensure t
-  :init
-  (progn
-    (setq aw-scope 'frame)
-    (global-set-key (kbd "C-x O") 'other-frame)
-    (global-set-key [remap other-window] 'ace-window)
-    (custom-set-faces
-     '(aw-leading-char-face
-       ((t (:inherit ace-jump-face-foreground :height 3.0)))))
-    ))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;; Writing Mail  via emacswiki ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1041,11 +1032,64 @@
           'sl/display-header)
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ace-window
+
+(use-package ace-window
+  :ensure t
+  :init
+  (progn
+    (setq aw-scope 'frame)
+    (global-set-key (kbd "C-x O") 'other-frame)
+  ;;  (global-set-key (kbd "M-o") 'hydra-frame-window)
+    (global-set-key (kbd "M-o") 'ace-window)
+    (custom-set-faces
+     '(aw-leading-char-face
+       ((t (:inherit ace-jump-face-foreground :height 3.0)))))
+    ))
+
+;;;;;;;;;;;;;;;;
+(use-package hydra :ensure t)
+
+
+;; hydra-frame-window is designed from ace-window (C-x o) and
+;; matches aw-dispatch-alist with a few extra
+(defhydra hydra-frame-window (:color red :hint nil)
+  "
+^Delete^                       ^Frame resize^             ^Window^                Window Size^^^^^^   ^Text^                         (__)
+_0_: delete-frame              _g_: resize-frame-right    _t_: toggle               ^ ^ _k_ ^ ^        _K_                           (oo)
+_1_: delete-other-frames       _H_: resize-frame-left     _e_: ace-swap-win         _h_ ^+^ _l_        ^+^                     /------\\/
+_2_: make-frame                _F_: fullscreen            ^ ^                       ^ ^ _j_ ^ ^        _J_                    / |    ||
+_d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window    _b_alance^^^^      ^ ^                   *  /\\---/\\  ~~  C-x f ;
+"
+  ("0" delete-frame :exit t)
+  ("1" delete-other-frames :exit t)
+  ("2" make-frame  :exit t)
+  ("b" balance-windows)
+  ("d" kill-and-delete-frame :exit t)
+  ("e" ace-swap-window)
+  ("F" toggle-frame-fullscreen)   ;; is <f11>
+  ("g" resize-frame-right :exit t)
+  ("H" resize-frame-left :exit t)  ;; aw-dispatch-alist uses h, I rebind here so hjkl can be used for size
+  ("n" new-frame-right :exit t)
+  ;; ("r" reverse-windows)
+  ("t" toggle-window-spilt)
+  ("w" ace-delete-window :exit t)
+  ("x" delete-frame :exit t)
+  ("K" text-scale-decrease)
+  ("J" text-scale-increase)
+  ("h" shrink-window-horizontally)
+  ("k" shrink-window)
+  ("j" enlarge-window)
+  ("l" enlarge-window-horizontally))
+(global-set-key (kbd "C-x o") 'hydra-frame-window/body)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; hydra
 ;; https://www.reddit.com/r/emacs/comments/8of6tx/tip_how_to_be_a_beast_with_hydra/
-(use-package hydra
-  :defer 2
-  :bind ("C-c c" . hydra-clock/body))
+;; (use-package hydra
+;;   :defer 2
+;;   :bind ("C-c t" . hydra-clock/body))
 
 (defhydra hydra-clock (:color blue)
     "
@@ -1069,67 +1113,17 @@
     ("j" org-clock-goto)
     ("o" org-clock-out)
     ("r" org-clock-report))
-;;
-(defhydra hydra-window
-                (:color red :hint nil)
-               "
-                               -- WINDOW MENU --
-
-"
-               ("z" ace-window "ace" :color blue :column "1-Switch")
-               ("h" windmove-left "← window")
-               ("j" windmove-down "↓ window")
-               ("k" windmove-up "↑ window")
-               ("l" windmove-right "→ window")
-               ("s" split-window-below "split window" :color blue :column "2-Split Management")
-               ("v" split-window-right "split window vertically" :color blue)
-               ("d" delete-window "delete current window")
-               ("f" follow-mode "toogle follow mode")
-               ("u" winner-undo "undo window conf" :column "3-Undo/Redo")
-               ("r" winner-redo "redo window conf")
-               ("b" balance-windows "balance window height" :column "4-Sizing")
-               ("m" maximize-window "maximize current window")
-               ("M" minimize-window "minimize current window")
-               ("q" nil "quit menu" :color blue :column nil))
-
+(global-set-key (kbd "C-c C-t") 'hydra-clock/body)
 
 ;;
-(defhydra hydra-helm (:hint nil :color pink)
-        "
-                                                                          ╭──────┐
-   Navigation   Other  Sources     Mark             Do             Help   │ Helm │
-  ╭───────────────────────────────────────────────────────────────────────┴──────╯
-        ^_k_^         _K_       _p_   [_m_] mark         [_v_] view         [_H_] helm help
-        ^^↑^^         ^↑^       ^↑^   [_t_] toggle all   [_d_] delete       [_s_] source help
-    _h_ ←   → _l_     _c_       ^ ^   [_u_] unmark all   [_f_] follow: %(helm-attr 'follow)
-        ^^↓^^         ^↓^       ^↓^    ^ ^               [_y_] yank selection
-        ^_j_^         _J_       _n_    ^ ^               [_w_] toggle windows
-  --------------------------------------------------------------------------------
-        "
-        ("<tab>" helm-keyboard-quit "back" :exit t)
-        ("<escape>" nil "quit")
-        ("\\" (insert "\\") "\\" :color blue)
-        ("h" helm-beginning-of-buffer)
-        ("j" helm-next-line)
-        ("k" helm-previous-line)
-        ("l" helm-end-of-buffer)
-        ("g" helm-beginning-of-buffer)
-        ("G" helm-end-of-buffer)
-        ("n" helm-next-source)
-        ("p" helm-previous-source)
-        ("K" helm-scroll-other-window-down)
-        ("J" helm-scroll-other-window)
-        ("c" helm-recenter-top-bottom-other-window)
-        ("m" helm-toggle-visible-mark)
-        ("t" helm-toggle-all-marks)
-        ("u" helm-unmark-all)
-        ("H" helm-help)
-        ("s" helm-buffer-help)
-        ("v" helm-execute-persistent-action)
-        ("d" helm-persistent-delete-marked)
-        ("y" helm-yank-selection)
-        ("w" helm-toggle-resplit-and-swap-windows)
-        ("f" helm-follow-mode))
+
+;;
+(defhydra hydra-zoom ()
+  "zoom"
+  ("g" text-scale-increase "in")
+  ("l" text-scale-decrease "out"))
+(global-set-key (kbd "C-x f") 'hydra-zoom/body)
+
 ;;
 
 (eval-after-load 'gnus-group
@@ -1194,6 +1188,60 @@
        ("q" nil "cancel"))
      (global-set-key (kbd "C-c C-y") 'hydra-message/body)))
 
+;;
+;; This is the basic launcher code. It makes a main differentiation according to the Emacs major-mode and for org uses the org-element-context and org-element-property functions to react according to the specific context element/type.
+
+(defun dfeich/context-hydra-launcher ()
+  "A launcher for hydras based on the current context."
+  (interactive)
+  (cl-case major-mode
+    ('org-mode (let* ((elem (org-element-context))
+                      (etype (car elem))
+                      (type (org-element-property :type elem)))
+                 (cl-case etype
+                   (src-block (hydra-babel-helper/body))
+                   (link (hydra-org-link-helper/body))
+                   ((table-row table-cell) (hydra-org-table-helper/body) )
+                   (t (message "No specific hydra for %s/%s" etype type)
+                      (hydra-org-default/body))))
+               )
+    ('bibtex-mode (org-ref-bibtex-hydra/body))
+    ('ibuffer-mode (hydra-ibuffer-main/body))
+    (t (message "No hydra for this major mode: %s" major-mode))))
+
+(global-set-key (kbd "<f9> <f9>") 'dfeich/context-hydra-launcher)
+
+;;
+(defhydra hydra-yank-pop ()
+  "yank"
+  ("C-y" yank nil)
+  ("M-y" yank-pop nil)
+  ("y" (yank-pop 1) "next")
+  ("Y" (yank-pop -1) "prev")
+  ("l" helm-show-kill-ring "list" :color blue))   ; or browse-kill-ring
+(global-set-key (kbd "M-y") #'hydra-yank-pop/yank-pop)
+(global-set-key (kbd "C-y") #'hydra-yank-pop/yank)
+
+;;Movement
+;;For many Emacs users, basic movement commands are the most frequently used! Set up a movement group that means we don't need to hold the control key.
+
+(global-set-key
+ (kbd "C-n")
+ (defhydra hydra-move
+   (:body-pre (next-line))
+   "move"
+   ("n" next-line)
+   ("p" previous-line)
+   ("f" forward-char)
+   ("b" backward-char)
+   ("a" beginning-of-line)
+   ("e" move-end-of-line)
+   ("v" scroll-up-command)
+   ;; Converting M-v to V here by analogy.
+   ("V" scroll-down-command)
+   ("l" recenter-top-bottom)))
+
+;;
 
 ;;;;;;;;;;;;;;;; eof
 
