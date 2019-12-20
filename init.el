@@ -1,14 +1,7 @@
 ;; -*- coding: utf-8-unix -*-
+;;; init.el --- Emacs initialization file -*- lical-binding: t -*-
 
-;; NTEmacs64
-
-;; msys2 
-;; Set up $PATH
-;;     Open "Environment Variables > System Variables > Path"
-;;     At the end, add $DEV/msys64/usr/bin
-;; Set up $HOME
-;; By default, msys will use $DEV/msys64/home as your home folder. If you want to use your existing home folder, set a $HOME env variable:
-;;     Under "Environment Variables > User variables", add HOME -> %USERPROFILE%
+;; emacs25 for lubunt
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; base package control                                            ;;;
@@ -28,6 +21,9 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+;;To install a package permanently, place a call to straight-use-package in your init-file, like:
+(straight-use-package 'el-patch)
+
 ;; use-packageをインストールする
 (straight-use-package 'use-package)
 
@@ -46,13 +42,78 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (package-utils use-package))))
+ '(cperl-close-paren-offset -4)
+ '(cperl-indent-parens-as-block t)
+ '(cperl-indent-subs-specially nil)
+ '(custom-enabled-themes (quote (tango-dark)))
+ '(custom-safe-themes
+   (quote
+    ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default)))
+ '(desktop-save-mode t)
+ '(org-agenda-files (quote ("~/org-mode/todo.org")))
+ '(org-babel-load-languages
+   (quote
+    ((emacs-lisp . t)
+     (scheme . t)
+     (awk . t)
+     (perl . t)
+     (shell . t))))
+ '(org-capture-templates
+   (quote
+    (("n" "etc notes" entry
+      (file "~/org-mode/notes.org")
+      "" :prepend t :jump-to-captured t :time-prompt t :tree-type week :kill-buffer t)
+     ("t" "todo list" checkitem
+      (file "~/org-mode/todo.org")
+      "" :time-prompt t :tree-type week :kill-buffer t))))
+ '(package-selected-packages
+   (quote
+    (ack smart-mode-line dired-open dired-subtree dired-filter systemd ag aggressive-indent pcre2el projectile golden-ratio magit-gh-pulls magit yasnippet yaml-mode web-mode use-package ripgrep rg recentf-ext rainbow-mode pony-mode pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets open-junk-file lispxmp grep-a-lot flx-ido exec-path-from-shell evil dired+ dash-functional browse-at-remote auto-async-byte-compile apache-mode anything adaptive-wrap ace-window)))
+ '(safe-local-variable-values (quote ((lical-binding . t))))
+ '(skk-annotation-other-sources
+   (quote
+    (ja\.wikipedia en\.wiktionary simple\.wikipedia en\.wikipedia)))
+ '(skk-auto-insert-paren t)
+ '(skk-auto-okuri-process nil)
+ '(skk-auto-start-henkan nil)
+ '(skk-aux-large-jisyo "/home/kato/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
+ '(skk-cdb-large-jisyo nil)
+ '(skk-check-okurigana-on-touroku (quote ask))
+ '(skk-date-ad t)
+ '(skk-delete-implies-kakutei t)
+ '(skk-egg-like-newline t)
+ '(skk-extra-jisyo-file-list
+   (quote
+    ("/home/kato/.emacs.d/skk-get-jisyo/SKK-JISYO.jinmei" "/home/kato/.emacs.d/skk-get-jisyo/SKK-JISYO.geo" "/home/kato/.emacs.d/skk-get-jisyo/SKK-JISYO.pubdic+")))
+ '(skk-henkan-okuri-strictly nil)
+ '(skk-henkan-strict-okuri-precedence nil)
+ '(skk-itaiji-jisyo "/home/kato/.emacs.d/skk-get-jisyo/SKK-JISYO.itaiji")
+ '(skk-j-mode-function-key-usage nil)
+ '(skk-japanese-message-and-error t)
+ '(skk-kakutei-early t)
+ '(skk-preload t)
+ '(skk-share-private-jisyo nil)
+ '(skk-show-annotation (quote (not list)))
+ '(skk-show-candidates-always-pop-to-buffer nil)
+ '(skk-show-icon t)
+ '(skk-show-inline nil)
+ '(skk-show-japanese-menu t)
+ '(skk-show-tooltip nil)
+ '(skk-start-henkan-char 32)
+ '(skk-use-color-cursor t)
+ '(skk-use-face t)
+ '(skk-use-jisx0201-input-method nil)
+ '(skk-use-look t)
+ '(skk-use-numeric-conversion t)
+ '(skk-verbose t)
+ '(smtpmail-smtp-server "smtp.lolipop.jp")
+ '(smtpmail-smtp-service 587))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
 
 ;;;; Package Archives
 (set-variable 'package-archives
@@ -81,35 +142,49 @@
 ;; @ character code (文字コード)
 ;; Setenv
 (set-language-environment "Japanese")
+(setenv "LANG" "ja_JP.UTF-8")
 
 (when (equal system-type 'ns)
   (require 'ucs-normalize)
-  (prefer-coding-system 'utf-8-unix)
+  (setq prefer-coding-system 'utf-8-unix)
   (setq locale-coding-system 'utf-8-unix)
   (setq default-process-coding-system '(utf-8-unix . cp932)) ;agで日本語検索させるためのおまじない
 
-  (set-file-name-coding-system 'cp932)
-  (set-keyboard-coding-system 'cp932)
-  (set-terminal-coding-system 'cp932)
+  (setq set-file-name-coding-system 'cp932)
+  (setq set-keyboard-coding-system 'cp932)
+  (setq set-terminal-coding-system 'cp932)
 )
-
 (require 'cl-lib)
 
-(setenv "LANG" "ja_JP.UTF-8")
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ language - coding system  on ubuntu18                         ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(when (equal system-type 'gnu/linux)
+  (require 'ucs-normalize)
+  ;;(setq default-process-coding-system 'utf-8-unix)
+  ;; プロセスが出力する文字oコードを判定して、process-coding-system の DECODING の設定値を決定する
+  (setq default-process-coding-system '(undecided-dos . utf-8-unix))
+  ;;  (setq default-process-coding-system '(utf-8-unix . cp932)) ;agで日本語検索 qさせるためのおまじない
+  (setq prefer-coding-system 'utf-8-unix)
+  (setq file-name-coding-system 'utf-8-unix)
+  (setq locale-coding-system 'utf-8-unix)
+  (setq set-default-coding-systems 'utf-8-unix)
+  )
+
 
 ;; IME の設定をした後には実行しないこと
-(set-language-environment 'Japanese)
-
+;;(set-language-environment 'Japanese)
 ;; ファイルのデフォルトの文字コード指定
 ;; 開いているバッファーのファイルの文字コードを変更する場合には set-buffer-file-coding-system (C-x RET f)を使います。
 ;; しかし、これを設定で書いても意味がありません。 バッファーごとの文字コード(buffer-file-coding-system) はバッファーローカルな値なので、 ロードしているバッファーの文字コードが変わるだけです。
 ;; 新規作成時のファイルのデフォルトを変える場合には set-default 関数を使って buffer-file-coding-system のデフォルト値を変更します。
-;; ファイルのデフォルトを non-BOM UTF-8
-(set-default 'buffer-file-coding-system 'utf-8-unix)
-
-;; BOM なし UTF-8 でなければならない言語のファイル文字固定
-(modify-coding-system-alist 'file "\\.org\\'" 'utf-8-unix)               ;; org-mode
-(modify-coding-system-alist 'file "\\.p?\\'" 'utf-8-unix)              ;; perl
+(when (equal system-type 'gnu/linux)
+  ;; ファイルのデフォルトを non-BOM UTF-8
+  (set-default 'buffer-file-coding-system 'utf-8-unix)
+  ;; BOM なし UTF-8 でなければならない言語のファイル文字固定
+  (modify-coding-system-alist 'file "\\.org\\'" 'utf-8-unix)               ;; org-mode
+  (modify-coding-system-alist 'file "\\.p?\\'" 'utf-8-unix)              ;; perl
+  )
 
 (when (equal system-type 'ns)
 
@@ -186,7 +261,7 @@
 
 ;; Specifying sort-order
 ;; If you'd like to tweak the default file sorting, like making Org-files appear first, tell ido which files to give a higher sort priority:
-(setq ido-file-extensions-order '(".org" ".txt" ".pl" ".emacs" ".xml" ".el"
+(setq ido-file-extensions-order '(".org" ".txt" ".pl" ".emacs" ".xml" ".el" ".scm"
 				  ".ini" ".cfg" ".conf" ".pm" ".t" ))
 
 ;; Access File Bookmarks from `C-x C-f'
@@ -198,70 +273,7 @@
      (define-abbrev global-abbrev-table name file))))
 
 
-;;(helm-mode nil ) ;; helm off
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ helm                                                          ;;;
-;;; https://qiita.com/jabberwocky0139/items/86df1d3108e147c69e2c#%E3%82%AB%E3%83%BC%E3%82%BD%E3%83%AB%E4%BB%98%E8%BF%91%E3%81%AE%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-
-
-;; (use-package helm
-;;   :defer t
-;;   :ensure t)
-
-;; (require 'helm)
-;; (require 'helm-config)
-
-;; (global-set-key (kbd "C-x b") 'helm-mini)
-;; 					;あいまい一致を有効にするには以下を追加しましょう:
-;; (setq helm-buffers-fuzzy-matching t
-;;       helm-recentf-fuzzy-match    t)
-
-;; ;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
-;; ;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
-;; ;; cannot change `helm-command-prefix-key' once `helm-config' is loaded.
-;; (global-set-key (kbd "C-c h") 'helm-command-prefix)
-;; (global-unset-key (kbd "C-x c"))
-
-;; (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-;; (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-;; (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
-
-;; (when (executable-find "curl")
-;;   (setq helm-google-suggest-use-curl-p t))
-
-;; (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
-;;       helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-;;       helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-;;       helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-;;       helm-ff-file-name-history-use-recentf t
-;;       helm-echo-input-in-header-line t)
-
-;; (defun spacemacs//helm-hide-minibuffer-maybe ()
-;;   "Hide minibuffer in Helm session if we use the header line as input field."
-;;   (when (with-helm-buffer helm-echo-input-in-header-line)
-;;     (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
-;;       (overlay-put ov 'window (selected-window))
-;;       (overlay-put ov 'face
-;;                    (let ((bg-color (face-background 'default nil)))
-;;                      `(:background ,bg-color :foreground ,bg-color)))
-;;       (setq-local cursor-type nil))))
-
-
-;; (add-hook 'helm-minibuffer-set-up-hook
-;;           'spacemacs//helm-hide-minibuffer-maybe)
-
-;; (setq helm-autoresize-max-height 0)
-;; (setq helm-autoresize-min-height 20)
-;; (helm-autoresize-mode 1)
-
-;; (helm-mode 1)
-
-;; (global-set-key (kbd "C-c a") 'helm-do-ag)
-
-
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;; http://emacs.rubikitch.com/global-hl-line-mode-timer/
 ;; 遅い場合は以下
 
@@ -296,7 +308,7 @@
 (setq scroll-preserve-screen-position t)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ windows                                                     ;;;
+;;; @ NTwindows                                                     ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
 ;; ;; MSYS2 のコマンドを使えるようにする.
@@ -348,15 +360,15 @@
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 (setq uniquify-ignore-buffers-re "*[^*]+*")
 
-;; '(package-selected-packages
-;;   (quote
-;;    (exec-path-from-shell dired-quick-sort  ace-window web-mode yaml-mode  pip-requirements grep-a-lot flycheck flx-ido  auto-async-byte-compile paredit lispxmp open-junk-file ripgrep rg ht  rainbow-mode ## recentf-ext anything)))
 
-;; '(send-mail-function (quote smtpmail-send-it))
+ '(package-selected-packages
+   (quote
+    (exec-path-from-shell dired-quick-sort dired+ ace-window web-mode yaml-mode systemd projectile pony-mode pip-requirements grep-a-lot flycheck flx-ido diff-hl apache-mode auto-async-byte-compile paredit lispxmp open-junk-file ripgrep rg ht yasnippet rainbow-mode ## recentf-ext anything)))
+ '(send-mail-function (quote smtpmail-send-it))
 
-;; (add-hook 'cperl-mode-hook
-;; 	  (lambda ()
-;;             (local-set-key (kbd "C-h f") 'cperl-perldoc)))
+(add-hook 'cperl-mode-hook
+       (lambda ()
+         (local-set-key (kbd "C-h f") 'cperl-perldoc)))
 
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -365,21 +377,6 @@
 
 ;; 警告音の代わりに画面フラッシュ
 (setq visible-bell t)
-
-;; ウィンドウの右端で改行をするかどうかを切り替えるための設定
-
-(global-set-key (kbd "M-<return>") 'toggle-truncate-lines)
-
-;; ;;; 括弧の範囲内を強調表示
-;; (setq show-paren-delay 0)
-;; (show-paren-mode t)
-;; (setq show-paren-style 'expression)
-
-;; ;; 括弧の範囲色
-;; (set-face-background 'show-paren-match-face "#800")
-
-;; ;;; 選択領域の色
-;; (set-face-background 'region "#555")
 
 ;;; 最近使ったファイルをメニューに表示
 (recentf-mode 1)
@@ -404,12 +401,7 @@
 (global-set-key "\C-cb" 'org-iswitchb)
 
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
+
 
 ;;eshellのときだけ行番号を表示しない
 (global-linum-mode 1)
@@ -458,29 +450,6 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ rubikichi                                                     ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;;== List2:C-x C-bを置き換える
-;;(global-set-key (kbd "C-x C-b") 'bs-show)
-
-;; eww google
-(setq eww-search-prefix "http://www.google.co.jp/search?q=")
-
-;; eww colore
-(defvar eww-disable-colorize t)
-(defun shr-colorize-region--disable (orig start end fg &optional bg &rest _)
-  (unless eww-disable-colorize
-    (funcall orig start end fg)))
-(advice-add 'shr-colorize-region :around 'shr-colorize-region--disable)
-(advice-add 'eww-colorize-region :around 'shr-colorize-region--disable)
-(defun eww-disable-color ()
-  "eww で文字色を反映させない"
-  (interactive)
-  (setq-local eww-disable-colorize t)
-  (eww-reload))
-(defun eww-enable-color ()
-  "eww で文字色を反映させる"
-  (interactive)
-  (setq-local eww-disable-colorize nil)
-  (eww-reload))
 
 ;; ;; 試行錯誤用ファイルを開くための設定
 ;; (require 'open-junk-file)
@@ -500,6 +469,7 @@
   (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
   (add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
   (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook 'enable-paredit-mode)
   (add-hook 'ielm-mode-hook 'enable-paredit-mode)
   (add-hook 'cperl-mode-hook 'enable-paredit-mode)  )
 
@@ -524,7 +494,25 @@
 ;;(add-to-list 'Info-directory-list "~/info/")
 
 ;; Emacs M-x toggle-truncate-lines: 長い行の折り返し表示を切り換える
-(global-set-key (kbd "C-c t") 'toggle-truncate-lines)
+;;(global-set-key (kbd "C-c t") 'toggle-truncate-lines)
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ ddskk rubikichi                                               ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+				;	==
+;; Windows 環境だと [noconvert]
+(setq skk-sticky-key [muhenkan])
+(when (equal system-type 'windows-nt)
+  (setq skk-sticky-key [noconvert])
+  )
+
+(require 'skk-hint)
+;;　muhenkanなどのキー名はどうやって取得するのかというと、 <f1> c を使います。その後に無変換キーを押せば「<muhenkan> is undefined」と出てきます。
+
+(when (require 'skk nil t)
+  (global-set-key (kbd "C-x j") 'skk-auto-fill-mode) ;;良い感じに改行を自動入力してくれる機能
+  (setq default-input-method "japanese-skk")         ;;emacs上での日本語入力にskkをつかう
+  (require 'skk-study))                              ;;変換学習機能の追加
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ LogFile                                                       ;;;
@@ -535,6 +523,19 @@
   (unless logger-process
     (setq logger-process (start-process-shell-command "logger" nil (concat "cat >> ~/log.txt"))))
   (process-send-string logger-process (concat (apply 'format msg) "\n")))
+
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ scheme-mode
+;;; http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/scheme.html;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+
+(setq scheme-program-name "/usr/local/bin/gosh")
+(autoload 'run-scheme "cmuscheme" "Run an inferior Scheme process." t)
+(setq cmuscheme-load-hook
+      '((lambda () (define-key inferior-scheme-mode-map "\C-c\C-t"
+     'favorite-cmd))))
+
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ cperl-mode
@@ -553,112 +554,46 @@
 
 ;; (cperl-set-style "PerlStyle")
 
+;; Emacs M-x toggle-truncate-lines: 長い行の折り返し表示を切り換える
+(global-set-key (kbd "C-c t") 'toggle-truncate-lines)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;; custom
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(straight-use-package 'ddskk)
 
-(when (require 'skk nil t)
-  (global-set-key (kbd "C-x j") 'skk-auto-fill-mode) ;;良い感じに改行を自動入力してくれる機能
-  (setq default-input-method "japanese-skk")         ;;emacs上での日本語入力にskkをつかう
-  (require 'skk-study))   
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(calendar-date-style (quote iso))
- '(cperl-close-paren-offset -4)
- '(cperl-indent-parens-as-block t)
- '(cperl-indent-subs-specially nil)
- '(custom-enabled-themes (quote (tango-dark)))
- '(custom-safe-themes
-   (quote
-    ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default)))
- '(desktop-save-mode t)
- '(org-agenda-files
-   (quote
-    ("C:\\Users\\goalw\\Dropbox\\organized\\note.org" "C:\\Users\\goalw\\Dropbox\\organized\\blog-2.org" "C:\\Users\\goalw\\Dropbox\\organized\\blog-1.org")))
- '(org-babel-load-languages (quote ((emacs-lisp . t) (awk . t) (perl . t) (shell . t))))
- '(org-capture-templates
-   (quote
-    (("m" "memo-check" checkitem
-      (file "C:\\Users\\goalw\\Dropbox\\organized\\memo2018.org")
-      "" :prepend t :kill-buffer t)
-     ("t" "task" entry
-      (file "C:\\Users\\goalw\\Dropbox\\organized\\note.org")
-      ""))))
- '(org-capture-templates-contexts nil)
- '(org-default-notes-file "C:\\Users\\goalw\\Dropbox\\organized\\note.org")
- '(org-directory "C:\\Users\\goalw\\Dropbox\\organized")
- '(package-selected-packages
-   (quote
-    (use-package-ensure-system-package wgrep-ag avy csv-mode multi-term smart-mode-line dired-open dired-subtree dired-filter ag aggressive-indent pcre2el golden-ratio yaml-mode web-mode use-package recentf-ext  pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets grep-a-lot flx-ido exec-path-from-shell dash-functional auto-async-byte-compile apache-mode anything adaptive-wrap ace-window)))
- '(safe-local-variable-values (quote ((lical-binding . t))))
- '(show-paren-mode t)
- '(skk-auto-insert-paren t)
- '(skk-auto-okuri-process nil)
- '(skk-auto-start-henkan t)
- '(skk-check-okurigana-on-touroku (quote auto))
- '(skk-date-ad t)
- '(skk-delete-implies-kakutei nil)
- '(skk-egg-like-newline t)
- '(skk-henkan-okuri-strictly nil)
- '(skk-henkan-strict-okuri-precedence nil)
- '(skk-j-mode-function-key-usage nil)
- '(skk-japanese-message-and-error nil)
- '(skk-kakutei-early t)
- '(skk-kakutei-key "
-")
- '(skk-preload t)
- '(skk-share-private-jisyo nil)
- '(skk-show-annotation nil)
- '(skk-show-candidates-always-pop-to-buffer nil)
- '(skk-show-icon t)
- '(skk-show-inline nil)
- '(skk-show-japanese-menu t)
- '(skk-show-tooltip nil)
- '(skk-sticky-key [non-convert])
- '(skk-use-color-cursor t)
- '(skk-use-face t)
- '(skk-use-jisx0201-input-method nil)
- '(skk-use-look t)
- '(skk-use-numeric-conversion t)
- '(skk-user-directory nil)
- '(skk-verbose nil))
-
-;;load cperl, then work around indent issue
-(load-library "cperl-mode")
-(defun cperl-backward-to-start-of-continued-exp (lim)
-  (goto-char (1+ lim))
-  (forward-sexp)
-  (beginning-of-line)
-  (skip-chars-forward " \t")
-  )
+ ;;load cperl, then work around indent issue
+ (load-library "cperl-mode")
+ (defun cperl-backward-to-start-of-continued-exp (lim)
+   (goto-char (1+ lim))
+   (forward-sexp)
+   (beginning-of-line)
+   (skip-chars-forward " \t")
+ )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (add-hook 'cperl-mode-hook
-	  (lambda ()
-            (local-set-key (kbd "C-h f") 'cperl-perldoc)))
+       (lambda ()
+         (local-set-key (kbd "C-h f") 'cperl-perldoc)))
 
 ;;; perl v path ;;;;
-(when (memq window-system '(mac ns x))
+;(when (memq window-system '(mac ns))
+  (exec-path-from-shell-initialize)
+  exec-path	(split-string (getenv "PATH") ":")
+ ; /home/blue/.plenv/versions/5.28.0/lib/perl5/5.28.0/
+
+   	; /home/kato/	.	plenv/versions/5.27.2/bin
+  (let ((path exec-path))
+    (format "  exec-path: %s\n" exec-path))
   ;;exec-path-from-shell.el
   ;;shell のパスをそのまま通す　重要 ;;
   (use-package exec-path-from-shell
-					;  :no-require t
-					;  :defer t
+   ; :no-require t
+    :defer t
     :ensure t
-    :init (exec-path-from-shell-initialize)
+    :init		(exec-path-from-shell-initialize)
     )
-					;  (exec-path-from-shell-initialize)
-  ;; exec-path	(split-string (getenv "PATH") ":")
 
-  ;; (let ((path exec-path))
-  ;;   (format "  exec-path: %s\n" exec-path))
-  )
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;  pcre2el rxt-mode http://emacs.rubikitch.com/pcre2el/
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -666,8 +601,6 @@
 ;; M-x rxt-mode でRegular eXpression Translationマイナーモード
 ;; C-c / /
 ;;     rxt-explain 正規表現を解説
-
-
 ;;; regexp perl
 (use-package pcre2el
   :ensure t
@@ -693,57 +626,30 @@
 (use-package ack
   :ensure t
   :config
-  (add-hook 'ack-minibuffer-setup-hook 'ack-skel-vc-grep t)
-  (add-hook 'ack-minibuffer-setup-hook 'ack-yank-symbol-at-point t)
- ; (grep-apply-setting 'grep-command "ack --with-filename --nofilter --nogroup ")
+ ;; (add-hook 'ack-minibuffer-setup-hook 'ack-skel-vc-grep t)
+ ;; (add-hook 'ack-minibuffer-setup-hook 'ack-yank-symbol-at-point t)
+ ;; (grep-apply-setting 'grep-command "ack --with-filename --nofilter --nogroup ")
   )
-
-;; (use-package helm-ack
-;;   :ensure t
-;;   :config
-;;   (custom-set-variables
-;;  ;; Does not insert '--type' option
-;;  '(helm-ack-auto-set-filetype nil)
-;;  ;; Insert "thing-at-point 'symbol" as search pattern
-;;  '(helm-ack-thing-at-point 'symbol)) 
-;;   )
-
 
 ;; Ag.el
 ;; https://agel.readthedocs.io/en/latest/installation.html#emacs
 ;; Afterwards, you can install ag.el from MELPA (the recommended approach).
-;;:: Functions are autoloaded, so (require 'ag) is unnecessary.
+;; :: Functions are autoloaded, so (require 'ag) is unnecessary.
 ;; silver_searcher https://github.com/ggreer/the_silver_searcher\
-					; ag
-;; (use-package ag
-;;   :ensure t
-;;   :config
-;; 					;(require 'ag)
-;;   (setq ag-highlight-search nil)  ; 検索キーワードをハイライト
-;;   (setq ag-reuse-buffers nil)     ; 検索用バッファを使い回す (検索ごとに新バッファを作らない)
-;;   )
+;; ag
+(use-package ag
+  :ensure t
+  :init
+  (setq ag-highlight-search nil)  ; 検索キーワードをハイライト
+  (setq ag-reuse-buffers nil)     ; 検索用バッファを使い回す (検索ごとに新バッファを作らない)
+  )
 
-;; 					; wgrep
-;; (add-hook 'ag-mode-hook '(lambda ()
-;;                            (require 'wgrep-ag)
-;;                            (setq wgrep-auto-save-buffer t)  ; 編集完了と同時に保存
-;;                            (setq wgrep-enable-key "r")      ; "r" キーで編集モードに
-;;                            (wgrep-ag-setup)))
-;;;;ripgrep.el
-;;;;[url=http://emacs.rubikitch.com/ripgrep/]ripgrep.el :
-;;;【agより、ずっとはやい!!】超音速grepとEmacsインターフェース(Windows安心)[/url]
-;; ;;; rgバイナリの位置
-;;  (setq ripgrep-executable  "C:\\tools\\msys64\\usr\\bin\\rg")
-;; ;;; rgに渡すオプション
-;;  (setq ripgrep-arguments '("-S"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 日本語環境 windows grep対策
 ;; https://qiita.com/ignorant/items/76e4c162cedc47336e75#%E5%85%B1%E9%80%9A%E3%81%AE%E8%A8%AD%E5%AE%9A
 ;; https://extra-vision.blogspot.jp/2016/01/ntemacs-ag-silver-searcher.html
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
 ;; 重要
 ;;Emacs でファイルの文字コードを変換するときの覚書Add Stargito2morygonzalez
 ;; 基本
@@ -760,52 +666,10 @@
 
 ;; todo:: ripgrepで日本語検索可能だが、ファイル文字コードがshit-jisだと読まれない
 ;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; Org-mode LaTeX export is easy. Place the following code in your .emacs and you're ready to go.
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-
-;(use-package org-plus-contrib  :ensure t )
-
-(require 'ox-latex)
-(unless (boundp 'org-latex-classes)
-  (setq org-latex-classes nil))
-(add-to-list 'org-latex-classes
-             '("article"
-               "\\documentclass{article}"
-               ("\\section{%s}" . "\\section*{%s}")))
-
-					;(require 'ox-bibtex)
-					;(use-package ox-bibtex :ensure t )
-
-;;;; LaTeX 形式のファイル PDF に変換するためのコマンド
-					; http://akisute3.hatenablog.com/entry/2013/12/28/144918
-(setq org-latex-pdf-process
-      '("platex %f"
-        "platex %f"
-        "bibtex %b"
-        "platex %f"
-        "platex %f"
-        "dvipdfmx %b.dvi"))
-
-;;; \hypersetup{...} を出力しない
-(setq org-latex-with-hyperref nil)
-
-(add-to-list 'org-latex-classes
-             '("thesis"
-               "\\documentclass{jarticle}
-                [NO-PACKAGES]
-                [NO-DEFAULT-PACKAGES]
-                \\usepackage[dvipdfmx]{graphicx}"
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\paragraph{%s}" . "\\paragraph*{%s}")
-               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;   Basic config                                                   ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-
 ;; Global minor modes
 					;(setq column-number-mode t)
 (delete-selection-mode 1) ;テキスト入力するとモードが取り消されるらしい
@@ -843,7 +707,6 @@
   :ensure t
   :config (golden-ratio-mode 1))
 
-
 (use-package s
   ;;:ensure t
   :no-require t )
@@ -852,65 +715,41 @@
   :ensure t 
   :no-require t)
 
+
+;; Fix ibuffer to use ido-find-file
+(require 'ibuffer)
+(define-key ibuffer-mode-map (kbd "C-x C-f") #'ido-find-file)
+;; Always use ibuffer
+(global-set-key [remap list-buffers] #'ibuffer)
+
+
 (use-package web-mode
-  ;;Notes about lazy loading
-  ;;In almost all cases you don't need to manually specify
-  :defer t  	   )
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;; Writing Mail  via emacswiki ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-					; Gnus:
-(setq mail-user-agent 'message-user-agent)
-
-					; Rmail:
-					;(setq mail-user-agent 'sendmail-user-agent)
-
-					; MH-E:
-					;(setq mail-user-agent 'mh-e-user-agent)
-
-					; Gnus is using MessageMode part:
-(setq message-send-mail-function 'smtpmail-send-it)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;; message mode configuration ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; ;
-;; (setq user-mail-address "me@jk***.com"
-;;       user-full-name "jk*** me")
-
-					;(setq smtpmail-smtp-server "smtp.somewhere.jp.com")
-(setq message-send-mail-function 'message-smtpmail-send-it)
-
-(add-hook 'message-mode-hook 'toggle-input-method)
-(setq smtpmail-debug-info t)
-(setq message-default-mail-headers "Cc: \nBcc:\n")
-(setq message-auto-save-directory "~/Mail/drafts")
-
-
-;; Additional extensions.
-;;(require 'myproject)
-
-
-
-;;;  
-;; You don't need to unset a key before you rebind it to something else. This should do what you want:
-
-;; ;; create a new prefix map
-;; (define-prefix-command 'my-keymap)
-;; ;; bind the new keymap to C-e 
-;; (global-set-key "\C-e" my-keymap)
-;; ;; bind the individual commands:
-;; (define-key my-keymap "e" 'move-end-of-line)
-;; (define-key my-keymap "r" 'end-of-buffer)
-
-;; Now hitting C-e is a prefix, and C-e e calls end-of-line etc.
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.vue?\\'" . web-mode))
+  (setq web-mode-engines-alist
+	'(("django"    . "\\.html\\'")))
+  (setq web-mode-ac-sources-alist
+	'(("css" . (ac-source-css-property))
+	  ("vue" . (ac-source-words-in-buffer ac-source-abbrev))
+	  ("html" . (ac-source-words-in-buffer ac-source-abbrev))))
+  (setq web-mode-enable-auto-closing t))
+(setq web-mode-enable-auto-quoting t) ; this fixes the quote problem I mentioned
 
 ;; unset key 
 (global-unset-key (kbd "C-z"))
 (global-unset-key (kbd "C-x C-c"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;; Writing Mail  via emacswiki ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Mutt support.
+(setq auto-mode-alist (append '(("/tmp/mutt.*" . mail-mode)) auto-mode-alist))
+
+; Gnus:
+(setq mail-user-agent 'message-user-agent)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -1034,7 +873,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ace-window
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package ace-window
   :ensure t
   :init
@@ -1241,7 +1080,133 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
    ("V" scroll-down-command)
    ("l" recenter-top-bottom)))
 
+;; Org mode の C-c C-s で挿入する日付の曜日、英語曜日表記を強制する。
+
+(setq system-time-locale "C")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;; ox-org : org-mode export to latex
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;
+;; Org mode
+;;
+(require 'ox-latex)
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(setq org-latex-default-class "bxjsarticle")
+(setq org-latex-pdf-process '("latexmk -e '$latex=q/uplatex %S/' -e '$bibtex=q/upbibtex %B/' -e '$biber=q/biber --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex -o %D %S/' -e '$dvipdf=q/dvipdfmx -o %D %S/' -norc -gg -pdfdvi %f"))
+;(setq org-latex-pdf-process '("latexmk -e '$lualatex=q/lualatex %S/' -e '$bibtex=q/upbibtex %B/' -e '$biber=q/biber --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex -o %D %S/' -norc -gg -pdflua %f"))
+;(setq org-export-in-background t)
+(setq org-file-apps
+      '(("pdf" . "evince %s")))
+
+(add-to-list 'org-latex-classes
+             '("bxjsarticle"
+               "\\documentclass[autodetect-engine,dvi=dvipdfmx,11pt,a4paper,ja=standard]{bxjsarticle}
+[NO-DEFAULT-PACKAGES]
+\\usepackage{amsmath}
+\\usepackage{newtxtext,newtxmath}
+\\usepackage{graphicx}
+\\usepackage{hyperref}
+\\ifdefined\\kanjiskip
+  \\usepackage{pxjahyper}
+  \\hypersetup{colorlinks=true}
+\\else
+  \\ifdefined\\XeTeXversion
+      \\hypersetup{colorlinks=true}
+  \\else
+    \\ifdefined\\directlua
+      \\hypersetup{pdfencoding=auto,colorlinks=true}
+    \\else
+      \\hypersetup{unicode,colorlinks=true}
+    \\fi
+  \\fi
+\\fi"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+(add-to-list 'org-latex-classes
+             '("jlreq"
+               "\\documentclass[11pt,paper=a4]{jlreq}
+[NO-DEFAULT-PACKAGES]
+\\usepackage{amsmath}
+\\usepackage{newtxtext,newtxmath}
+\\ifdefined\\kanjiskip
+  \\usepackage[dvipdfmx]{graphicx}
+  \\usepackage[dvipdfmx]{hyperref}
+  \\usepackage{pxjahyper}
+  \\hypersetup{colorlinks=true}
+\\else
+  \\usepackage{graphicx}
+  \\usepackage{hyperref}
+  \\hypersetup{pdfencoding=auto,colorlinks=true}
+\\fi"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+(add-to-list 'org-latex-classes
+             '("jlreq-tate"
+               "\\documentclass[tate,11pt,paper=a4]{jlreq}
+[NO-DEFAULT-PACKAGES]
+\\usepackage{amsmath}
+\\usepackage{newtxtext,newtxmath}
+\\ifdefined\\kanjiskip
+  \\usepackage[dvipdfmx]{graphicx}
+  \\usepackage[dvipdfmx]{hyperref}
+  \\usepackage{pxjahyper}
+  \\hypersetup{colorlinks=true}
+\\else
+  \\usepackage{graphicx}
+  \\usepackage{hyperref}
+  \\hypersetup{pdfencoding=auto,colorlinks=true}
+\\fi"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+;; ↑
+;; 使い方 †
+;; ↑
+;; bxjsarticle を使用する場合 †
+
+;; org ファイルの先頭に
+
+;; #+TITLE: hoge
+;; #+AUTHOR: fuga
+;; #+LATEX_CLASS: bxjsarticle
+
+;; を追加します．
+;; ↑
+;; jlreq の横書きを使用する場合 †
+
+;; org ファイルの先頭に
+
+;; #+TITLE: hoge
+;; #+AUTHOR: fuga
+;; #+LATEX_CLASS: jlreq
+
+;; を追加します．
+;; ↑
+;; jlreq の縦書きを使用する場合 †
+
+;; org ファイルの先頭に
+
+;; #+TITLE: hoge
+;; #+AUTHOR: fuga
+;; #+LATEX_CLASS: jlreq-tate
+
+;; を追加します．
+
+
+
 
 ;;;;;;;;;;;;;;;; eof
 
