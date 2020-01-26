@@ -69,7 +69,7 @@
       "" :time-prompt t :tree-type week :kill-buffer t))))
  '(package-selected-packages
    (quote
-    (ack smart-mode-line dired-open dired-subtree dired-filter systemd ag aggressive-indent pcre2el projectile golden-ratio magit-gh-pulls magit yasnippet yaml-mode web-mode use-package ripgrep rg recentf-ext rainbow-mode pony-mode pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets open-junk-file lispxmp grep-a-lot flx-ido exec-path-from-shell evil dired+ dash-functional browse-at-remote auto-async-byte-compile apache-mode anything adaptive-wrap ace-window)))
+    (ack smart-mode-line pcre2el projectile golden-ratio yaml-mode web-mode use-package ripgrep rg recentf-ext pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets lispxmp grep-a-lot flx-ido exec-path-from-shell evil dash-functional  adaptive-wrap ace-window)))
  '(safe-local-variable-values (quote ((lical-binding . t))))
  '(skk-annotation-other-sources
    (quote
@@ -209,6 +209,30 @@
 ;; ldd の結果のキャッシュ
 (defvar ldd-cache nil)
 
+
+;;;;; devuan PATH  ;;;;;;;;;;
+
+;; (when (equal system-type 'windows-nt)
+;; ;
+;;  )
+  ;; (setenv "PATH"
+  ;;         (concat
+  ;; 	 ;  "C:\\ProgramData\\chocolatey\\lib\\ag\\tools;"
+  ;; 	   "/usr/bin"
+  ;; 	   "/usr/local/texlive/2019/bin/x86_64-linux"
+  ;; 	   "/bin"
+  ;; 	   "/app/bin"
+  ;; 	   (getenv "PATH")))
+
+    (setenv "PATH" (concat (getenv "PATH") ":/usr/bin"))
+    (setq exec-path (append exec-path '("/usr/bin")))
+    (setenv "PATH" (concat (getenv "PATH") ":/app/bin"))
+    (setq exec-path (append exec-path '("/app/bin")))
+    (setenv "PATH" (concat (getenv "PATH") ":/usr/local/texlive/2019/bin/x86_64-linux"))
+    (setq exec-path (append exec-path '("/usr/local/texlive/2019/bin/x86_64-linux")))
+
+
+;;;;;
 
 ;;; ob-shell.el --- Babel Functions for Shell Evaluation 
 ;; Copyright (C) 2009-2020 Free Software Foundation, Inc.
@@ -882,16 +906,20 @@ return the value of the last statement in BODY."
    ; :no-require t
     :defer t
     :ensure t
+    :init
+    (exec-path-from-shell-initialize)    
     )
-(exec-path-from-shell-initialize)
+
    
   ;;; perl v path ;;;;  
  ;
-( )
- (when (equal system-type 'windows-nt)
-   (exec-path	(split-string (getenv "PATH") ":"))
-   (let ((path exec-path))
-     (format "  exec-path: %s\n" exec-path)))
+;; ( )
+;;  (when (equal system-type 'windows-nt)
+;;    (exec-path	(split-string (getenv "PATH") ":"))
+;;    (let ((path exec-path))
+;;      (format "  exec-path: %s\n" exec-path)))
+
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;  pcre2el rxt-mode http://emacs.rubikitch.com/pcre2el/
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
