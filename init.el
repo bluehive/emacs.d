@@ -1,7 +1,7 @@
 ;; -*- coding: utf-8-unix -*-
 ;;; init.el --- Emacs initialization file -*- lical-binding: t -*-
 
-;; emacs26  for devuan
+;; emacs25 or 26 for devuan
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; base package control                                            ;;;
@@ -867,22 +867,18 @@ return the value of the last statement in BODY."
 
 (use-package exec-path-from-shell
    ; :no-require t
-   ; :defer t
+    :defer t
     :ensure t
     )
 (exec-path-from-shell-initialize)
    
-  ;;; perl v path ;;;;  equal system-type 'ns
-    (
-     (when (equal system-type '(mac ns))
-  (exec-path-from-shell-initialize)
-  exec-path	(split-string (getenv "PATH") ":")
- ; /home/blue/.plenv/versions/5.28.0/lib/perl5/5.28.0/
-
-   	; /home/kato/	.	plenv/versions/5.27.2/bin
-  (let ((path exec-path))
-    (format "  exec-path: %s\n" exec-path))))
-
+  ;;; perl v path ;;;;  
+ ;
+( )
+ (when (equal system-type 'windows-nt)
+   (exec-path	(split-string (getenv "PATH") ":"))
+   (let ((path exec-path))
+     (format "  exec-path: %s\n" exec-path)))
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;  pcre2el rxt-mode http://emacs.rubikitch.com/pcre2el/
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
