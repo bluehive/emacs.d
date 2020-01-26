@@ -1,7 +1,7 @@
 ;; -*- coding: utf-8-unix -*-
 ;;; init.el --- Emacs initialization file -*- lical-binding: t -*-
 
-;; emacs25 for lubunt
+;; emacs26  for devuan
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; base package control                                            ;;;
@@ -50,6 +50,7 @@
    (quote
     ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default)))
  '(desktop-save-mode t)
+ '(font-use-system-font nil)
  '(org-agenda-files (quote ("~/org-mode/todo.org")))
  '(org-babel-load-languages
    (quote
@@ -76,7 +77,7 @@
  '(skk-auto-insert-paren t)
  '(skk-auto-okuri-process nil)
  '(skk-auto-start-henkan nil)
- '(skk-aux-large-jisyo "/home/kato/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
+ '(skk-aux-large-jisyo "/home/devuan/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
  '(skk-cdb-large-jisyo nil)
  '(skk-check-okurigana-on-touroku (quote ask))
  '(skk-date-ad t)
@@ -84,10 +85,10 @@
  '(skk-egg-like-newline t)
  '(skk-extra-jisyo-file-list
    (quote
-    ("/home/kato/.emacs.d/skk-get-jisyo/SKK-JISYO.jinmei" "/home/kato/.emacs.d/skk-get-jisyo/SKK-JISYO.geo" "/home/kato/.emacs.d/skk-get-jisyo/SKK-JISYO.pubdic+")))
+    ("/home/devuan/.emacs.d/skk-get-jisyo/SKK-JISYO.jinmei" "/home/devuan/.emacs.d/skk-get-jisyo/SKK-JISYO.geo" "/home/devuan/.emacs.d/skk-get-jisyo/SKK-JISYO.pubdic+")))
  '(skk-henkan-okuri-strictly nil)
  '(skk-henkan-strict-okuri-precedence nil)
- '(skk-itaiji-jisyo "/home/kato/.emacs.d/skk-get-jisyo/SKK-JISYO.itaiji")
+ '(skk-itaiji-jisyo "/home/devuan/.emacs.d/skk-get-jisyo/SKK-JISYO.itaiji")
  '(skk-j-mode-function-key-usage nil)
  '(skk-japanese-message-and-error t)
  '(skk-kakutei-early t)
@@ -156,12 +157,14 @@
 )
 (require 'cl-lib)
 
+
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ language - coding system  on ubuntu18                         ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (when (equal system-type 'gnu/linux)
   (require 'ucs-normalize)
-  ;;(setq default-process-coding-system 'utf-8-unix)
+  ;; (setq default-process-coding-system 'utf-8-unix)
   ;; プロセスが出力する文字oコードを判定して、process-coding-system の DECODING の設定値を決定する
   (setq default-process-coding-system '(undecided-dos . utf-8-unix))
   ;;  (setq default-process-coding-system '(utf-8-unix . cp932)) ;agで日本語検索 qさせるためのおまじない
@@ -170,7 +173,6 @@
   (setq locale-coding-system 'utf-8-unix)
   (setq set-default-coding-systems 'utf-8-unix)
   )
-
 
 ;; IME の設定をした後には実行しないこと
 ;;(set-language-environment 'Japanese)
@@ -193,6 +195,289 @@
 
 ;; ldd の結果のキャッシュ
 (defvar ldd-cache nil)
+
+
+;;; ob-shell.el --- Babel Functions for Shell Evaluation 
+;; Copyright (C) 2009-2020 Free Software Foundation, Inc.
+
+;; Author: Eric Schulte
+;; Keywords: literate programming, reproducible research
+;; Homepage: https://orgmode.org
+
+;; This file is part of GNU Emacs.
+
+;; GNU Emacs is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; GNU Emacs is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; Org-Babel support for evaluating shell source code.
+
+;;; Code:
+(require 'ob)
+(require 'org-macs)
+(require 'shell)
+(require 'cl-lib)
+
+(declare-function org-babel-comint-in-buffer "ob-comint" (buffer &rest body)
+		  t)
+(declare-function org-babel-comint-wait-for-output "ob-comint" (buffer))
+(declare-function org-babel-comint-buffer-livep "ob-comint" (buffer))
+(declare-function org-babel-comint-with-output "ob-comint" (meta &rest body)
+		  t)
+(declare-function orgtbl-to-generic "org-table" (table params))
+
+(defvar org-babel-default-header-args:shell '())
+(defvar org-babel-shell-names)
+
+(defun org-babel-shell-initialize ()
+  "Define execution functions associated to shell names.
+This function has to be called whenever `org-babel-shell-names'
+is modified outside the Customize interface."
+  (interactive)
+  (dolist (name org-babel-shell-names)
+    (eval `(defun ,(intern (concat "org-babel-execute:" name))
+	       (body params)
+	     ,(format "Execute a block of %s commands with Babel." name)
+	     (let ((shell-file-name ,name))
+	       (org-babel-execute:shell body params))))
+    (eval `(defalias ',(intern (concat "org-babel-variable-assignments:" name))
+	     'org-babel-variable-assignments:shell
+	     ,(format "Return list of %s statements assigning to the block's \
+variables."
+		      name)))
+    (eval `(defvar ,(intern (concat "org-babel-default-header-args:" name)) '()))))
+
+(defcustom org-babel-shell-names
+  '("sh" "bash" "zsh" "fish" "csh" "ash" "dash" "ksh" "mksh" "posh")
+  "List of names of shell supported by babel shell code blocks.
+Call `org-babel-shell-initialize' when modifying this variable
+outside the Customize interface."
+  :group 'org-babel
+  :type '(repeat (string :tag "Shell name: "))
+  :set (lambda (symbol value)
+	 (set-default symbol value)
+	 (org-babel-shell-initialize)))
+
+(defun org-babel-execute:shell (body params)
+  "Execute a block of Shell commands with Babel.
+This function is called by `org-babel-execute-src-block'."
+  (let* ((session (org-babel-sh-initiate-session
+		   (cdr (assq :session params))))
+	 (stdin (let ((stdin (cdr (assq :stdin params))))
+                  (when stdin (org-babel-sh-var-to-string
+                               (org-babel-ref-resolve stdin)))))
+	 (cmdline (cdr (assq :cmdline params)))
+         (full-body (org-babel-expand-body:generic
+		     body params (org-babel-variable-assignments:shell params))))
+    (org-babel-reassemble-table
+     (org-babel-sh-evaluate session full-body params stdin cmdline)
+     (org-babel-pick-name
+      (cdr (assq :colname-names params)) (cdr (assq :colnames params)))
+     (org-babel-pick-name
+      (cdr (assq :rowname-names params)) (cdr (assq :rownames params))))))
+
+(defun org-babel-prep-session:shell (session params)
+  "Prepare SESSION according to the header arguments specified in PARAMS."
+  (let* ((session (org-babel-sh-initiate-session session))
+	 (var-lines (org-babel-variable-assignments:shell params)))
+    (org-babel-comint-in-buffer session
+      (mapc (lambda (var)
+              (insert var) (comint-send-input nil t)
+              (org-babel-comint-wait-for-output session)) var-lines))
+    session))
+
+(defun org-babel-load-session:shell (session body params)
+  "Load BODY into SESSION."
+  (save-window-excursion
+    (let ((buffer (org-babel-prep-session:shell session params)))
+      (with-current-buffer buffer
+        (goto-char (process-mark (get-buffer-process (current-buffer))))
+        (insert (org-babel-chomp body)))
+      buffer)))
+
+
+;;; Helper functions
+(defun org-babel--variable-assignments:sh-generic
+    (varname values &optional sep hline)
+  "Return a list of statements declaring the values as a generic variable."
+  (format "%s=%s" varname (org-babel-sh-var-to-sh values sep hline)))
+
+(defun org-babel--variable-assignments:bash_array
+    (varname values &optional sep hline)
+  "Return a list of statements declaring the values as a bash array."
+  (format "unset %s\ndeclare -a %s=( %s )"
+	  varname varname
+	  (mapconcat
+	   (lambda (value) (org-babel-sh-var-to-sh value sep hline))
+	   values
+	   " ")))
+
+(defun org-babel--variable-assignments:bash_assoc
+    (varname values &optional sep hline)
+  "Return a list of statements declaring the values as bash associative array."
+  (format "unset %s\ndeclare -A %s\n%s"
+    varname varname
+    (mapconcat
+     (lambda (items)
+       (format "%s[%s]=%s"
+	       varname
+	       (org-babel-sh-var-to-sh (car items) sep hline)
+	       (org-babel-sh-var-to-sh (cdr items) sep hline)))
+     values
+     "\n")))
+
+(defun org-babel--variable-assignments:bash (varname values &optional sep hline)
+  "Represent the parameters as useful Bash shell variables."
+  (pcase values
+    (`((,_ ,_ . ,_) . ,_)		;two-dimensional array
+     (org-babel--variable-assignments:bash_assoc varname values sep hline))
+    (`(,_ . ,_)				;simple list
+     (org-babel--variable-assignments:bash_array varname values sep hline))
+    (_					;scalar value
+     (org-babel--variable-assignments:sh-generic varname values sep hline))))
+
+(defun org-babel-variable-assignments:shell (params)
+  "Return list of shell statements assigning the block's variables."
+  (let ((sep (cdr (assq :separator params)))
+	(hline (when (string= "yes" (cdr (assq :hlines params)))
+		 (or (cdr (assq :hline-string params))
+		     "hline"))))
+    (mapcar
+     (lambda (pair)
+       (if (string-suffix-p "bash" shell-file-name)
+	   (org-babel--variable-assignments:bash
+            (car pair) (cdr pair) sep hline)
+         (org-babel--variable-assignments:sh-generic
+	  (car pair) (cdr pair) sep hline)))
+     (org-babel--get-vars params))))
+
+(defun org-babel-sh-var-to-sh (var &optional sep hline)
+  "Convert an elisp value to a shell variable.
+Convert an elisp var into a string of shell commands specifying a
+var of the same value."
+  (concat "'" (replace-regexp-in-string
+	       "'" "'\"'\"'"
+	       (org-babel-sh-var-to-string var sep hline))
+	  "'"))
+
+(defun org-babel-sh-var-to-string (var &optional sep hline)
+  "Convert an elisp value to a string."
+  (let ((echo-var (lambda (v) (if (stringp v) v (format "%S" v)))))
+    (cond
+     ((and (listp var) (or (listp (car var)) (eq (car var) 'hline)))
+      (orgtbl-to-generic var  (list :sep (or sep "\t") :fmt echo-var
+				    :hline hline)))
+     ((listp var)
+      (mapconcat echo-var var "\n"))
+     (t (funcall echo-var var)))))
+
+(defun org-babel-sh-initiate-session (&optional session _params)
+  "Initiate a session named SESSION according to PARAMS."
+  (when (and session (not (string= session "none")))
+    (save-window-excursion
+      (or (org-babel-comint-buffer-livep session)
+          (progn
+	    (shell session)
+	    ;; Needed for Emacs 23 since the marker is initially
+	    ;; undefined and the filter functions try to use it without
+	    ;; checking.
+	    (set-marker comint-last-output-start (point))
+	    (get-buffer (current-buffer)))))))
+
+(defvar org-babel-sh-eoe-indicator "echo 'org_babel_sh_eoe'"
+  "String to indicate that evaluation has completed.")
+(defvar org-babel-sh-eoe-output "org_babel_sh_eoe"
+  "String to indicate that evaluation has completed.")
+
+(defun org-babel-sh-evaluate (session body &optional params stdin cmdline)
+  "Pass BODY to the Shell process in BUFFER.
+If RESULT-TYPE equals `output' then return a list of the outputs
+of the statements in BODY, if RESULT-TYPE equals `value' then
+return the value of the last statement in BODY."
+  (let* ((shebang (cdr (assq :shebang params)))
+	 (results
+	  (cond
+	   ((or stdin cmdline)	       ; external shell script w/STDIN
+	    (let ((script-file (org-babel-temp-file "sh-script-"))
+		  (stdin-file (org-babel-temp-file "sh-stdin-"))
+		  (padline (not (string= "no" (cdr (assq :padline params))))))
+	      (with-temp-file script-file
+		(when shebang (insert shebang "\n"))
+		(when padline (insert "\n"))
+		(insert body))
+	      (set-file-modes script-file #o755)
+	      (with-temp-file stdin-file (insert (or stdin "")))
+	      (with-temp-buffer
+		(call-process-shell-command
+		 (concat (if shebang script-file
+			   (format "%s %s" shell-file-name script-file))
+			 (and cmdline (concat " " cmdline)))
+		 stdin-file
+		 (current-buffer))
+		(buffer-string))))
+	   (session			; session evaluation
+	    (mapconcat
+	     #'org-babel-sh-strip-weird-long-prompt
+	     (mapcar
+	      #'org-trim
+	      (butlast
+	       (org-babel-comint-with-output
+		   (session org-babel-sh-eoe-output t body)
+		 (dolist (line (append (split-string (org-trim body) "\n")
+				       (list org-babel-sh-eoe-indicator)))
+		   (insert line)
+		   (comint-send-input nil t)
+		   (while (save-excursion
+			    (goto-char comint-last-input-end)
+			    (not (re-search-forward
+				  comint-prompt-regexp nil t)))
+		     (accept-process-output
+		      (get-buffer-process (current-buffer))))))
+	       2))
+	     "\n"))
+	   ;; External shell script, with or without a predefined
+	   ;; shebang.
+	   ((org-string-nw-p shebang)
+	    (let ((script-file (org-babel-temp-file "sh-script-"))
+		  (padline (not (equal "no" (cdr (assq :padline params))))))
+	      (with-temp-file script-file
+		(insert shebang "\n")
+		(when padline (insert "\n"))
+		(insert body))
+	      (set-file-modes script-file #o755)
+	      (org-babel-eval script-file "")))
+	   (t
+	    (org-babel-eval shell-file-name (org-trim body))))))
+    (when results
+      (let ((result-params (cdr (assq :result-params params))))
+        (org-babel-result-cond result-params
+          results
+          (let ((tmp-file (org-babel-temp-file "sh-")))
+            (with-temp-file tmp-file (insert results))
+            (org-babel-import-elisp-from-file tmp-file)))))))
+
+(defun org-babel-sh-strip-weird-long-prompt (string)
+  "Remove prompt cruft from a string of shell output."
+  (while (string-match "^% +[\r\n$]+ *" string)
+    (setq string (substring string (match-end 0))))
+  string)
+
+(provide 'ob-shell)
+
+
+
+;;; ob-shell.el ends here
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Ido itself                                      ;;;
@@ -363,7 +648,7 @@
 
  '(package-selected-packages
    (quote
-    (exec-path-from-shell dired-quick-sort dired+ ace-window web-mode yaml-mode systemd projectile pony-mode pip-requirements grep-a-lot flycheck flx-ido diff-hl apache-mode auto-async-byte-compile paredit lispxmp open-junk-file ripgrep rg ht yasnippet rainbow-mode ## recentf-ext anything)))
+    (exec-path-from-shell dired-quick-sort yatex ace-window web-mode yaml-mode flycheck flx-ido diff-hl paredit lispxmp rg ht ## recentf-ext )))
  '(send-mail-function (quote smtpmail-send-it))
 
 (add-hook 'cperl-mode-hook
@@ -487,7 +772,7 @@
 (find-function-setup-keys)
 
 ;; org-mode
-(require 'org)
+;;(require 'org)
 
 ;; 日本語info設定
 ;;; ~/info/以下をinfoファイル検索ディレクトリに加える
@@ -530,11 +815,11 @@
 ;;; http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/scheme.html;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
-(setq scheme-program-name "/usr/local/bin/gosh")
-(autoload 'run-scheme "cmuscheme" "Run an inferior Scheme process." t)
-(setq cmuscheme-load-hook
-      '((lambda () (define-key inferior-scheme-mode-map "\C-c\C-t"
-     'favorite-cmd))))
+;; (setq scheme-program-name "/usr/local/bin/gosh")
+;; (autoload 'run-scheme "cmuscheme" "Run an inferior Scheme process." t)
+;; (setq cmuscheme-load-hook
+;;       '((lambda () (define-key inferior-scheme-mode-map "\C-c\C-t"
+;;      'favorite-cmd))))
 
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -576,23 +861,27 @@
        (lambda ()
          (local-set-key (kbd "C-h f") 'cperl-perldoc)))
 
-;;; perl v path ;;;;
-;(when (memq window-system '(mac ns))
+;;exec-path-from-shell.el
+  ;;shell のパスをそのまま通す　重要 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package exec-path-from-shell
+   ; :no-require t
+   ; :defer t
+    :ensure t
+    )
+(exec-path-from-shell-initialize)
+   
+  ;;; perl v path ;;;;  equal system-type 'ns
+    (
+     (when (equal system-type '(mac ns))
   (exec-path-from-shell-initialize)
   exec-path	(split-string (getenv "PATH") ":")
  ; /home/blue/.plenv/versions/5.28.0/lib/perl5/5.28.0/
 
    	; /home/kato/	.	plenv/versions/5.27.2/bin
   (let ((path exec-path))
-    (format "  exec-path: %s\n" exec-path))
-  ;;exec-path-from-shell.el
-  ;;shell のパスをそのまま通す　重要 ;;
-  (use-package exec-path-from-shell
-   ; :no-require t
-    :defer t
-    :ensure t
-    :init		(exec-path-from-shell-initialize)
-    )
+    (format "  exec-path: %s\n" exec-path))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;  pcre2el rxt-mode http://emacs.rubikitch.com/pcre2el/
@@ -625,11 +914,24 @@
 
 (use-package ack
   :ensure t
-  :config
- ;; (add-hook 'ack-minibuffer-setup-hook 'ack-skel-vc-grep t)
- ;; (add-hook 'ack-minibuffer-setup-hook 'ack-yank-symbol-at-point t)
- ;; (grep-apply-setting 'grep-command "ack --with-filename --nofilter --nogroup ")
-  )
+ ;; :config
+ )
+  (defvar ack-history nil
+  "History for the `ack' command.")
+  (defun ack (command-args)
+  (interactive
+   (let ((ack-command "ack --nofilter --nogroup --with-filename "))
+     (list (read-shell-command "Run ack (like this): "
+                               ack-command
+                               'ack-history))))
+  (let ((compilation-disable-input t))
+    (compilation-start (concat command-args " < " null-device)
+                       'grep-mode))) 
+
+ (add-hook 'ack-minibuffer-setup-hook 'ack-skel-vc-grep t)
+ (add-hook 'ack-minibuffer-setup-hook 'ack-yank-symbol-at-point t)
+;; (grep-apply-setting 'grep-command "ack --with-filename --nofilter --nogroup ")
+
 
 ;; Ag.el
 ;; https://agel.readthedocs.io/en/latest/installation.html#emacs
@@ -1084,6 +1386,164 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
 
 (setq system-time-locale "C")
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;; yatex to latex 野鳥起動のための設定
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(use-package yatex
+  :ensure t
+ ; :config
+)
+ ;; (setq auto-mode-alist
+ ;; 		(cons (cons "\\.tex$" ’yatex-mode) auto-mode-alist))
+ ;;  (autoload ’yatex-mode "yatex" "Yet Another LaTeX mode" t)
+
+  (setq load-path (cons (expand-file-name "~/Documents/latex/yatex") load-path))  
+(autoload 'yatex-mode "yatex" "Yet Another LaTeX mode" t)
+
+;; YaTeX-mode
+;; (setq auto-mode-alist
+;;       (cons (cons "\\.tex$" 'yatex-mode) auto-mode-alist))
+;; (setq dvi2-command "xdvi"
+;;       tex-command "platex"
+;;       dviprint-command-format "dvips %s | lpr"
+;;       YaTeX-kanji-code nil)
+
+;; ;; YaHtml-mode
+;; (setq auto-mode-alist
+;;       (cons (cons "\\.html$" 'yahtml-mode) auto-mode-alist))
+;; (autoload 'yahtml-mode "yahtml" "Yet Another HTML mode" t)
+;; (setq yahtml-www-browser "netscape")
+
+;; (setq mac-option-modifier 'meta)
+
+;; (setq indent-tabs-mode nil)
+
+;;;;;;;;;  ;;;;;;;;;;;;;;;;;;;  https://texwiki.texjp.org/?YaTeX#e2cbcccd  ;;;;;;;;;;;;;;
+
+(autoload 'yatex-mode "yatex" "Yet Another LaTeX mode" t)
+(setq auto-mode-alist
+      (append '(("\\.tex$" . yatex-mode)
+                ("\\.ltx$" . yatex-mode)
+                ("\\.cls$" . yatex-mode)
+                ("\\.sty$" . yatex-mode)
+                ("\\.clo$" . yatex-mode)
+                ("\\.bbl$" . yatex-mode)) auto-mode-alist))
+(setq YaTeX-inhibit-prefix-letter t)
+(setq YaTeX-kanji-code nil)
+(setq YaTeX-latex-message-code 'utf-8)
+(setq YaTeX-use-LaTeX2e t)
+(setq YaTeX-use-AMS-LaTeX t)
+(setq YaTeX-dvi2-command-ext-alist
+      '(("TeXworks\\|texworks\\|texstudio\\|mupdf\\|SumatraPDF\\|Preview\\|Skim\\|TeXShop\\|evince\\|atril\\|xreader\\|okular\\|zathura\\|qpdfview\\|Firefox\\|firefox\\|chrome\\|chromium\\|MicrosoftEdge\\|microsoft-edge\\|Adobe\\|Acrobat\\|AcroRd32\\|acroread\\|pdfopen\\|xdg-open\\|open\\|start" . ".pdf")))
+(setq tex-command "ptex2pdf -u -l -ot '-synctex=1'")
+;(setq tex-command "lualatex -synctex=1")
+;(setq tex-command "latexmk")
+;(setq tex-command "latexmk -e '$latex=q/uplatex %O -synctex=1 %S/' -e '$bibtex=q/upbibtex %O %B/' -e '$biber=q/biber %O --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex %O -o %D %S/' -e '$dvipdf=q/dvipdfmx %O -o %D %S/' -norc -gg -pdfdvi")
+;(setq tex-command "latexmk -e '$lualatex=q/lualatex %O -synctex=1 %S/' -e '$bibtex=q/upbibtex %O %B/' -e '$biber=q/biber %O --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex %O -o %D %S/' -norc -gg -pdflua")
+(setq bibtex-command "latexmk -e '$latex=q/uplatex %O -synctex=1 %S/' -e '$bibtex=q/upbibtex %O %B/' -e '$biber=q/biber %O --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex %O -o %D %S/' -e '$dvipdf=q/dvipdfmx %O -o %D %S/' -norc -gg -pdfdvi")
+(setq makeindex-command  "latexmk -e '$latex=q/uplatex %O -synctex=1 %S/' -e '$bibtex=q/upbibtex %O %B/' -e '$biber=q/biber %O --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex %O -o %D %S/' -e '$dvipdf=q/dvipdfmx %O -o %D %S/' -norc -gg -pdfdvi")
+;(setq dvi2-command "xdg-open")
+(setq dvi2-command "evince")
+;(setq dvi2-command "atril")
+;(setq dvi2-command "okular --unique")
+;(setq dvi2-command "zathura -x \"emacsclient --no-wait +%{line} %{input}\"")
+;(setq dvi2-command "qpdfview --unique")
+;(setq dvi2-command "texworks")
+;(setq dvi2-command "texstudio --pdf-viewer-only")
+;(setq tex-pdfview-command "xdg-open")
+(setq tex-pdfview-command "evince")
+;(setq tex-pdfview-command "atril")
+;(setq tex-pdfview-command "okular --unique")
+;(setq tex-pdfview-command "zathura -x \"emacsclient --no-wait +%{line} %{input}\"")
+;(setq tex-pdfview-command "qpdfview --unique")
+;(setq tex-pdfview-command "texworks")
+;(setq tex-pdfview-command "texstudio --pdf-viewer-only")
+(setq dviprint-command-format "wine cmd /c start AcroRd32.exe `echo %s | sed -e \"s/\\.[^.]*$/\\.pdf/\"`")
+
+(require 'dbus)
+
+(defun un-urlify (fname-or-url)
+  "A trivial function that replaces a prefix of file:/// with just /."
+  (if (string= (substring fname-or-url 0 8) "file:///")
+      (substring fname-or-url 7)
+    fname-or-url))
+
+(defun evince-inverse-search (file linecol &rest ignored)
+  (let* ((fname (decode-coding-string (url-unhex-string (un-urlify file)) 'utf-8))
+         (buf (find-file fname))
+         (line (car linecol))
+         (col (cadr linecol)))
+    (if (null buf)
+        (message "[Synctex]: %s is not opened..." fname)
+      (switch-to-buffer buf)
+      (goto-line (car linecol))
+      (unless (= col -1)
+        (move-to-column col))
+      (x-focus-frame (selected-frame)))))
+
+(dbus-register-signal
+ :session nil "/org/gnome/evince/Window/0"
+ "org.gnome.evince.Window" "SyncSource"
+ 'evince-inverse-search)
+
+(with-eval-after-load 'yatexprc
+  (defun YaTeX-preview-jump-line ()
+    "Call jump-line function of various previewer on current main file"
+    (interactive)
+    (save-excursion
+      (save-restriction
+        (widen)
+        (let*((pf (or YaTeX-parent-file
+                      (save-excursion (YaTeX-visit-main t) (buffer-file-name))))
+              (pdir (file-name-directory pf))
+              (bnr (substring pf 0 (string-match "\\....$" pf)))
+              ;(cf (file-relative-name (buffer-file-name) pdir))
+              (cf (buffer-file-name)) ;2016-01-08
+              (buffer (get-buffer-create " *preview-jump-line*"))
+              (line (count-lines (point-min) (point-end-of-line)))
+              (previewer (YaTeX-preview-default-previewer))
+              (cmd (cond
+                    ((string-match "Skim" previewer)
+                     (format "%s %d '%s.pdf' '%s'"
+                             YaTeX-cmd-displayline line bnr cf))
+                    ((string-match "evince" previewer)
+                     (format "%s '%s.pdf' %d '%s'"
+                             "fwdevince" bnr line cf))
+                    ((string-match "sumatra" previewer)
+                     (format "%s \"%s.pdf\" -forward-search \"%s\" %d"
+                             previewer bnr cf line))
+                    ((string-match "zathura" previewer)
+                     (format "%s --synctex-forward '%d:0:%s' '%s.pdf'"
+                             previewer line cf bnr))
+                    ((string-match "qpdfview" previewer)
+                     (format "%s '%s.pdf#src:%s:%d:0'"
+                             previewer bnr cf line))
+                    ((string-match "okular" previewer)
+                     (format "%s '%s.pdf#src:%d %s'"
+                             previewer bnr line (expand-file-name cf)))
+                    )))
+          (YaTeX-system cmd "jump-line" 'noask pdir))))))
+
+(add-hook 'yatex-mode-hook
+          '(lambda ()
+             (auto-fill-mode -1)))
+
+;;
+;; RefTeX with YaTeX
+;;
+;(add-hook 'yatex-mode-hook 'turn-on-reftex)
+(add-hook 'yatex-mode-hook
+          '(lambda ()
+             (reftex-mode 1)
+             (define-key reftex-mode-map (concat YaTeX-prefix ">") 'YaTeX-comment-region)
+             (define-key reftex-mode-map (concat YaTeX-prefix "<") 'YaTeX-uncomment-region)))
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; ox-org : org-mode export to latex
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1172,6 +1632,7 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
+;
 ;; ↑
 ;; 使い方 †
 ;; ↑
@@ -1181,8 +1642,8 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
 
 ;; #+TITLE: hoge
 ;; #+AUTHOR: fuga
-;; #+LATEX_CLASS: bxjsarticle
-
+;; #+LATEX_CLASS: bxjsarticle p
+ 
 ;; を追加します．
 ;; ↑
 ;; jlreq の横書きを使用する場合 †
@@ -1205,6 +1666,7 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
 
 ;; を追加します．
 
+;;
 
 
 
