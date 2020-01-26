@@ -1,4 +1,4 @@
-;; -*- coding: utf-8-unix -*-
+;; -*- coding: utf-8 -*-
 ;;; init.el --- Emacs initialization file -*- lical-binding: t -*-
 
 ;; emacs25 or 26 for devuan
@@ -147,9 +147,9 @@
 
 (when (equal system-type 'ns)
   (require 'ucs-normalize)
-  (setq prefer-coding-system 'utf-8-unix)
-  (setq locale-coding-system 'utf-8-unix)
-  (setq default-process-coding-system '(utf-8-unix . cp932)) ;agで日本語検索させるためのおまじない
+  (setq prefer-coding-system 'utf-8)
+  (setq locale-coding-system nil)
+  (setq default-process-coding-system '(utf-8 . cp932)) ;agで日本語検索させるためのおまじない
 
   (setq set-file-name-coding-system 'cp932)
   (setq set-keyboard-coding-system 'cp932)
@@ -163,15 +163,28 @@
 ;;; @ language - coding system  on ubuntu18                         ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (when (equal system-type 'gnu/linux)
-  (require 'ucs-normalize)
-  ;; (setq default-process-coding-system 'utf-8-unix)
-  ;; プロセスが出力する文字oコードを判定して、process-coding-system の DECODING の設定値を決定する
-  (setq default-process-coding-system '(undecided-dos . utf-8-unix))
-  ;;  (setq default-process-coding-system '(utf-8-unix . cp932)) ;agで日本語検索 qさせるためのおまじない
-  (setq prefer-coding-system 'utf-8-unix)
-  (setq file-name-coding-system 'utf-8-unix)
-  (setq locale-coding-system 'utf-8-unix)
-  (setq set-default-coding-systems 'utf-8-unix)
+  ;; (require 'ucs-normalize)
+  ;; ;; (setq default-process-coding-system 'utf-8-unix)
+  ;; ;; プロセスが出力する文字oコードを判定して、process-coding-system の DECODING の設定値を決定する
+  ;; (setq default-process-coding-system '(undecided-dos . utf-8-unix))
+  ;; ;;  (setq default-process-coding-system '(utf-8-unix . cp932)) ;agで日本語検索 qさせるためのおまじない
+  ;; (setq prefer-coding-system 'utf-8-unix)
+  ;; (setq file-name-coding-system 'utf-8-unix)
+  ;; (setq locale-coding-system 'utf-8-unix)
+  ;; (setq set-default-coding-systems 'utf-8-unix)
+
+  ;;;
+  
+;; 環境を日本語、UTF-8にする
+(set-locale-environment nil)
+;;(set-language-environment "Japanese")
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-buffer-file-coding-system 'utf-8)
+(setq default-buffer-file-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(prefer-coding-system 'utf-8)
+
   )
 
 ;; IME の設定をした後には実行しないこと
@@ -182,16 +195,16 @@
 ;; 新規作成時のファイルのデフォルトを変える場合には set-default 関数を使って buffer-file-coding-system のデフォルト値を変更します。
 (when (equal system-type 'gnu/linux)
   ;; ファイルのデフォルトを non-BOM UTF-8
-  (set-default 'buffer-file-coding-system 'utf-8-unix)
+  (set-default 'buffer-file-coding-system 'utf-8)
   ;; BOM なし UTF-8 でなければならない言語のファイル文字固定
-  (modify-coding-system-alist 'file "\\.org\\'" 'utf-8-unix)               ;; org-mode
-  (modify-coding-system-alist 'file "\\.p?\\'" 'utf-8-unix)              ;; perl
+  (modify-coding-system-alist 'file "\\.org\\'" 'utf-8)               ;; org-mode
+  (modify-coding-system-alist 'file "\\.p?\\'" 'utf-8)              ;; perl
   )
 
 (when (equal system-type 'ns)
 
 ;; プロセスが出力する文字コードを判定して、process-coding-system の DECODING の設定値を決定する
-  (setq default-process-coding-system '(undecided-dos . utf-8-unix)))
+  (setq default-process-coding-system '(undecided-dos . utf-8)))
 
 ;; ldd の結果のキャッシュ
 (defvar ldd-cache nil)
