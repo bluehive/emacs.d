@@ -1,7 +1,7 @@
 ;; -*- coding: utf-8 -*-
 ;;; init.el --- Emacs initialization file -*- lical-binding: t -*-
 
-;; emacs25 or 26 for devuan
+;; emacs25 on devuan-os
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; base package control                                            ;;;
@@ -1627,7 +1627,7 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
 
 (add-to-list 'org-latex-classes
              '("jlreq"
-               "\\documentclass[11pt,paper=a4]{jlreq}
+               "\\documentclass[luatexjp,12pt,paper=a4]{jlreq}
 [NO-DEFAULT-PACKAGES]
 \\usepackage{amsmath}
 \\usepackage{newtxtext,newtxmath}
@@ -1649,9 +1649,10 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
 
 (add-to-list 'org-latex-classes
              '("jlreq-tate"
-               "\\documentclass[tate,11pt,paper=a4]{jlreq}
+               "\\documentclass[luatexjp,tate,12pt,paper=a4]{jlreq}
 [NO-DEFAULT-PACKAGES]
 \\usepackage{amsmath}
+\\usepackage{kocho}
 \\usepackage{newtxtext,newtxmath}
 \\ifdefined\\kanjiskip
   \\usepackage[dvipdfmx]{graphicx}
