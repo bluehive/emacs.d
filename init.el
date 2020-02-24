@@ -50,7 +50,6 @@
    (quote
     ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default)))
  '(desktop-save-mode t)
- '(font-use-system-font nil)
  '(org-agenda-files (quote ("~/org-mode/todo.org")))
  '(org-babel-load-languages
    (quote
@@ -69,8 +68,9 @@
       "" :time-prompt t :tree-type week :kill-buffer t))))
  '(package-selected-packages
    (quote
-    (ack smart-mode-line pcre2el projectile golden-ratio yaml-mode web-mode use-package ripgrep rg recentf-ext pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets lispxmp grep-a-lot flx-ido exec-path-from-shell evil dash-functional  adaptive-wrap ace-window)))
+    (ack smart-mode-line pcre2el projectile golden-ratio yaml-mode web-mode use-package ripgrep rg recentf-ext pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets lispxmp grep-a-lot flx-ido exec-path-from-shell evil dash-functional adaptive-wrap ace-window)))
  '(safe-local-variable-values (quote ((lical-binding . t))))
+ '(show-paren-mode t)
  '(skk-annotation-other-sources
    (quote
     (ja\.wikipedia en\.wiktionary simple\.wikipedia en\.wikipedia)))
@@ -114,6 +114,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:family "Noto Sans Mono CJK JP" :foundry "adobe" :slant normal :weight normal :height 98 :width normal))))
  '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
 
 ;;;; Package Archives
@@ -1424,6 +1425,46 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
 (setq system-time-locale "C")
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; magit
+;; https://github.com/ice007yang/dotfiles/blob/06d94d728a3ec93a51686c82667e97e9ded0e21f/emacs.d/lisp/init-pkgs.el#L189
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package magit
+  :ensure t
+  :defer t
+  :bind (("M-g s" . magit-status)
+         ("M-g l" . magit-log)
+         ("M-g f" . magit-pull)
+         ("M-g p" . magit-push)
+         ("M-g x" . magit-reset-hard))
+  :init
+  (setq magit-popup-show-common-commands nil)
+  (setq magit-log-arguments '("--graph"
+                              "--decorate"
+                              "--color"))
+  :config
+  (progn
+    (defadvice magit-status (around magit-fullscreen activate)
+      (window-configuration-to-register :magit-fullscreen)
+      ad-do-it
+      (delete-other-windows))
+
+    (defun magit-quit-session ()
+      "Restores the previous window configuration and kills the magit buffer"
+      (interactive)
+      (kill-buffer)
+      (jump-to-register :magit-fullscreen))
+
+    (define-key magit-status-mode-map (kbd "q") 'magit-quit-session))
+
+  ;; removes 1.4.0 warning in arguably cleaner way
+  (remove-hook 'after-init-hook 'magit-maybe-show-setup-instructions)
+  (defadvice magit-blame-mode (after switch-to-emacs-state activate)
+    (if magit-blame-mode
+        (evil-emacs-state 1)
+      (evil-normal-state 1))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; yatex to latex 野鳥起動のための設定
@@ -1582,7 +1623,7 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;; ox-org : org-mode export to latex
+;;;;; ox-org : org-mode export to latex 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;
@@ -1670,11 +1711,14 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
-;
+;;dd;;  ;
+
+;; ()  (
+
 ;; ↑
 ;; 使い方 †
 ;; ↑
-;; bxjsarticle を使用する場合 †
+;; bxjsarticle を使用する場合 † )
 
 ;; org ファイルの先頭に
 
@@ -1704,9 +1748,16 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
 
 ;; を追加します．
 
-;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;ｂｏｏｋｍａｒｋ　ｐｌｕｓのための設定
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; (use-package  Bookmarkplus
+;;   :ensure t
+;;  ; :config
+;; )
 
+;d
 
 ;;;;;;;;;;;;;;;; eof
 
