@@ -50,22 +50,34 @@
    (quote
     ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default)))
  '(desktop-save-mode t)
- '(org-agenda-files (quote ("~/org-mode/todo.org")))
+ '(org-agenda-files (quote ("~/org-mode/todo.org" "~/org-mode/note.org" "~/Documents/organized/blog-3-0.org")))
  '(org-babel-load-languages
    (quote
     ((emacs-lisp . t)
-     (scheme . t)
+  ;   (scheme . t)
      (awk . t)
      (perl . t)
      (shell . t))))
  '(org-capture-templates
    (quote
-    (("n" "etc notes" entry
+    ("key"
+           "description"
+           type
+           target
+           "template"
+           property)
+    (("n" "notes" entry
       (file "~/org-mode/notes.org")
-      "" :prepend t :jump-to-captured t :time-prompt t :tree-type week :kill-buffer t)
+      "* %U%?\n\n%a\n%F\n" :prepend t :time-prompt t :tree-type nil :kill-buffer t)
      ("t" "todo list" checkitem
       (file "~/org-mode/todo.org")
-      "" :time-prompt t :tree-type week :kill-buffer t))))
+      "* %U%?\n\n%a\n%F\n" :prepend t :jump-to-captured t :time-prompt t :tree-type week :kill-buffer t)
+    ("p" "ぱっと Viewer " plain
+     (file+headline nil "PLAIN")
+     "%?"
+     :empty-lines t
+     :jump-to-captured t
+     :unnarrowed t))    ))
  '(package-selected-packages
    (quote
     (ack smart-mode-line pcre2el projectile golden-ratio yaml-mode web-mode use-package ripgrep rg recentf-ext pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets lispxmp grep-a-lot flx-ido exec-path-from-shell evil dash-functional adaptive-wrap ace-window)))
