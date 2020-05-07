@@ -50,34 +50,29 @@
    (quote
     ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default)))
  '(desktop-save-mode t)
- '(org-agenda-files (quote ("~/org-mode/todo.org" "~/org-mode/note.org" "~/Documents/organized/blog-3-0.org")))
- '(org-babel-load-languages
+ '(org-agenda-files
    (quote
-    ((emacs-lisp . t)
-  ;   (scheme . t)
-     (awk . t)
-     (perl . t)
-     (shell . t))))
+    ("~/org-mode/todo.org" "~/Documents/organized/blog-3-0.org" "~/org-mode/notes.org")))
+ '(org-babel-load-languages (quote ((emacs-lisp . t) (awk . t) (perl . t) (shell . t))))
  '(org-capture-templates
    (quote
-    ("key"
-           "description"
-           type
-           target
-           "template"
-           property)
     (("n" "notes" entry
       (file "~/org-mode/notes.org")
-      "* %U%?\n\n%a\n%F\n" :prepend t :time-prompt t :tree-type nil :kill-buffer t)
+      "* %U%?
+
+%a
+%F
+" :prepend t :time-prompt t :tree-type nil :kill-buffer t)
      ("t" "todo list" checkitem
       (file "~/org-mode/todo.org")
-      "* %U%?\n\n%a\n%F\n" :prepend t :jump-to-captured t :time-prompt t :tree-type week :kill-buffer t)
-    ("p" "ぱっと Viewer " plain
-     (file+headline nil "PLAIN")
-     "%?"
-     :empty-lines t
-     :jump-to-captured t
-     :unnarrowed t))    ))
+      "* %U%?
+
+%a
+%F
+" :prepend t :jump-to-captured t :time-prompt t :tree-type week :kill-buffer t)
+     ("p" "ぱっと Viewer " plain
+      (file+headline nil "PLAIN")
+      "%?" :empty-lines t :jump-to-captured t :unnarrowed t))))
  '(package-selected-packages
    (quote
     (ack smart-mode-line pcre2el projectile golden-ratio yaml-mode web-mode use-package ripgrep rg recentf-ext pip-requirements phi-rectangle peg paredit paradox package-utils org-toodledo org-table-comment org-plus-contrib org-octopress org-bullets lispxmp grep-a-lot flx-ido exec-path-from-shell evil dash-functional adaptive-wrap ace-window)))
@@ -89,7 +84,7 @@
  '(skk-auto-insert-paren t)
  '(skk-auto-okuri-process nil)
  '(skk-auto-start-henkan nil)
- '(skk-aux-large-jisyo "/home/devuan/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
+ '(skk-aux-large-jisyo "/home/mevius/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
  '(skk-cdb-large-jisyo nil)
  '(skk-check-okurigana-on-touroku (quote ask))
  '(skk-date-ad t)
@@ -97,10 +92,10 @@
  '(skk-egg-like-newline t)
  '(skk-extra-jisyo-file-list
    (quote
-    ("/home/devuan/.emacs.d/skk-get-jisyo/SKK-JISYO.jinmei" "/home/devuan/.emacs.d/skk-get-jisyo/SKK-JISYO.geo" "/home/devuan/.emacs.d/skk-get-jisyo/SKK-JISYO.pubdic+")))
+    ("/home/mevius/.emacs.d/skk-get-jisyo/SKK-JISYO.jinmei" "/home/mevius/.emacs.d/skk-get-jisyo/SKK-JISYO.geo" "/home/mevius/.emacs.d/skk-get-jisyo/SKK-JISYO.pubdic+")))
  '(skk-henkan-okuri-strictly nil)
  '(skk-henkan-strict-okuri-precedence nil)
- '(skk-itaiji-jisyo "/home/devuan/.emacs.d/skk-get-jisyo/SKK-JISYO.itaiji")
+ '(skk-itaiji-jisyo "/home/mevius/.emacs.d/skk-get-jisyo/SKK-JISYO.itaiji")
  '(skk-j-mode-function-key-usage nil)
  '(skk-japanese-message-and-error t)
  '(skk-kakutei-early t)
@@ -1722,54 +1717,6 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-
-;;dd;;  ;
-
-;; ()  (
-
-;; ↑
-;; 使い方 †
-;; ↑
-;; bxjsarticle を使用する場合 † )
-
-;; org ファイルの先頭に
-
-;; #+TITLE: hoge
-;; #+AUTHOR: fuga
-;; #+LATEX_CLASS: bxjsarticle p
- 
-;; を追加します．
-;; ↑
-;; jlreq の横書きを使用する場合 †
-
-;; org ファイルの先頭に
-
-;; #+TITLE: hoge
-;; #+AUTHOR: fuga
-;; #+LATEX_CLASS: jlreq
-
-;; を追加します．
-;; ↑
-;; jlreq の縦書きを使用する場合 †
-
-;; org ファイルの先頭に
-
-;; #+TITLE: hoge
-;; #+AUTHOR: fuga
-;; #+LATEX_CLASS: jlreq-tate
-
-;; を追加します．
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;ｂｏｏｋｍａｒｋ　ｐｌｕｓのための設定
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; (use-package  Bookmarkplus
-;;   :ensure t
-;;  ; :config
-;; )
-
-;d
 
 ;;;;;;;;;;;;;;;; eof
 
