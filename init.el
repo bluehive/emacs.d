@@ -1,19 +1,5 @@
 ;;; init.el --- My init.el  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020  Naoya Yamashita
-
-;; Author: Naoya Yamashita <conao3@gmail.com>
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -115,6 +101,76 @@
  ;;         exec-path-from-shell-arguments '("-l"))
   ;;  (exec-path-from-shell-initialize)))
 
+
+;; 環境を日本語、UTF-8にする
+;(set-locale-environment nil)
+(setq buffer-file-coding-system 'utf-8)
+;font 
+;(set-fontset-font t 'japanese-jisx0208 "IPAPGothic-11")
+
+;;
+;;;;;;;;;;;;;;;;;;;;;;
+;; Colors and Fonts ;;
+;; https://github.com/cdepillabout/docs/blob/53086c3cd34db01d001997e24d79ad9e0ec4cc8e/dot_files/dot_emacs
+;;;;;;;;;;;;;;;;;;;;;;
+
+(load-theme 'manoj-dark)
+
+;; Set the default font.
+(set-face-attribute 'default nil
+  :family "Source Code Pro"
+  :height 140
+  :weight 'normal
+  :width 'normal)
+
+;; Set the cursor color to red to match Vim in the terminal.
+(set-cursor-color "red")
+
+;; Set the EOL whitespace to be colored in white.
+(set-face-attribute 'trailing-whitespace nil
+   :background "white")
+
+;; Set the default font for Japanese characters.
+(set-fontset-font t 'japanese-jisx0208 (font-spec :family "IPAPGothic"))
+
+;; Style the tab-bar so it looks like my Vim tab-bar.
+(set-face-attribute 'tab-bar nil
+  :background "white"
+  :foreground "black")
+(set-face-attribute 'tab-bar-tab nil
+  :background "deep sky blue"
+  :foreground "white"
+  :box 'nil
+  :weight 'bold)
+(set-face-attribute 'tab-bar-tab-inactive nil
+  ;; :background "deep sky blue"
+  :foreground "black"
+  :box 'nil
+  :weight 'normal
+  )
+
+(with-eval-after-load "org"
+  (if (display-graphic-p)
+
+    ;; faces to set if we are in the GUI
+    (progn
+      (set-face-attribute 'org-level-2 nil :foreground "dark goldenrod" :weight 'bold)
+      (set-face-attribute 'org-level-3 nil :foreground "firebrick" :weight 'bold)
+      (set-face-attribute 'org-special-keyword nil :foreground "light gray" :weight 'light)
+      (set-face-attribute 'org-date nil :foreground "dark magenta" :underline nil :weight 'normal)
+      (set-face-attribute 'org-tag nil :foreground "cornflower blue" :weight 'light)
+    )
+
+    ;; faces to set if we are in the CUI
+    (set-face-attribute 'org-level-2 nil :foreground "color-116" :weight 'bold)
+    (set-face-attribute 'org-level-3 nil :foreground "color-41" :weight 'bold)
+    (set-face-attribute 'org-level-4 nil :weight 'bold)
+    (set-face-attribute 'org-level-5 nil :weight 'bold)
+    (set-face-attribute 'org-special-keyword nil :foreground "color-95" :weight 'light)
+  )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ここにいっぱい設定を書く
@@ -225,6 +281,7 @@
 	:config
 	(recentf-mode 1))
 
+;; https://emacs-jp.github.io/tips/emacs-in-2020 ;;
 
 (leaf ivy
   :doc "Incremental Vertical completYon"
@@ -307,7 +364,7 @@
   :tag "minor-mode" "tools" "languages" "convenience" "emacs>=24.3"
   :url "http://www.flycheck.org"
   :emacs>= 24.3
-  :ensure t
+  :ensure nil
   :bind (("M-n" . flycheck-next-error)
          ("M-p" . flycheck-previous-error))
   :global-minor-mode global-flycheck-mode)
@@ -321,7 +378,7 @@
   :tag "matching" "convenience" "abbrev" "emacs>=24.3"
   :url "http://company-mode.github.io/"
   :emacs>= 24.3
-  :ensure t
+  :ensure nil
   :blackout t
   :leaf-defer nil
   :bind ((company-active-map
@@ -359,8 +416,11 @@
 
 ;;3.10 Font
 
-(set-fontset-font t 'japanese-jisx0208 "TakaoPGothic")
-(add-to-list 'face-font-rescale-alist '(".*Takao P.*" . 0.85))
+;;(set-fontset-font t 'japanese-jisx0208 "TakaoPGothic")
+;;(add-to-list 'face-font-rescale-alist '(".*Takao P.*" . 0.85))
+
+;;;;;;;;;;;;;;;;;;;
+
 
 ;;3.11 GC
 
@@ -1151,6 +1211,34 @@ return the value of the last statement in BODY."
     (compilation-start (concat command-args " < " null-device)
                        'grep-mode)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org-agenda config
+;; http://www.i3s.unice.fr/~malapert/emacs_orgmode.html
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq org-agenda-ndays 7)
+(setq org-agenda-show-all-dates t)
+(setq org-agenda-skip-deadline-if-done t)
+(setq org-agenda-skip-scheduled-if-done t)
+(setq org-agenda-start-on-weekday nil)
+(setq org-deadline-warning-days 14)
+(setq org-agenda-custom-commands
+      '(("g" . "GTD contexts")
+        ("gh" "Home" tags-todo "HOME")
+        ("gu" "Urgent" tags-todo "URGENT")
+        ("G" "GTD Block Agenda"
+         ((todo "STARTED")
+          (tags-todo "URGENT")
+          (todo "NEXT"))
+         ((org-agenda-prefix-format "[ ] %T: ")
+          (org-agenda-with-colors nil)
+          (org-agenda-compact-blocks t)
+          (org-agenda-remove-tags t)
+          (ps-number-of-columns 2)
+          (ps-landscape-mode t))
+         ;;nil                      ;; i.e., no local settings
+         ("~/next-actions.txt"))
+        ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
