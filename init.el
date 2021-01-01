@@ -134,20 +134,6 @@
 (set-fontset-font t 'japanese-jisx0208 (font-spec :family "IPAPGothic"))
 
 ;; Style the tab-bar so it looks like my Vim tab-bar.
-(set-face-attribute 'tab-bar nil
-  :background "white"
-  :foreground "black")
-(set-face-attribute 'tab-bar-tab nil
-  :background "deep sky blue"
-  :foreground "white"
-  :box 'nil
-  :weight 'bold)
-(set-face-attribute 'tab-bar-tab-inactive nil
-  ;; :background "deep sky blue"
-  :foreground "black"
-  :box 'nil
-  :weight 'normal
-  )
 
 (with-eval-after-load "org"
   (if (display-graphic-p)
