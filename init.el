@@ -134,6 +134,20 @@
 (set-fontset-font t 'japanese-jisx0208 (font-spec :family "IPAPGothic"))
 
 ;; Style the tab-bar so it looks like my Vim tab-bar.
+;; (set-face-attribute 'tab-bar nil
+;;   :background "white"
+;;   :foreground "black")
+;; (set-face-attribute 'tab-bar-tab nil
+;;   :background "deep sky blue"
+;;   :foreground "white"
+;;   :box 'nil
+;;   :weight 'bold)
+;; (set-face-attribute 'tab-bar-tab-inactive nil
+;;   ;; :background "deep sky blue"
+;;   :foreground "black"
+;;   :box 'nil
+;;   :weight 'normal
+;;   )
 
 (with-eval-after-load "org"
   (if (display-graphic-p)
@@ -254,6 +268,7 @@
 (leaf f :ensure t)
 (leaf ht :ensure t)
 (leaf general :ensure t)
+;;(leaf org-mode :ensure t) 
 
 ;6.14 File;;6.14.1 recentf
 
@@ -461,7 +476,7 @@
 (setq-default org-use-speed-commands t
 		org-agenda-todo-ignore-with-date t
 		org-directory "~/org"
-		org-agenda-files '("~/org/todo.org")
+		org-agenda-files '("~/org/todo.org" "~/Documents/organized/blog-3-0.org" "~/Documents/organized/blog-2.org" )
 		org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)"))
 		org-capture-templates '(("t" "Todo" entry (file+datetree "~/org/todo.org")
 					 "* %?")
@@ -481,6 +496,17 @@
 (general-define-key
  :keymaps 'org-mode-map
  "C-m" nil)
+
+;; tags
+(setq org-tag-alist '(
+                      ("@office".?o)
+                      ("@home".?h)
+                      ("@blog".?b)
+                      ("notes".?n)
+                      ("awak".?a)
+                      ("7yr".?7)
+                      ("14yr".?1)
+                      ("READing".?R)))
 
 ;; ;7.2 org Keybind
 
@@ -804,9 +830,6 @@
 ;;;;; ox-org : org-mode export to latex 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;
-;; Org mode
-;;
 (require 'ox-latex)
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 (setq org-latex-default-class "bxjsarticle")
@@ -1225,6 +1248,28 @@ return the value of the last statement in BODY."
          ;;nil                      ;; i.e., no local settings
          ("~/next-actions.txt"))
         ))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; AWK Source Code Blocks in Org Mode
+;; https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-awk.html
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((awk . t)))
+
+;; makefile
+
+(setq org-src-preserve-indentation t)
+
+;; Currently, there is no need to activate makefile with org-babel-do-load-languages, but it won't hurt to do so.
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((makefile . t)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
