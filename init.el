@@ -476,12 +476,12 @@
 (setq-default org-use-speed-commands t
 		org-agenda-todo-ignore-with-date t
 		org-directory "~/org"
-		org-agenda-files '("~/org/todo.org" "~/Documents/organized/blog-3-0.org" "~/Documents/organized/blog-2.org" )
+		org-agenda-files '("~/org/" "~/Documents/organized/"  )
 		org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)"))
 		org-capture-templates '(("t" "Todo" entry (file+datetree "~/org/todo.org")
 					 "* %?")
-					("b" "Blog" entry (file "~/org/blog.org")
-					 "* %?")
+				;;	("b" "Blog" entry (file "~/org/blog.org")
+				;;	 "* %?")
 					("m" "Memo" entry (file "~/org/memo.org")
 					 "* %?")))
 (leaf org-temp)
@@ -1225,29 +1225,29 @@ return the value of the last statement in BODY."
 ;; http://www.i3s.unice.fr/~malapert/emacs_orgmode.html
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq org-agenda-ndays 7)
-(setq org-agenda-show-all-dates t)
-(setq org-agenda-skip-deadline-if-done t)
-(setq org-agenda-skip-scheduled-if-done t)
-(setq org-agenda-start-on-weekday nil)
-(setq org-deadline-warning-days 14)
-(setq org-agenda-custom-commands
-      '(("g" . "GTD contexts")
-        ("gh" "Home" tags-todo "HOME")
-        ("gu" "Urgent" tags-todo "URGENT")
-        ("G" "GTD Block Agenda"
-         ((todo "STARTED")
-          (tags-todo "URGENT")
-          (todo "NEXT"))
-         ((org-agenda-prefix-format "[ ] %T: ")
-          (org-agenda-with-colors nil)
-          (org-agenda-compact-blocks t)
-          (org-agenda-remove-tags t)
-          (ps-number-of-columns 2)
-          (ps-landscape-mode t))
-         ;;nil                      ;; i.e., no local settings
-         ("~/next-actions.txt"))
-        ))
+;; (setq org-agenda-ndays 7)
+;; (setq org-agenda-show-all-dates t)
+;; (setq org-agenda-skip-deadline-if-done t)
+;; (setq org-agenda-skip-scheduled-if-done t)
+;; (setq org-agenda-start-on-weekday nil)
+;; (setq org-deadline-warning-days 14)
+;; (setq org-agenda-custom-commands
+;;       '(("g" . "GTD contexts")
+;;         ("gh" "Home" tags-todo "HOME")
+;;         ("gu" "Urgent" tags-todo "URGENT")
+;;         ("G" "GTD Block Agenda"
+;;          ((todo "STARTED")
+;;           (tags-todo "URGENT")
+;;           (todo "NEXT"))
+;;          ((org-agenda-prefix-format "[ ] %T: ")
+;;           (org-agenda-with-colors nil)
+;;           (org-agenda-compact-blocks t)
+;;           (org-agenda-remove-tags t)
+;;           (ps-number-of-columns 2)
+;;           (ps-landscape-mode t))
+;;          ;;nil                      ;; i.e., no local settings
+;;          ("~/next-actions.txt"))
+;;         ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
