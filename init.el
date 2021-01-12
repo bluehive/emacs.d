@@ -20,7 +20,8 @@
 (eval-and-compile
   (customize-set-variable
    'package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
-                       ("melpa" . "https://melpa.org/packages/")
+                  ;;; ("melpa" . "http://melpa.milkbox.net/packages/")
+                       ("melpa-stable" . "https://stable.melpa.org/packages/")
                        ("org"   . "https://orgmode.org/elpa/")))
   (package-initialize)
   (unless (package-installed-p 'leaf)
@@ -506,7 +507,7 @@
                       ("awak".?a)
                       ("7yr".?7)
                       ("14yr".?1)
-                      ("READing".?R)))
+                      ("READing".?r)))
 
 ;; ;7.2 org Keybind
 
@@ -594,8 +595,8 @@
   :bind
   ("C-x j" . skk-mode))
 
-;(leaf skk-study  :ensure t)
-;(leaf skk-hint  :ensure t)
+;;(leaf skk-study  :ensure t)
+;;(leaf skk-hint  :ensure t)
 
 ;; Windows 環境だと [noconvert]
 (setq skk-sticky-key [muhenkan])
@@ -620,18 +621,6 @@
   (unless logger-process
     (setq logger-process (start-process-shell-command "logger" nil (concat "cat >> ~/log.txt"))))
   (process-send-string logger-process (concat (apply 'format msg) "\n")))
-
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ scheme-mode
-;;; http://www.math.s.chiba-u.ac.jp/~matsu/emacs/emacs21/scheme.html;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-
-;; (setq scheme-program-name "/usr/local/bin/gosh")
-;; (autoload 'run-scheme "cmuscheme" "Run an inferior Scheme process." t)
-;; (setq cmuscheme-load-hook
-;;       '((lambda () (define-key inferior-scheme-mode-map "\C-c\C-t"
-;;      'favorite-cmd))))
 
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -672,6 +661,16 @@
 ;;       '(
 ;;         (font . "Cica 16")))
 
+;;
+;;
+;;;; https://www.gnu.org/software/guile/manual/html_node/Using-Guile-in-Emacs.html
+;;scheme-mode
+;;
+
+(leaf geiser
+  :ensure t
+  :config
+  (setq geiser-active-implementations '(guile)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; yatex to latex 野鳥起動のための設定
