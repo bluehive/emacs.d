@@ -11,23 +11,26 @@
 
 ;; this enables this running method
 ;;   emacs -q -l ~/.debug.emacs.d/init.el
+
 (eval-and-compile
   (when (or load-file-name byte-compile-current-file)
     (setq user-emacs-directory
           (expand-file-name
            (file-name-directory (or load-file-name byte-compile-current-file))))))
 
-(eval-and-compile
   (customize-set-variable
    'package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
-                  ;;; ("melpa" . "http://melpa.milkbox.net/packages/")
-                       ("melpa-stable" . "https://stable.melpa.org/packages/")
+             ;;      ("melpa" . "http://melpa.milkbox.net/packages/")
+                       ("melpa" . "https://melpa.org/packages/")
+             ;;     ("melpa-stable" . "https://stable.melpa.org/packages/")
                        ("org"   . "https://orgmode.org/elpa/")))
   (package-initialize)
   (unless (package-installed-p 'leaf)
     (package-refresh-contents)
     (package-install 'leaf))
 
+  ;;
+  
   (leaf leaf-keywords
     :ensure t
     :init
@@ -38,7 +41,7 @@
 
     :config
     ;; initialize leaf-keywords.el
-    (leaf-keywords-init)))
+    (leaf-keywords-init))
 
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
