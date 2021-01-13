@@ -466,6 +466,46 @@
   :mode ("\\.skk$"))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;; http://emacs.rubikitch.com/global-hl-line-mode-timer/
+;; 遅い場合は以下
+
+(require 'hl-line)
+;;; hl-lineを無効にするメジャーモードを指定する
+(defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
+(defun global-hl-line-timer-function ()
+  (unless (memq major-mode global-hl-line-timer-exclude-modes)
+    (global-hl-line-unhighlight-all)
+    (let ((global-hl-line-mode t))
+      (global-hl-line-highlight))))
+(setq global-hl-line-timer
+      (run-with-idle-timer 0.03 t 'global-hl-line-timer-function))
+;; (cancel-timer global-hl-line-timer)
+
+;;;;;
+;;スクロールを鮮やかにする
+;;https://github.com/k-talo/smooth-scroll.el
+					;(require 'smooth-scroll)
+					;(smooth-scroll-mode t)
+
+;; スクロールした際のカーソルの移動行数
+(setq scroll-conservatively 1)
+
+;; スクロール開始のマージンの行数
+(setq scroll-margin 10)
+
+;; 1 画面スクロール時に重複させる行数
+(setq next-screen-context-lines 10)
+
+;; 1 画面スクロール時にカーソルの画面上の位置をなるべく変えない
+(setq scroll-preserve-screen-position t)
+
+
+
+;;eshellのときだけ行番号を表示しない
+(global-linum-mode 1)
+(add-hook 'eshell-mode-hook (lambda () (linum-mode -1)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; orgmode
@@ -1269,7 +1309,207 @@ return the value of the last statement in BODY."
  'org-babel-load-languages
  '((makefile . t)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; hydra
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+;; hydra-frame-window is designed from ace-window (C-x o) and
+;; matches aw-dispatch-alist with a few extra
+(defhydra hydra-frame-window (:color red :hint nil)
+  "
+^Delete^                       ^Frame resize^             ^Window^                Window Size^^^^^^   ^Text^                         (__)
+_0_: delete-frame              _g_: resize-frame-right    _t_: toggle               ^ ^ _k_ ^ ^        _K_                           (oo)
+_1_: delete-other-frames       _H_: resize-frame-left     _e_: ace-swap-win         _h_ ^+^ _l_        ^+^                     /------\\/
+_2_: make-frame                _F_: fullscreen            ^ ^                       ^ ^ _j_ ^ ^        _J_                    / |    ||
+_d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window    _b_alance^^^^      ^ ^                   *  /\\---/\\  ~~  C-x f ;
+"
+  ("0" delete-frame :exit t)
+  ("1" delete-other-frames :exit t)
+  ("2" make-frame  :exit t)
+  ("b" balance-windows)
+  ("d" kill-and-delete-frame :exit t)
+  ("e" ace-swap-window)
+  ("F" toggle-frame-fullscreen)   ;; is <f11>
+  ("g" resize-frame-right :exit t)
+  ("H" resize-frame-left :exit t)  ;; aw-dispatch-alist uses h, I rebind here so hjkl can be used for size
+  ("n" new-frame-right :exit t)
+  ;; ("r" reverse-windows)
+  ("t" toggle-window-spilt)
+  ("w" ace-delete-window :exit t)
+  ("x" delete-frame :exit t)
+  ("K" text-scale-decrease)
+  ("J" text-scale-increase)
+  ("h" shrink-window-horizontally)
+  ("k" shrink-window)
+  ("j" enlarge-window)
+  ("l" enlarge-window-horizontally))
+(global-set-key (kbd "C-x o") 'hydra-frame-window/body)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; hydra
+;; https://www.reddit.com/r/emacs/comments/8of6tx/tip_how_to_be_a_beast_with_hydra/
+;; (leaf hydra
+;;   :ensure t
+;;   :defer 2
+;;   :bind ("C-c t" . hydra-clock/body))
+
+(defhydra hydra-clock (:color blue)
+    "
+    ^
+    ^Clock^             ^Do^
+    ^─────^─────────────^──^─────────
+    _q_ quit            _c_ cancel
+    ^^                  _d_ display
+    ^^                  _e_ effort
+    ^^                  _i_ in
+    ^^                  _j_ jump
+    ^^                  _o_ out
+    ^^                  _r_ report
+    ^^                  ^^
+    "
+    ("q" nil)
+    ("c" org-clock-cancel :color pink)
+    ("d" org-clock-display)
+    ("e" org-clock-modify-effort-estimate)
+    ("i" org-clock-in)
+    ("j" org-clock-goto)
+    ("o" org-clock-out)
+    ("r" org-clock-report))
+(global-set-key (kbd "C-c C-t") 'hydra-clock/body)
+
+;;
+
+;;
+(defhydra hydra-zoom ()
+  "zoom"
+  ("g" text-scale-increase "in")
+  ("l" text-scale-decrease "out"))
+(global-set-key (kbd "C-x f") 'hydra-zoom/body)
+
+;;
+
+(eval-after-load 'gnus-group
+  '(progn
+     (defhydra hydra-gnus-group (:color blue)
+       "Do?"
+       ("a" gnus-group-list-active "REMOTE groups A A")
+       ("l" gnus-group-list-all-groups "LOCAL groups L")
+       ("c" gnus-topic-catchup-articles "Read all c")
+       ("G" gnus-group-make-nnir-group "Search server G G")
+       ("g" gnus-group-get-new-news "Refresh g")
+       ("s" gnus-group-enter-server-mode "Servers")
+       ("m" gnus-group-new-mail "Compose m OR C-x m")
+       ("#" gnus-topic-mark-topic "mark #")
+       ("q" nil "cancel"))
+     ;; y is not used by default
+     (define-key gnus-group-mode-map "y" 'hydra-gnus-group/body)))
+
+;; gnus-summary-mode
+(eval-after-load 'gnus-sum
+  '(progn
+     (defhydra hydra-gnus-summary (:color blue)
+       "Do?"
+       ("s" gnus-summary-show-thread "Show thread")
+       ("h" gnus-summary-hide-thread "Hide thread")
+       ("n" gnus-summary-insert-new-articles "Refresh / N")
+       ("f" gnus-summary-mail-forward "Forward C-c C-f")
+       ("!" gnus-summary-tick-article-forward "Mail -> disk !")
+       ("p" gnus-summary-put-mark-as-read "Mail <- disk")
+       ("c" gnus-summary-catchup-and-exit "Read all c")
+       ("e" gnus-summary-resend-message-edit "Resend S D e")
+       ("R" gnus-summary-reply-with-original "Reply with original R")
+       ("r" gnus-summary-reply "Reply r")
+       ("W" gnus-summary-wide-reply-with-original "Reply all with original S W")
+       ("w" gnus-summary-wide-reply "Reply all S w")
+       ("#" gnus-topic-mark-topic "mark #")
+       ("q" nil "cancel"))
+     ;; y is not used by default
+     (define-key gnus-summary-mode-map "y" 'hydra-gnus-summary/body)))
+
+;; gnus-article-mode
+(eval-after-load 'gnus-art
+  '(progn
+     (defhydra hydra-gnus-article (:color blue)
+       "Do?"
+       ("f" gnus-summary-mail-forward "Forward")
+       ("R" gnus-article-reply-with-original "Reply with original R")
+       ("r" gnus-article-reply "Reply r")
+       ("W" gnus-article-wide-reply-with-original "Reply all with original S W")
+       ("o" gnus-mime-save-part "Save attachment at point o")
+       ("w" gnus-article-wide-reply "Reply all S w")
+       ("q" nil "cancel"))
+     ;; y is not used by default
+     (define-key gnus-article-mode-map "y" 'hydra-gnus-article/body)))
+
+(eval-after-load 'message
+  '(progn
+     (defhydra hydra-message (:color blue)
+       "Do?"
+       ("ca" mml-attach-file "Attach C-c C-a")
+       ("cc" message-send-and-exit "Send C-c C-c")
+       ("q" nil "cancel"))
+     (global-set-key (kbd "C-c C-y") 'hydra-message/body)))
+
+;;
+;; This is the basic launcher code. It makes a main differentiation according to the Emacs major-mode and for org uses the org-element-context and org-element-property functions to react according to the specific context element/type.
+
+(defun dfeich/context-hydra-launcher ()
+  "A launcher for hydras based on the current context."
+  (interactive)
+  (cl-case major-mode
+    ('org-mode (let* ((elem (org-element-context))
+                      (etype (car elem))
+                      (type (org-element-property :type elem)))
+                 (cl-case etype
+                   (src-block (hydra-babel-helper/body))
+                   (link (hydra-org-link-helper/body))
+                   ((table-row table-cell) (hydra-org-table-helper/body) )
+                   (t (message "No specific hydra for %s/%s" etype type)
+                      (hydra-org-default/body))))
+               )
+    ('bibtex-mode (org-ref-bibtex-hydra/body))
+    ('ibuffer-mode (hydra-ibuffer-main/body))
+    (t (message "No hydra for this major mode: %s" major-mode))))
+
+(global-set-key (kbd "<f9> <f9>") 'dfeich/context-hydra-launcher)
+
+;;
+(defhydra hydra-yank-pop ()
+  "yank"
+  ("C-y" yank nil)
+  ("M-y" yank-pop nil)
+  ("y" (yank-pop 1) "next")
+  ("Y" (yank-pop -1) "prev")
+  ("l" helm-show-kill-ring "list" :color blue))   ; or browse-kill-ring
+(global-set-key (kbd "M-y") #'hydra-yank-pop/yank-pop)
+(global-set-key (kbd "C-y") #'hydra-yank-pop/yank)
+
+;;Movement
+;;For many Emacs users, basic movement commands are the most frequently used! Set up a movement group that means we don't need to hold the control key.
+
+(global-set-key
+ (kbd "C-n")
+ (defhydra hydra-move
+   (:body-pre (next-line))
+   "move"
+   ("n" next-line)
+   ("p" previous-line)
+   ("f" forward-char)
+   ("b" backward-char)
+   ("a" beginning-of-line)
+   ("e" move-end-of-line)
+   ("v" scroll-up-command)
+   ;; Converting M-v to V here by analogy.
+   ("V" scroll-down-command)
+   ("l" recenter-top-bottom)))
+
+;; Org mode の C-c C-s で挿入する日付の曜日、英語曜日表記を強制する。
+
+(setq system-time-locale "C")
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (leaf exec-path-from-shell
