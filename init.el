@@ -12,6 +12,12 @@
 ;; this enables this running method
 ;;   emacs -q -l ~/.debug.emacs.d/init.el
 
+;; GCの設定
+;; 起動にも影響するのでleaf無しで最初にやります
+;; https://github.com/ncaq/.emacs.d/blob/master/init.el
+(setq gc-cons-threshold 200000000)            ; 200MB
+(run-with-idle-timer 120 t #'garbage-collect) ; 2分のアイドル時間ごとに明示的にガベージコレクトを呼び出す
+
 (eval-and-compile
   (when (or load-file-name byte-compile-current-file)
     (setq user-emacs-directory
@@ -363,18 +369,18 @@
 ;;補完が強化され、 M-x はこのような表示になります。 コマンドの断片で検索できるようになるので、あえてキーバインドを与えず、 M-x から起動する方法も便利です。 この補完では正規表現が使えるので、 ^ivy- をクエリーを入力すれば、 ivy パッケージのインタラクティブ関数が一覧できます。
 
 
-(leaf flycheck
-  :doc "On-the-fly syntax checking"
-  :req "dash-2.12.1" "pkg-info-0.4" "let-alist-1.0.4" "seq-1.11" "emacs-24.3"
-  :tag "minor-mode" "tools" "languages" "convenience" "emacs>=24.3"
-  :url "http://www.flycheck.org"
-  :emacs>= 24.3
-  :ensure nil
-  :bind (("M-n" . flycheck-next-error)
-         ("M-p" . flycheck-previous-error))
-  :global-minor-mode global-flycheck-mode)
+;; (leaf flycheck
+;;   :doc "On-the-fly syntax checking"
+;;   :req "dash-2.12.1" "pkg-info-0.4" "let-alist-1.0.4" "seq-1.11" "emacs-24.3"
+;;   :tag "minor-mode" "tools" "languages" "convenience" "emacs>=24.3"
+;;   :url "http://www.flycheck.org"
+;;   :emacs>= 24.3
+;;   :ensure nil
+;;   :bind (("M-n" . flycheck-next-error)
+;;          ("M-p" . flycheck-previous-error))
+;;   :global-minor-mode global-flycheck-mode)
 
-;;flycheckはリアルタイムにソースのエラーやワーニングを表示するマイナーモードです。
+;; ;;flycheckはリアルタイムにソースのエラーやワーニングを表示するマイナーモードです。
 
 
 (leaf company
@@ -425,29 +431,55 @@
 ;;(add-to-list 'face-font-rescale-alist '(".*Takao P.*" . 0.85))
 
 ;;;;;;;;;;;;;;;;;;;
+;; カットペーストなど挿入削除時にハイライト
+;;https://github.com/ncaq/.emacs.d/blob/master/init.el
+(leaf volatile-highlights :ensure t :config (volatile-highlights-mode t))
+
+;; 置換の動きを可視化
+;;https://github.com/ncaq/.emacs.d/blob/master/init.el
+
+(leaf anzu
+  :ensure t
+  :custom (global-anzu-mode . t)
+  :bind
+  ([remap query-replace] . anzu-query-replace)
+  ([remap query-replace-regexp] . anzu-query-replace-regexp))
 
 
-;;3.11 GC
+;; ;3.4 行番号を表示する
+;; (global-linum-mode t)
+;;   行番号の表示を linum で表示
 
-(setq gc-cons-threshold (* 128 1024 1024)) ;; 128MB
-(setq garbage-collection-messages t)
+;; (leaf linum
+;;   :doc "display line numbers in the left margin"
+;;   :tag "builtin"
+;;   :added "2020-08-27"
+;;   :init (global-linum-mode 1))
 
+;; emacs 26で入ったdisplay-line-numbersを利用する
+;;emacsで左側に行数を表示するlinum-modeは重いことで有名だった。 軽くするためにはいろいろと設定しなくてはいけなかった.
+;;しかし, emacs26でついに行数表示のネイティブ実装であるdiplay-line-numbers-modeが実装された.
 
-;3.4 行番号を表示する
+(if (version<= "26.0.50" emacs-version)
+      (global-display-line-numbers-mode))
+;;個人的にはemacs -nwで起動したときに行数表示の色が見にくかったので以下のようにしている
 
-(global-linum-mode t)
+;; (if (version<= "26.0.50" emacs-version)
+;;     (progn
+;;       (global-display-line-numbers-mode)
+;;       (defun display-line-numbers-color-on-after-init (frame)
+;;         "Hook function executed after FRAME is generated."
+;;         (unless (display-graphic-p frame)
+;;           (set-face-background
+;;            'line-number
+;;            (plist-get base16-solarized-dark-colors :base01))))
+;;       (add-hook 'after-make-frame-functions
+;;                 (lambda (frame)
+;;                   (display-line-numbers-color-on-after-init frame)))
+;;       ))
 
-
- ;;   行番号の表示を linum で表示
-
-(leaf linum
-  :doc "display line numbers in the left margin"
-  :tag "builtin"
-  :added "2020-08-27"
-  :init (global-linum-mode 1))
 
 ;;    対応する括弧の自動挿入
-
 (leaf electric
   :doc "window maker and Command loop for `electric' modes"
   :tag "builtin"
@@ -473,17 +505,17 @@
 ;;;;;; http://emacs.rubikitch.com/global-hl-line-mode-timer/
 ;; 遅い場合は以下
 
-(require 'hl-line)
-;;; hl-lineを無効にするメジャーモードを指定する
-(defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
-(defun global-hl-line-timer-function ()
-  (unless (memq major-mode global-hl-line-timer-exclude-modes)
-    (global-hl-line-unhighlight-all)
-    (let ((global-hl-line-mode t))
-      (global-hl-line-highlight))))
-(setq global-hl-line-timer
-      (run-with-idle-timer 0.03 t 'global-hl-line-timer-function))
-;; (cancel-timer global-hl-line-timer)
+;; (require 'hl-line)
+;; ;;; hl-lineを無効にするメジャーモードを指定する
+;; (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
+;; (defun global-hl-line-timer-function ()
+;;   (unless (memq major-mode global-hl-line-timer-exclude-modes)
+;;     (global-hl-line-unhighlight-all)
+;;     (let ((global-hl-line-mode t))
+;;       (global-hl-line-highlight))))
+;; (setq global-hl-line-timer
+;;       (run-with-idle-timer 0.03 t 'global-hl-line-timer-function))
+;; ;; (cancel-timer global-hl-line-timer)
 
 ;;;;;
 ;;スクロールを鮮やかにする
@@ -491,23 +523,22 @@
 					;(require 'smooth-scroll)
 					;(smooth-scroll-mode t)
 
-;; スクロールした際のカーソルの移動行数
-(setq scroll-conservatively 1)
+;; ;; スクロールした際のカーソルの移動行数
+;; (setq scroll-conservatively 1)
 
-;; スクロール開始のマージンの行数
-(setq scroll-margin 10)
+;; ;; スクロール開始のマージンの行数
+;; (setq scroll-margin 10)
 
-;; 1 画面スクロール時に重複させる行数
-(setq next-screen-context-lines 10)
+;; ;; 1 画面スクロール時に重複させる行数
+;; (setq next-screen-context-lines 10)
 
-;; 1 画面スクロール時にカーソルの画面上の位置をなるべく変えない
-(setq scroll-preserve-screen-position t)
-
+;; ;; 1 画面スクロール時にカーソルの画面上の位置をなるべく変えない
+;; (setq scroll-preserve-screen-position t)
 
 
 ;;eshellのときだけ行番号を表示しない
-(global-linum-mode 1)
-(add-hook 'eshell-mode-hook (lambda () (linum-mode -1)))
+;;(global-linum-mode 1)
+;;(add-hook 'eshell-mode-hook (lambda () (linum-mode -1)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -671,31 +702,31 @@
 ;;; https://www.emacswiki.org/emacs/CPerlMode                       ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
-;;; cperl-mode is preferred to perl-mode
-;;; "Brevity is the soul of wit" <foo at acm.org>
-(defalias 'perl-mode 'cperl-mode)
+;; ;;; cperl-mode is preferred to perl-mode
+;; ;;; "Brevity is the soul of wit" <foo at acm.org>
+;; (defalias 'perl-mode 'cperl-mode)
 
-;;; (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|al\\)\\'" . cperl-mode))
-(add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|t\\)\\'" . cperl-mode))
-(add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
-(add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
-(add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
+;; ;;; (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|al\\)\\'" . cperl-mode))
+;; (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|t\\)\\'" . cperl-mode))
+;; (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
+;; (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
+;; (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
 
-;; (cperl-set-style "PerlStyle")
+;; ;; (cperl-set-style "PerlStyle")
 
-;; Emacs M-x toggle-truncate-lines: 長い行の折り返し表示を切り換える
-(global-set-key (kbd "C-c t") 'toggle-truncate-lines)
+;; ;; Emacs M-x toggle-truncate-lines: 長い行の折り返し表示を切り換える
+;; (global-set-key (kbd "C-c t") 'toggle-truncate-lines)
 
-;;;;;; perl custom
+;; ;;;;;; perl custom
 
- ;;load cperl, then work around indent issue
- (load-library "cperl-mode")
- (defun cperl-backward-to-start-of-continued-exp (lim)
-   (goto-char (1+ lim))
-   (forward-sexp)
-   (beginning-of-line)
-   (skip-chars-forward " \t")
- )
+;;  ;;load cperl, then work around indent issue
+;;  (load-library "cperl-mode")
+;;  (defun cperl-backward-to-start-of-continued-exp (lim)
+;;    (goto-char (1+ lim))
+;;    (forward-sexp)
+;;    (beginning-of-line)
+;;    (skip-chars-forward " \t")
+;;  )
 
 ;;フォントの設定を忘れてた。
 ;;設定の仕方は、シンプルに
