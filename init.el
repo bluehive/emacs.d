@@ -1,10 +1,10 @@
 ;;; init.el --- My init.el  -*- lexical-binding: t; -*-
 
+;; Copyright (C) bluehive@github.
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-
 ;; My init.el.
 ;; byte compile ;;;;;;;;;;;;;; emacs --batch -f batch-byte-compile init.el
 ;;; Code:
@@ -283,14 +283,14 @@
 ;6.14 File;;6.14.1 recentf
 
      (leaf recentf
-	:ensure t
-	:setq-default ((recentf-max-saved-items . 10000)
-		       (recentf-auto-cleanup quote never)
-		       (recentf-save-file . "~/.emacs.d/.recentf")
-		       (recentf-exclude quote
-					(".recentf")))
-	:config
-	(recentf-mode 1))
+       :ensure t
+       :setq-default ((recentf-max-saved-items . 10000)
+		      (recentf-auto-cleanup quote never)
+		      (recentf-save-file . "~/.emacs.d/.recentf")
+		      (recentf-exclude quote
+				       (".recentf")))
+       :config
+       (recentf-mode 1))
 
 ;; https://emacs-jp.github.io/tips/emacs-in-2020 ;;
 
@@ -540,6 +540,8 @@
 ;;(global-linum-mode 1)
 ;;(add-hook 'eshell-mode-hook (lambda () (linum-mode -1)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; orgmode
@@ -554,11 +556,11 @@
 		org-agenda-files '("~/org/" "~/Documents/organized/"  )
 		org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)"))
 		org-capture-templates '(("t" "Todo" entry (file+datetree "~/org/todo.org")
-					 "* %?")
+					 "* TODO %? %U %i\n %a")
 				;;	("b" "Blog" entry (file "~/org/blog.org")
 				;;	 "* %?")
 					("m" "Memo" entry (file "~/org/memo.org")
-					 "* %?")))
+					 "* %? %U\n %i")))
 (leaf org-temp)
 
 
@@ -1343,51 +1345,29 @@ return the value of the last statement in BODY."
  'org-babel-load-languages
  '((makefile . t)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; hydra
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-;; hydra-frame-window is designed from ace-window (C-x o) and
-;; matches aw-dispatch-alist with a few extra
-(defhydra hydra-frame-window (:color red :hint nil)
-  "
-^Delete^                       ^Frame resize^             ^Window^                Window Size^^^^^^   ^Text^                         (__)
-_0_: delete-frame              _g_: resize-frame-right    _t_: toggle               ^ ^ _k_ ^ ^        _K_                           (oo)
-_1_: delete-other-frames       _H_: resize-frame-left     _e_: ace-swap-win         _h_ ^+^ _l_        ^+^                     /------\\/
-_2_: make-frame                _F_: fullscreen            ^ ^                       ^ ^ _j_ ^ ^        _J_                    / |    ||
-_d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window    _b_alance^^^^      ^ ^                   *  /\\---/\\  ~~  C-x f ;
-"
-  ("0" delete-frame :exit t)
-  ("1" delete-other-frames :exit t)
-  ("2" make-frame  :exit t)
-  ("b" balance-windows)
-  ("d" kill-and-delete-frame :exit t)
-  ("e" ace-swap-window)
-  ("F" toggle-frame-fullscreen)   ;; is <f11>
-  ("g" resize-frame-right :exit t)
-  ("H" resize-frame-left :exit t)  ;; aw-dispatch-alist uses h, I rebind here so hjkl can be used for size
-  ("n" new-frame-right :exit t)
-  ;; ("r" reverse-windows)
-  ("t" toggle-window-spilt)
-  ("w" ace-delete-window :exit t)
-  ("x" delete-frame :exit t)
-  ("K" text-scale-decrease)
-  ("J" text-scale-increase)
-  ("h" shrink-window-horizontally)
-  ("k" shrink-window)
-  ("j" enlarge-window)
-  ("l" enlarge-window-horizontally))
-(global-set-key (kbd "C-x o") 'hydra-frame-window/body)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; hydra
 ;; https://www.reddit.com/r/emacs/comments/8of6tx/tip_how_to_be_a_beast_with_hydra/
+;; https://github.com/abo-abo/hydra/wiki/Org-clock-and-timers
+;;
 ;; (leaf hydra
 ;;   :ensure t
 ;;   :defer 2
 ;;   :bind ("C-c t" . hydra-clock/body))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (defhydra hydra-org-agenda-clock (:color blue :hint nil)
+;;   ("i" org-agenda-clock-in)
+;;   ("o" org-agenda-clock-out)
+;;   ("q" org-agenda-clock-cancel)
+;;   ("g" org-agenda-clock-goto))
+;; (bind-keys ("C-c w" . hydra-org-clock/body)
+;;            :map org-agenda-mode-map
+;;            ("C-c w" . hydra-org-agenda-clock/body))
 
+
+;; https://github.com/abo-abo/hydra/wiki/Info
 (defhydra hydra-clock (:color blue)
     "
     ^
@@ -1410,19 +1390,144 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
     ("j" org-clock-goto)
     ("o" org-clock-out)
     ("r" org-clock-report))
-(global-set-key (kbd "C-c C-t") 'hydra-clock/body)
+(global-set-key (kbd "C-c t") 'hydra-clock/body)
 
+;;(defhydra hydra-zoom ()
+;;   "zoom"
+;;   ("g" text-scale-increase "in")
+;;   ("l" text-scale-decrease "out"))
+;; (global-set-key (kbd "C-x f") 'hydra-zoom/body)
 ;;
+;;;;
 
-;;
-(defhydra hydra-zoom ()
-  "zoom"
-  ("g" text-scale-increase "in")
-  ("l" text-scale-decrease "out"))
-(global-set-key (kbd "C-x f") 'hydra-zoom/body)
+(define-key Info-mode-map (kbd "?") #'hydra-info/body)
+(defhydra hydra-info (:color blue
+                      :hint nil)
+      "
+Info-mode:
 
-;;
+  ^^_]_ forward  (next logical node)       ^^_l_ast (←)        _u_p (↑)                             _f_ollow reference       _T_OC
+  ^^_[_ backward (prev logical node)       ^^_r_eturn (→)      _m_enu (↓) (C-u for new window)      _i_ndex                  _d_irectory
+  ^^_n_ext (same level only)               ^^_H_istory         _g_oto (C-u for new window)          _,_ next index item      _c_opy node name
+  ^^_p_rev (same level only)               _<_/_t_op           _b_eginning of buffer                virtual _I_ndex          _C_lone buffer
+  regex _s_earch (_S_ case sensitive)      ^^_>_ final         _e_nd of buffer                      ^^                       _a_propos
 
+  _1_ .. _9_ Pick first .. ninth item in the node's menu.
+
+"
+      ("]"   Info-forward-node)
+      ("["   Info-backward-node)
+      ("n"   Info-next)
+      ("p"   Info-prev)
+      ("s"   Info-search)
+      ("S"   Info-search-case-sensitively)
+
+      ("l"   Info-history-back)
+      ("r"   Info-history-forward)
+      ("H"   Info-history)
+      ("t"   Info-top-node)
+      ("<"   Info-top-node)
+      (">"   Info-final-node)
+
+      ("u"   Info-up)
+      ("^"   Info-up)
+      ("m"   Info-menu)
+      ("g"   Info-goto-node)
+      ("b"   beginning-of-buffer)
+      ("e"   end-of-buffer)
+
+      ("f"   Info-follow-reference)
+      ("i"   Info-index)
+      (","   Info-index-next)
+      ("I"   Info-virtual-index)
+
+      ("T"   Info-toc)
+      ("d"   Info-directory)
+      ("c"   Info-copy-current-node-name)
+      ("C"   clone-buffer)
+      ("a"   info-apropos)
+
+      ("1"   Info-nth-menu-item)
+      ("2"   Info-nth-menu-item)
+      ("3"   Info-nth-menu-item)
+      ("4"   Info-nth-menu-item)
+      ("5"   Info-nth-menu-item)
+      ;; ("6"   Info-nth-menu-item)
+      ;; ("7"   Info-nth-menu-item)
+      ;; ("8"   Info-nth-menu-item)
+      ;; ("9"   Info-nth-menu-item)
+
+      ("?"   Info-summary "Info summary")
+      ("h"   Info-help "Info help")
+      ("q"   Info-exit "Info exit")
+      ("C-g" nil "cancel" :color blue))
+;;;;;;;;
+;; https://github.com/abo-abo/hydra/wiki/Org-mode-block-templates
+;;;;;;;
+
+;;  (defhydra hydra-org-template (:color blue :hint nil)
+;;     "
+;;  _c_enter  _q_uote     _e_macs-lisp    _L_aTeX:
+;;  _l_atex   _E_xample   _p_erl          _i_ndex:
+;;  _a_scii   _v_erse     _P_erl tangled  _I_NCLUDE:
+;;  _s_rc     _n_ote      plant_u_ml      _H_TML:
+;;  _h_tml    ^ ^         ^ ^             _A_SCII:
+;; "
+;;     ("s" (hot-expand "<s"))
+;;     ("E" (hot-expand "<e"))
+;;     ("q" (hot-expand "<q"))
+;;     ("v" (hot-expand "<v"))
+;;     ("n" (hot-expand "<not"))
+;;     ("c" (hot-expand "<c"))
+;;     ("l" (hot-expand "<l"))
+;;     ("h" (hot-expand "<h"))
+;;     ("a" (hot-expand "<a"))
+;;     ("L" (hot-expand "<L"))
+;;     ("i" (hot-expand "<i"))
+;;     ("e" (hot-expand "<s" "emacs-lisp"))
+;;     ("p" (hot-expand "<s" "perl"))
+;;     ("u" (hot-expand "<s" "plantuml :file CHANGE.png"))
+;;     ("P" (hot-expand "<s" "perl" ":results output :exports both :shebang \"#!/usr/bin/env perl\"\n"))
+;;     ("I" (hot-expand "<I"))
+;;     ("H" (hot-expand "<H"))
+;;     ("A" (hot-expand "<A"))
+;;     ("<" self-insert-command "ins")
+;;     ("o" nil "quit"))
+
+;;   (require 'org-tempo) ; Required from org 9 onwards for old template expansion
+;;   ;; Reset the org-template expnsion system, this is need after upgrading to org 9 for some reason
+;;   (setq org-structure-template-alist (eval (car (get 'org-structure-template-alist 'standard-value))))
+;;   (defun hot-expand (str &optional mod header)
+;;     "Expand org template.
+
+;; STR is a structure template string recognised by org like <s. MOD is a
+;; string with additional parameters to add the begin line of the
+;; structure element. HEADER string includes more parameters that are
+;; prepended to the element after the #+HEADER: tag."
+;;     (let (text)
+;;       (when (region-active-p)
+;;         (setq text (buffer-substring (region-beginning) (region-end)))
+;;         (delete-region (region-beginning) (region-end))
+;;         (deactivate-mark))
+;;       (when header (insert "#+HEADER: " header) (forward-line))
+;;       (insert str)
+;;       (org-tempo-complete-tag)
+;;       (when mod (insert mod) (forward-line))
+;;       (when text (insert text))))
+
+;;   (define-key org-mode-map "<"
+;;     (lambda () (interactive)
+;;       (if (or (region-active-p) (looking-back "^"))
+;;           (hydra-org-template/body)
+;;         (self-insert-command 1))))
+
+;;   (eval-after-load "org"
+;;     '(cl-pushnew
+;;     '("not" . "note")
+;;       org-structure-template-alist))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (eval-after-load 'gnus-group
   '(progn
      (defhydra hydra-gnus-group (:color blue)
@@ -1485,7 +1590,7 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
        ("q" nil "cancel"))
      (global-set-key (kbd "C-c C-y") 'hydra-message/body)))
 
-;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; This is the basic launcher code. It makes a main differentiation according to the Emacs major-mode and for org uses the org-element-context and org-element-property functions to react according to the specific context element/type.
 
 (defun dfeich/context-hydra-launcher ()
@@ -1542,8 +1647,169 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
 
 (setq system-time-locale "C")
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; vcs git{attributes,config,ignore}-mode, git-commit
+;;; https://uwabami.github.io/cc-env/Emacs.html
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(leaf *git
+  :emacs>= 25
+  :init
+  (leaf git-commit :ensure t)
+  (leaf gitattributes-mode :ensure t)
+  (leaf gitconfig-mode :ensure t)
+  (leaf gitignore-mode :ensure t)
+  )
+
+
+;;Git Gutter+
+(leaf git-gutter+
+  :emacs>= 25
+  :ensure t
+  :blackout `((git-gutter+-mode
+               . ,(format "%s" (all-the-icons-octicon "git-merge"))))
+  :bind ("C-x G" . global-git-gutter+-mode)
+  )
+
+;; magit 
+;; https://uwabami.github.io/cc-env/Emacs.html
+
+;; (leaf magit
+;;   :bind (("C-x g" . magit-status))
+;;   :ensure t
+;;   :init
+;;   (leaf transient
+;;     :custom
+;;     `((transient-history-file
+;;        . ,(expand-file-name "transient-history.el" my:d:tmp))
+;;       (transient-levels-file
+;;        . ,(expand-file-name "transient-levels.el" my:d:tmp))
+;;       (transient-values-file
+;;        . ,(expand-file-name "transient-values.el" my:d:tmp))
+;;       (transient-force-fixed-pitch . t))
+;;     )
+;;   :config
+;;   (setq magit-completing-read-function 'ivy
+;;         magit-refs-show-commit-count   'all
+;;         magit-log-buffer-file-locked   t
+;;         magit-revision-show-gravatars  nil
+;;         )
+;;   )
+
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;; https://github.com/abo-abo/hydra/wiki/Version-Control
+;; Navigation among git hunks
+;;This hydra allows navigating between git diff hunks in the buffer and acting on them (staging, reverting, etc). It requires git-gutter or git-gutter-fringe.
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+
+(defhydra hydra-git-gutter (:body-pre (git-gutter-mode 1)
+                            :hint nil)
+  "
+Git gutter:
+  _j_: next hunk        _s_tage hunk     _q_uit
+  _k_: previous hunk    _r_evert hunk    _Q_uit and deactivate git-gutter
+  ^ ^                   _p_opup hunk
+  _h_: first hunk
+  _l_: last hunk        set start _R_evision
+"
+  ("j" git-gutter:next-hunk)
+  ("k" git-gutter:previous-hunk)
+  ("h" (progn (goto-char (point-min))
+              (git-gutter:next-hunk 1)))
+  ("l" (progn (goto-char (point-min))
+              (git-gutter:previous-hunk 1)))
+  ("s" git-gutter:stage-hunk)
+  ("r" git-gutter:revert-hunk)
+  ("p" git-gutter:popup-hunk)
+  ("R" git-gutter:set-start-revision)
+  ("q" nil :color blue)
+  ("Q" (progn (git-gutter-mode -1)
+              ;; git-gutter-fringe doesn't seem to
+              ;; clear the markup right away
+              (sit-for 0.1)
+              (git-gutter:clear))
+       :color blue))
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; マシーン依存の個別path
+
+;; Tesinfo my-path 
+(require 'info)
+(setq Info-directory-list
+ (cons (expand-file-name "/home/mevius/info")
+       Info-directory-list))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;; test  ;;;;;;;;;;;;;;;;;
+;; https://uwabami.github.io/cc-env/Emacs.html
+
+;; ;;;###autoload
+;; (defun my:load-window-config ()
+;;   "load window-system specific settings"
+;;   (interactive)
+;;   (progn
+;;     (set-face-attribute 'default nil
+;;                         :family "FSMRMP"
+;;                         :height 135)
+;;     (set-face-attribute 'fixed-pitch nil
+;;                         :family "FSMRMP"
+;;                         :height 135)
+;;     (set-face-attribute 'variable-pitch nil
+;;                         :family "FSMRMP"
+;;                         :height 135)
+;;     ;; Math symbols
+;;     (set-fontset-font nil
+;;                       '(#x2200 . #x22FF)
+;;                       (font-spec :family "FSMRMP" :height 135))
+;;     ;; Greek
+;;     (set-fontset-font nil
+;;                       '(#x0370 . #x03FF)
+;;                       (font-spec :family "FSMRMP" :height 135))
+;;     ;; Some Icons
+;;     (set-fontset-font nil
+;;                       '(#xE0A0 . #xEEE0)
+;;                       (font-spec :family "FSMRMP" :height 135))
+;;     (setq use-default-font-for-symbols t)
+;;     ))
+;; ;;;###autoload
+;; (defun my:load-side-window-config ()
+;;   "load window-system specific settings"
+;;   (interactive)
+;;   (progn
+;;     (set-face-attribute 'default nil
+;;                         :family "FSMRMP"
+;;                         :height 120)
+;;     (set-face-attribute 'fixed-pitch nil
+;;                         :family "FSMRMP"
+;;                         :height 120)
+;;     (set-face-attribute 'variable-pitch nil
+;;                         :family "FSMRMP"
+;;                         :height 120)
+;;     ;; Math symbols
+;;     (set-fontset-font nil
+;;                       '(#x2200 . #x22FF)
+;;                       (font-spec :family "FSMRMP" :height 120))
+;;     ;; Greek
+;;     (set-fontset-font nil
+;;                       '(#x0370 . #x03FF)
+;;                       (font-spec :family "FSMRMP" :height 120))
+;;     ;; Some Icons
+;;     (set-fontset-font nil
+;;                       '(#xE0A0 . #xEEE0)
+;;                       (font-spec :family "FSMRMP" :height 120))
+;;     ))
+;; (leaf *gui
+;;   :if window-system
+;;   :config
+;;   (set-frame-parameter nil 'alpha 95)
+;;   (setq use-default-font-for-symbols nil)
+;; ;;  (my:load-window-config)
+;;   )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (leaf exec-path-from-shell
@@ -1554,10 +1820,6 @@ _d_: kill-and-delete-frame     _n_: new-frame-right       _w_: ace-delete-window
   :url "https://github.com/purcell/exec-path-from-shell"
   :emacs>= 24.1
   :ensure t)
-
-
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
