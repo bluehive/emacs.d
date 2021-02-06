@@ -1805,7 +1805,7 @@ Git gutter:
   :ensure t
   :commands (slime slime-mode slime-connect)
   :init     (progn
-              (setq inferior-lisp-program "/usr/bin/eclc" ;;"sbcl --noinform --no-linedit"
+              (setq inferior-lisp-program "/usr/bin/ecl" ;;"sbcl --noinform --no-linedit"
                     slime-compile-file-options '(:fasl-directory "/home/mevius/tmp/slime-fasls/")
                     slime-net-coding-system 'utf-8-unix
                     slime-completion-at-point-functions 'slime-fuzzy-complete-symbol
