@@ -794,22 +794,24 @@
 ;;https://github.com/exot/.emacs.d/blob/9cf17c973f889621e2cd6452bcfe3b20d36a072f/init.el
 
 (leaf slime
-  :commands (slime slime-mode slime-connect)
+  :ensure t
+  :commands (slime slime-mode  slime-connect  )
   :init     (progn
-              (setq inferior-lisp-program "clisp"
-                    slime-compile-file-options '(:fasl-directory "~/tmp/slime-fasls/")
+              (setq inferior-lisp-program "gcl"
+                    slime-compile-file-options '(:fasl-directory "/home/mevius/tmp/slime-fasls/")
                     slime-net-coding-system 'utf-8-unix
                     slime-completion-at-point-functions 'slime-fuzzy-complete-symbol
                     slime-lisp-implementations '((gcl ("gcl") :coding-system utf-8-unix)
                                                  (clisp ("clisp") :coding-system utf-8-unix)
-                                                 (ccl ("ccl") :coding-system utf-8-unix))
+                                                (ccl ("ccl") :coding-system utf-8-unix)
+                                                 )
                     slime-repl-history-remove-duplicates t
                     slime-repl-history-trim-whitespaces t)
-              (add-hook 'lisp-mode-hook '(lambda () (slime-mode +1)) t))
+              (add-hook 'lisp-mode-hook '(lambda () (slime-mode +1)) t)))
   :config   (progn
-              (make-directory "~/tmp/slime-fasls/" t)
+             (make-directory "/home/mevius/tmp/slime-fasls/" t)
               (slime-setup '(slime-repl slime-fancy slime-autodoc))
-              (add-hook 'slime-mode-hook 'slime-redirect-inferior-output)))
+              (add-hook 'slime-mode-hook 'slime-redirect-inferior-output))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; yatex to latex 野鳥起動のための設定
