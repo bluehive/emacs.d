@@ -180,20 +180,55 @@
   )
 )
 
-;;;;;;;;;;;;;;;;;;;;;;
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ここにいっぱい設定を書く
 ;; https://emacs-jp.github.io/tips/emacs-in-2020
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;leafの :custom で設定するとinit.elにcustomが勝手に設定を追記します。 この状況になると、変数の二重管理になってしまうので、customがinit.elに追記しないように設定します。
 (leaf cus-edit
   :doc "tools for customizing Emacs and Lisp packages"
   :tag "builtin" "faces" "help"
   :custom `((custom-file . ,(locate-user-emacs-file "custom.el"))))
 
+;;cus-start.c EmacsのC言語部分で定義されている変数をcustomで扱えるようにまとめているファイルです。 私の設定を書いておくので、取捨選択して頂ければと思います。変数の説明は F1 v で確認できます。
 
+(leaf cus-start
+  :doc "define customization properties of builtins"
+  :tag "builtin" "internal"
+  :preface
+  (defun c/redraw-frame nil
+    (interactive)
+    (redraw-frame))
 
+  :bind (("M-ESC ESC" . c/redraw-frame))
+  :custom '(;;(user-full-name . "Naoya Yamashita")
+            ;;(user-mail-address . "conao3@gmail.com")
+            ;;(user-login-name . "conao3")
+            (create-lockfiles . nil)
+            (debug-on-error . t)
+            (init-file-debug . t)
+            (frame-resize-pixelwise . t)
+            (enable-recursive-minibuffers . t)
+            (history-length . 1000)
+            (history-delete-duplicates . t)
+            (scroll-preserve-screen-position . t)
+            (scroll-conservatively . 100)
+            (mouse-wheel-scroll-amount . '(1 ((control) . 5)))
+            (ring-bell-function . 'ignore)
+            (text-quoting-style . 'straight)
+            (truncate-lines . t)
+            ;; (use-dialog-box . nil)
+            ;; (use-file-dialog . nil)
+             (menu-bar-mode . t)
+            ;; (tool-bar-mode . nil)
+            (scroll-bar-mode . nil)
+            (indent-tabs-mode . nil))
+  :config
+  (defalias 'yes-or-no-p 'y-or-n-p)
+  (keyboard-translate ?\C-h ?\C-?))
+
+;;
 (eval-and-compile
   (leaf bytecomp
     :doc "compilation of Lisp code into byte code"
@@ -201,7 +236,7 @@
     :custom (byte-compile-warnings . '(cl-functions))))
 
 
-
+;;Emacsの外でファイルが書き変わったときに自動的に読み直すマイナーモードです。 もちろん、Emacsで編集している場合は外の変更で上書きされることはありません。
 (leaf autorevert
   :doc "revert buffers when files on disk change"
   :tag "builtin"
@@ -211,15 +246,16 @@
 
 
 ;;delsel
+;;選択している状態で入力したときに、regionを削除して挿入するマイナーモードです。 おそらくこの挙動のほうが現代人の意図に合っていると思います。
 
 (leaf delsel
   :doc "delete selection if you insert"
   :tag "builtin"
   :global-minor-mode delete-selection-mode)
 
-;;選択している状態で入力したときに、regionを削除して挿入するマイナーモードです。 おそらくこの挙動のほうが現代人の意図に合っていると思います。
 
 ;;paren
+;;対応するカッコを強調表示するマイナーモードです。
 
 (leaf paren
   :doc "highlight matching paren"
@@ -227,9 +263,9 @@
   :custom ((show-paren-delay . 0.1))
   :global-minor-mode show-paren-mode)
 
-;;対応するカッコを強調表示するマイナーモードです。
 
 ;;simple
+;;kill-ringの数を制御したり、kill-lineの挙動を変更したりします。
 
 (leaf simple
   :doc "basic editing commands for Emacs"
@@ -240,8 +276,8 @@
            (eval-expression-print-length . nil)
            (eval-expression-print-level . nil)))
 
-;;kill-ringの数を制御したり、kill-lineの挙動を変更したりします。
 ;;files
+;;Emacsで好みが分かれる設定として、バックアップファイルを開いているファイルと同じディレクトリに作成するという挙動があります。 実際、このバックアップファイルに助けられることもあるので、 .emacs.d 以下にディレクトリを掘って、そこに保存するようにします。
 
 (leaf files
   :doc "file input and output commands for Emacs"
@@ -254,16 +290,14 @@
             (version-control . t)
             (delete-old-versions . t)))
 
-;;Emacsで好みが分かれる設定として、バックアップファイルを開いているファイルと同じディレクトリに作成するという挙動があります。 実際、このバックアップファイルに助けられることもあるので、 .emacs.d 以下にディレクトリを掘って、そこに保存するようにします。
 
 ;;startup
+;;自動保存されたファイルのリストです。 .emacs.d/backup 以下にまとめて保存するようにします。
 
 (leaf startup
   :doc "process Emacs shell arguments"
   :tag "builtin" "internal"
   :custom `((auto-save-list-file-prefix . ,(locate-user-emacs-file "backup/.saves-"))))
-
-;;自動保存されたファイルのリストです。 .emacs.d/backup 以下にまとめて保存するようにします。
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -479,62 +513,8 @@
 ;;       ))
 
 
-;;    対応する括弧の自動挿入
-(leaf electric
-  :doc "window maker and Command loop for `electric' modes"
-  :tag "builtin"
-  :added "2020-08-27"
-  :init (electric-pair-mode 1))
-
- ;;   ispell を aspell で使う
-
-(leaf ispell
-  :doc "interface to spell checkers"
-  :tag "builtin"
-  :added "2020-08-27"
-  :setq-default (ispell-program-name . "aspell"))
-
-
-;;4.9 emacs-lisp-mode
-
-(leaf emacs-lisp-mode
-  :mode ("\\.skk$"))
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;; http://emacs.rubikitch.com/global-hl-line-mode-timer/
-;; 遅い場合は以下
-
-;; (require 'hl-line)
-;; ;;; hl-lineを無効にするメジャーモードを指定する
-;; (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
-;; (defun global-hl-line-timer-function ()
-;;   (unless (memq major-mode global-hl-line-timer-exclude-modes)
-;;     (global-hl-line-unhighlight-all)
-;;     (let ((global-hl-line-mode t))
-;;       (global-hl-line-highlight))))
-;; (setq global-hl-line-timer
-;;       (run-with-idle-timer 0.03 t 'global-hl-line-timer-function))
-;; ;; (cancel-timer global-hl-line-timer)
-
-;;;;;
-;;スクロールを鮮やかにする
-;;https://github.com/k-talo/smooth-scroll.el
-					;(require 'smooth-scroll)
-					;(smooth-scroll-mode t)
-
-;; ;; スクロールした際のカーソルの移動行数
-;; (setq scroll-conservatively 1)
-
-;; ;; スクロール開始のマージンの行数
-;; (setq scroll-margin 10)
-
-;; ;; 1 画面スクロール時に重複させる行数
-;; (setq next-screen-context-lines 10)
-
-;; ;; 1 画面スクロール時にカーソルの画面上の位置をなるべく変えない
-;; (setq scroll-preserve-screen-position t)
-
 
 ;;eshellのときだけ行番号を表示しない
 ;;(global-linum-mode 1)
@@ -699,119 +679,7 @@
   (process-send-string logger-process (concat (apply 'format msg) "\n")))
 
 
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ cperl-mode
-;;; https://www.emacswiki.org/emacs/CPerlMode                       ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
-;; ;;; cperl-mode is preferred to perl-mode
-;; ;;; "Brevity is the soul of wit" <foo at acm.org>
-;; (defalias 'perl-mode 'cperl-mode)
-
-;; ;;; (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|al\\)\\'" . cperl-mode))
-;; (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|t\\)\\'" . cperl-mode))
-;; (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
-;; (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
-;; (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
-
-;; ;; (cperl-set-style "PerlStyle")
-
-;; ;; Emacs M-x toggle-truncate-lines: 長い行の折り返し表示を切り換える
-;; (global-set-key (kbd "C-c t") 'toggle-truncate-lines)
-
-;; ;;;;;; perl custom
-
-;;  ;;load cperl, then work around indent issue
-;;  (load-library "cperl-mode")
-;;  (defun cperl-backward-to-start-of-continued-exp (lim)
-;;    (goto-char (1+ lim))
-;;    (forward-sexp)
-;;    (beginning-of-line)
-;;    (skip-chars-forward " \t")
-;;  )
-
-;;フォントの設定を忘れてた。
-;;設定の仕方は、シンプルに
-
-;; (setq default-frame-alist
-;;       '(
-;;         (font . "Cica 16")))
-
-;;
-;;
-;;;; https://www.gnu.org/software/guile/manual/html_node/Using-Guile-in-Emacs.html
-;;scheme-mode
-;;
-
-;; (leaf geiser
-;;   :ensure t
-;;   :config
-;;   (setq geiser-active-implementations '(guile)))
-
-;; GNU-Emacsには、Lispを起動するコマンドがあります。
-;; Lisp起動コマンドでgclを起動するには、
-;; .emacs中などで
-;;(setq inferior-lisp-program "gcl")
-(setq inferior-lisp-program "clisp")
-
-;;https://github.com/takeokunn/.emacs.d/blob/35f6254f5a73c8d8969796962086f4d2a6341d03/index.org
-
-(leaf slim-mode
-  :ensure t
-  :mode ("\\.slim$"))
-
-(leaf paredit
-  :ensure t
-  :commands enable-paredit-mode
-  :hook ((emacs-lisp-mode-hook . enable-paredit-mode)
-         (lisp-mode-hook . enable-paredit-mode)
-         (lisp-interacton-mode-hook . enable-paredit-mode)
-         (scheme-mode-hook . enable-paredit-mode))
-  :bind
-  ("C-<right>" . paredit-forward-slurp-sexp)
-  ("C-c f" . paredit-forward-slurp-sexp)
-  ("C-<left>" . paredit-forward-barf-sexp)
-  ("C-c b" . paredit-forward-barf-sexp))
-
-;;5.1.2 rainbow-delimiters
-(leaf rainbow-delimiters
-  :ensure t
-  :hook (prog-mode-hook))
-
-(leaf elisp-slime-nav :ensure t)
-
-;; https://github.com/takeokunn/.emacs.d/blob/35f6254f5a73c8d8969796962086f4d2a6341d03/index.org
-(leaf web-mode
-  :ensure t
-  :bind ("C-j" . web-mode-comment-indent-new-line)
-  :mode ("\\.html?\\'" "\\.erb\\'" "\\.gsp\\'" "\\.tsx\\'"))
-;;4.37 yaml-mode
-(leaf yaml-mode
-  :ensure t
-  :mode ("\\.ya?ml$"))
-
-;;slime-mode
-;;https://github.com/exot/.emacs.d/blob/9cf17c973f889621e2cd6452bcfe3b20d36a072f/init.el
-
-(leaf slime
-  :ensure t
-  :commands (slime slime-mode  slime-connect  )
-  :init     (progn
-              (setq inferior-lisp-program "gcl"
-                    slime-compile-file-options '(:fasl-directory "/home/mevius/tmp/slime-fasls/")
-                    slime-net-coding-system 'utf-8-unix
-                    slime-completion-at-point-functions 'slime-fuzzy-complete-symbol
-                    slime-lisp-implementations '((gcl ("gcl") :coding-system utf-8-unix)
-                                                 (clisp ("clisp") :coding-system utf-8-unix)
-                                                (ccl ("ccl") :coding-system utf-8-unix)
-                                                 )
-                    slime-repl-history-remove-duplicates t
-                    slime-repl-history-trim-whitespaces t)
-              (add-hook 'lisp-mode-hook '(lambda () (slime-mode +1)) t)))
-  :config   (progn
-             (make-directory "/home/mevius/tmp/slime-fasls/" t)
-              (slime-setup '(slime-repl slime-fancy slime-autodoc))
-              (add-hook 'slime-mode-hook 'slime-redirect-inferior-output))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; yatex to latex 野鳥起動のための設定
@@ -1075,7 +943,6 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;;; ob-shell.el --- Babel Functions for Shell Evaluation 
 ;; Copyright (C) 2009-2020 Free Software Foundation, Inc.
 
@@ -1342,23 +1209,6 @@ return the value of the last statement in BODY."
 ;(provide 'ob-shell)
 ;;; ob-shell.el ends here
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; ack grep A minimalistic interface to Ack is:
-;;; https://www.emacswiki.org/emacs/Ack
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defvar ack-history nil
-  "History for the `ack' command.")
-
-(defun ack (command-args)
-  (interactive
-   (let ((ack-command "ack --nofilter --nogroup --with-filename "))
-     (list (read-shell-command "Run ack (like this): "
-                               ack-command
-                               'ack-history))))
-  (let ((compilation-disable-input t))
-    (compilation-start (concat command-args " < " null-device)
-                       'grep-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org-agenda config
@@ -1391,24 +1241,6 @@ return the value of the last statement in BODY."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; AWK Source Code Blocks in Org Mode
-;; https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-awk.html
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((awk . t)))
-
-;; makefile
-
-(setq org-src-preserve-indentation t)
-
-;; Currently, there is no need to activate makefile with org-babel-do-load-languages, but it won't hurt to do so.
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((makefile . t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1708,6 +1540,59 @@ Info-mode:
    ("V" scroll-down-command)
    ("l" recenter-top-bottom)))
 
+
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;; https://github.com/abo-abo/hydra/wiki/Version-Control
+;; Navigation among git hunks
+;;This hydra allows navigating between git diff hunks in the buffer and acting on them (staging, reverting, etc). It requires git-gutter or git-gutter-fringe.
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+
+(defhydra hydra-git-gutter (:body-pre (git-gutter-mode 1)
+                            :hint nil)
+  "
+Git gutter:
+  _j_: next hunk        _s_tage hunk     _q_uit
+  _k_: previous hunk    _r_evert hunk    _Q_uit and deactivate git-gutter
+  ^ ^                   _p_opup hunk
+  _h_: first hunk
+  _l_: last hunk        set start _R_evision
+"
+  ("j" git-gutter:next-hunk)
+  ("k" git-gutter:previous-hunk)
+  ("h" (progn (goto-char (point-min))
+              (git-gutter:next-hunk 1)))
+  ("l" (progn (goto-char (point-min))
+              (git-gutter:previous-hunk 1)))
+  ("s" git-gutter:stage-hunk)
+  ("r" git-gutter:revert-hunk)
+  ("p" git-gutter:popup-hunk)
+  ("R" git-gutter:set-start-revision)
+  ("q" nil :color blue)
+  ("Q" (progn (git-gutter-mode -1)
+              ;; git-gutter-fringe doesn't seem to
+              ;; clear the markup right away
+              (sit-for 0.1)
+              (git-gutter:clear))
+       :color blue))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; prog lang mode
+;;;; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; https://github.com/takeokunn/.emacs.d/blob/35f6254f5a73c8d8969796962086f4d2a6341d03/index.org
+(leaf web-mode
+  :ensure t
+  :bind ("C-j" . web-mode-comment-indent-new-line)
+  :mode ("\\.html?\\'" "\\.erb\\'" "\\.gsp\\'" "\\.tsx\\'"))
+;;4.37 yaml-mode
+(leaf yaml-mode
+  :ensure t
+  :mode ("\\.ya?ml$"))
+
 ;; Org mode の C-c C-s で挿入する日付の曜日、英語曜日表記を強制する。
 
 (setq system-time-locale "C")
@@ -1760,47 +1645,193 @@ Info-mode:
 ;;         magit-revision-show-gravatars  nil
 ;;         )
 ;;   )
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; ack grep A minimalistic interface to Ack is:
+;;; https://www.emacswiki.org/emacs/Ack
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;
-;; https://github.com/abo-abo/hydra/wiki/Version-Control
-;; Navigation among git hunks
-;;This hydra allows navigating between git diff hunks in the buffer and acting on them (staging, reverting, etc). It requires git-gutter or git-gutter-fringe.
-;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;
+(defvar ack-history nil
+  "History for the `ack' command.")
 
-(defhydra hydra-git-gutter (:body-pre (git-gutter-mode 1)
-                            :hint nil)
-  "
-Git gutter:
-  _j_: next hunk        _s_tage hunk     _q_uit
-  _k_: previous hunk    _r_evert hunk    _Q_uit and deactivate git-gutter
-  ^ ^                   _p_opup hunk
-  _h_: first hunk
-  _l_: last hunk        set start _R_evision
-"
-  ("j" git-gutter:next-hunk)
-  ("k" git-gutter:previous-hunk)
-  ("h" (progn (goto-char (point-min))
-              (git-gutter:next-hunk 1)))
-  ("l" (progn (goto-char (point-min))
-              (git-gutter:previous-hunk 1)))
-  ("s" git-gutter:stage-hunk)
-  ("r" git-gutter:revert-hunk)
-  ("p" git-gutter:popup-hunk)
-  ("R" git-gutter:set-start-revision)
-  ("q" nil :color blue)
-  ("Q" (progn (git-gutter-mode -1)
-              ;; git-gutter-fringe doesn't seem to
-              ;; clear the markup right away
-              (sit-for 0.1)
-              (git-gutter:clear))
-       :color blue))
+(defun ack (command-args)
+  (interactive
+   (let ((ack-command "ack --nofilter --nogroup --with-filename "))
+     (list (read-shell-command "Run ack (like this): "
+                               ack-command
+                               'ack-history))))
+  (let ((compilation-disable-input t))
+    (compilation-start (concat command-args " < " null-device)
+                       'grep-mode)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; AWK Source Code Blocks in Org Mode
+;; https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-awk.html
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((awk . t)))
+
+;; makefile
+
+(setq org-src-preserve-indentation t)
+
+;; Currently, there is no need to activate makefile with org-babel-do-load-languages, but it won't hurt to do so.
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((makefile . t)))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; マシーン依存の個別path
+;;https://emacs-jp.github.io/tips/emacs-in-2020
+;;    対応する括弧の自動挿入
+(leaf electric
+  :doc "window maker and Command loop for `electric' modes"
+  :tag "builtin"
+  :added "2020-08-27"
+  :init (electric-pair-mode 1))
+
+ ;;   ispell を aspell で使う
+
+(leaf ispell
+  :doc "interface to spell checkers"
+  :tag "builtin"
+  :added "2020-08-27"
+  :setq-default (ispell-program-name . "aspell"))
+
+
+;;4.9 emacs-lisp-mode
+
+(leaf emacs-lisp-mode
+  :mode ("\\.skk$"))
+
+
+;;cc-mode
+(leaf cc-mode
+  :doc "major mode for editing C and similar languages"
+  :tag "builtin"
+  :defvar (c-basic-offset)
+  :bind (c-mode-base-map
+         ("C-c c" . compile))
+  :mode-hook
+  (c-mode-hook . ((c-set-style "bsd")
+                  (setq c-basic-offset 4)))
+  (c++-mode-hook . ((c-set-style "bsd")
+                    (setq c-basic-offset 4))))
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ cperl-mode
+;;; https://www.emacswiki.org/emacs/CPerlMode                       ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+
+;; ;;; cperl-mode is preferred to perl-mode
+;; ;;; "Brevity is the soul of wit" <foo at acm.org>
+;; (defalias 'perl-mode 'cperl-mode)
+
+;; ;;; (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|al\\)\\'" . cperl-mode))
+;; (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|t\\)\\'" . cperl-mode))
+;; (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
+;; (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
+;; (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
+
+;; ;; (cperl-set-style "PerlStyle")
+
+;; ;; Emacs M-x toggle-truncate-lines: 長い行の折り返し表示を切り換える
+;; (global-set-key (kbd "C-c t") 'toggle-truncate-lines)
+
+;; ;;;;;; perl custom
+
+;;  ;;load cperl, then work around indent issue
+;;  (load-library "cperl-mode")
+;;  (defun cperl-backward-to-start-of-continued-exp (lim)
+;;    (goto-char (1+ lim))
+;;    (forward-sexp)
+;;    (beginning-of-line)
+;;    (skip-chars-forward " \t")
+;;  )
+
+;;フォントの設定を忘れてた。
+;;設定の仕方は、シンプルに
+
+;; (setq default-frame-alist
+;;       '(
+;;         (font . "Cica 16")))
+
+;;
+;;;; https://www.gnu.org/software/guile/manual/html_node/Using-Guile-in-Emacs.html
+;;scheme-mode
+;;
+(leaf geiser
+  :ensure t
+  :config
+  (setq geiser-active-implementations '(guile)))
+
+
+;;https://github.com/takeokunn/.emacs.d/blob/35f6254f5a73c8d8969796962086f4d2a6341d03/index.org
+
+;; (leaf slim-mode
+;;   :ensure t
+;;   :mode ("\\.slim$"))
+
+(leaf paredit
+  :ensure t
+  :commands enable-paredit-mode
+  :hook ((emacs-lisp-mode-hook . enable-paredit-mode)
+         (lisp-mode-hook . enable-paredit-mode)
+         (lisp-interacton-mode-hook . enable-paredit-mode)
+         (scheme-mode-hook . enable-paredit-mode))
+  :bind
+  ("C-<right>" . paredit-forward-slurp-sexp)
+  ("C-c f" . paredit-forward-slurp-sexp)
+  ("C-<left>" . paredit-forward-barf-sexp)
+  ("C-c b" . paredit-forward-barf-sexp))
+
+;;5.1.2 rainbow-delimiters
+(leaf rainbow-delimiters
+  :ensure t
+  :hook (prog-mode-hook))
+
+;; GNU-Emacsには、Lispを起動するコマンドがあります。
+;; Lisp起動コマンドでgclを起動するには、
+;; .emacs中などで
+;;(setq inferior-lisp-program "/usr/bin/gcl")
+;;(setq inferior-lisp-program "/usr/bin/clisp")
+(setq inferior-lisp-program "/usr/bin/ecl")
+
+;;slime-mode
+;;https://github.com/exot/.emacs.d/blob/9cf17c973f889621e2cd6452bcfe3b20d36a072f/init.el
+;;
+(leaf slime
+  :ensure t
+  :commands (slime slime-mode slime-connect)
+  :init     (progn
+              (setq inferior-lisp-program "/usr/bin/eclc" ;;"sbcl --noinform --no-linedit"
+                    slime-compile-file-options '(:fasl-directory "/home/mevius/tmp/slime-fasls/")
+                    slime-net-coding-system 'utf-8-unix
+                    slime-completion-at-point-functions 'slime-fuzzy-complete-symbol
+                    slime-lisp-implementations '((gcl ("gcl") :coding-system utf-8-unix)
+                                                 (clisp ("clisp") :coding-system utf-8-unix)
+                                                 (ecl ("ecl") :coding-system utf-8-unix))
+                    slime-repl-history-remove-duplicates t
+                    slime-repl-history-trim-whitespaces t)
+              (add-hook 'lisp-mode-hook '(lambda () (slime-mode +1)) t))
+  :config   (progn
+              (make-directory "/home/mevius/tmp/slime-fasls/" t)
+              (slime-setup '(slime-repl slime-fancy slime-autodoc))
+              (add-hook 'slime-mode-hook 'slime-redirect-inferior-output)))
+
+;;5.2.2 slime
+;;https://github.com/takeokunn/.emacs.d/blob/35f6254f5a73c8d8969796962086f4d2a6341d03/index.org
+;; (with-eval-after-load 'slime
+;;  ; (load (expand-file-name "~/.roswell/helper.el"))
+;;   (add-hook 'slime-mode-hook 'set-up-slime-ac)
+;;   (add-hook 'slime-repl-mode-hook 'set-up-slime-ac))
+;;
+(leaf elisp-slime-nav :ensure t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; マシーン依存の個別path
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Tesinfo my-path 
 (require 'info)
@@ -1873,6 +1904,7 @@ Git gutter:
 ;;   (setq use-default-font-for-symbols nil)
 ;; ;;  (my:load-window-config)
 ;;   )
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
