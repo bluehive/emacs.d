@@ -327,6 +327,8 @@
        (recentf-mode 1))
 
 ;; https://emacs-jp.github.io/tips/emacs-in-2020 ;;
+;;ivyはミニバッファの補完を強化するパッケージです。
+;;補完が強化され、 M-x はこのような表示になります。 コマンドの断片で検索できるようになるので、あえてキーバインドを与えず、 M-x から起動する方法も便利です。 この補完では正規表現が使えるので、 ^ivy- をクエリーを入力すれば、 ivy パッケージのインタラクティブ関数が一覧できます。
 
 (leaf ivy
   :doc "Incremental Vertical completYon"
@@ -398,23 +400,18 @@
   :custom ((ivy-prescient-retain-classic-highlighting . t))
   :global-minor-mode t)
 
-;;ivyはミニバッファの補完を強化するパッケージです。
-
-;;補完が強化され、 M-x はこのような表示になります。 コマンドの断片で検索できるようになるので、あえてキーバインドを与えず、 M-x から起動する方法も便利です。 この補完では正規表現が使えるので、 ^ivy- をクエリーを入力すれば、 ivy パッケージのインタラクティブ関数が一覧できます。
-
-
-;; (leaf flycheck
-;;   :doc "On-the-fly syntax checking"
-;;   :req "dash-2.12.1" "pkg-info-0.4" "let-alist-1.0.4" "seq-1.11" "emacs-24.3"
-;;   :tag "minor-mode" "tools" "languages" "convenience" "emacs>=24.3"
-;;   :url "http://www.flycheck.org"
-;;   :emacs>= 24.3
-;;   :ensure nil
-;;   :bind (("M-n" . flycheck-next-error)
-;;          ("M-p" . flycheck-previous-error))
-;;   :global-minor-mode global-flycheck-mode)
 
 ;; ;;flycheckはリアルタイムにソースのエラーやワーニングを表示するマイナーモードです。
+(leaf flycheck
+  :doc "On-the-fly syntax checking"
+  :req "dash-2.12.1" "pkg-info-0.4" "let-alist-1.0.4" "seq-1.11" "emacs-24.3"
+  :tag "minor-mode" "tools" "languages" "convenience" "emacs>=24.3"
+  :url "http://www.flycheck.org"
+  :emacs>= 24.3
+  :ensure nil
+  :bind (("M-n" . flycheck-next-error)
+         ("M-p" . flycheck-previous-error))
+  :global-minor-mode global-flycheck-mode)
 
 
 (leaf company
@@ -515,12 +512,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;; http://emacs.rubikitch.com/global-hl-line-mode-timer/
-
 ;;eshellのときだけ行番号を表示しない
-;;(global-linum-mode 1)
-;;(add-hook 'eshell-mode-hook (lambda () (linum-mode -1)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;(global-linum-mode 1)
+(add-hook 'eshell-mode-hook (lambda () (linum-mode -1)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1692,7 +1686,6 @@ Git gutter:
   :init (electric-pair-mode 1))
 
  ;;   ispell を aspell で使う
-
 (leaf ispell
   :doc "interface to spell checkers"
   :tag "builtin"
@@ -1701,7 +1694,6 @@ Git gutter:
 
 
 ;;4.9 emacs-lisp-mode
-
 (leaf emacs-lisp-mode
   :mode ("\\.skk$"))
 
@@ -1767,12 +1759,6 @@ Git gutter:
   (setq geiser-active-implementations '(guile)))
 
 
-;;https://github.com/takeokunn/.emacs.d/blob/35f6254f5a73c8d8969796962086f4d2a6341d03/index.org
-
-;; (leaf slim-mode
-;;   :ensure t
-;;   :mode ("\\.slim$"))
-
 (leaf paredit
   :ensure t
   :commands enable-paredit-mode
@@ -1801,43 +1787,50 @@ Git gutter:
 ;;slime-mode
 ;;https://github.com/exot/.emacs.d/blob/9cf17c973f889621e2cd6452bcfe3b20d36a072f/init.el
 ;;
-(leaf slime
-  :ensure t
-  :commands (slime slime-mode slime-connect)
-  :init     (progn
-              (setq inferior-lisp-program "/usr/bin/ecl" ;;"sbcl --noinform --no-linedit"
-                    slime-compile-file-options '(:fasl-directory "/home/mevius/tmp/slime-fasls/")
-                    slime-net-coding-system 'utf-8-unix
-                    slime-completion-at-point-functions 'slime-fuzzy-complete-symbol
-                    slime-lisp-implementations '((gcl ("gcl") :coding-system utf-8-unix)
-                                                 (clisp ("clisp") :coding-system utf-8-unix)
-                                                 (ecl ("ecl") :coding-system utf-8-unix))
-                    slime-repl-history-remove-duplicates t
-                    slime-repl-history-trim-whitespaces t)
-              (add-hook 'lisp-mode-hook '(lambda () (slime-mode +1)) t))
-  :config   (progn
-              (make-directory "/home/mevius/tmp/slime-fasls/" t)
-              (slime-setup '(slime-repl slime-fancy slime-autodoc))
-              (add-hook 'slime-mode-hook 'slime-redirect-inferior-output)))
+;; (leaf slime
+;;   :ensure t
+;;   :commands (slime slime-mode slime-connect)
+;;   :init     (progn
+;;               (setq inferior-lisp-program "/usr/bin/ecl" ;;"sbcl --noinform --no-linedit"
+;;                     slime-compile-file-options '(:fasl-directory "/home/mevius/tmp/slime-fasls/")
+;;                     slime-net-coding-system 'utf-8-unix
+;;                     slime-completion-at-point-functions 'slime-fuzzy-complete-symbol
+;;                     slime-lisp-implementations '((gcl ("gcl") :coding-system utf-8-unix)
+;;                                                  (clisp ("clisp") :coding-system utf-8-unix)
+;;                                                  (ecl ("ecl") :coding-system utf-8-unix))
+;;                     slime-repl-history-remove-duplicates t
+;;                     slime-repl-history-trim-whitespaces t)
+;;               (add-hook 'lisp-mode-hook '(lambda () (slime-mode +1)) t))
+;;   :config   (progn
+;;               (make-directory "/home/mevius/tmp/slime-fasls/" t)
+;;               (slime-setup '(slime-repl slime-fancy slime-autodoc))
+;;               (add-hook 'slime-mode-hook 'slime-redirect-inferior-output)))
 
-;;5.2.2 slime
-;;https://github.com/takeokunn/.emacs.d/blob/35f6254f5a73c8d8969796962086f4d2a6341d03/index.org
+;; ;;5.2.2 slime
+;; ;;https://github.com/takeokunn/.emacs.d/blob/35f6254f5a73c8d8969796962086f4d2a6341d03/index.org
 ;; (with-eval-after-load 'slime
 ;;  ; (load (expand-file-name "~/.roswell/helper.el"))
 ;;   (add-hook 'slime-mode-hook 'set-up-slime-ac)
 ;;   (add-hook 'slime-repl-mode-hook 'set-up-slime-ac))
-;;
-(leaf elisp-slime-nav :ensure t)
+;; ;;
+;; (leaf elisp-slime-nav :ensure t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; マシーン依存の個別path
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Tesinfo my-path 
+;; ;; Texinfo my-path 
+;; (require 'info)
+;; (setq Info-directory-list
+;;  (cons (expand-file-name "/home/mevius/info")
+;;        Info-directory-list))
+;;実際にInfoディレクトリを追加してみる.emacs.el設定
+
+;; Emacs and Other Info files
 (require 'info)
-(setq Info-directory-list
- (cons (expand-file-name "/home/mevius/info")
-       Info-directory-list))
+(setq Info-default-directory-list
+  (cons (expand-file-name "/home/mevius/info/")
+    Info-default-directory-list))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; test  ;;;;;;;;;;;;;;;;;
 ;; https://uwabami.github.io/cc-env/Emacs.html
