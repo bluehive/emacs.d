@@ -509,14 +509,6 @@
 ;;                   (display-line-numbers-color-on-after-init frame)))
 ;;       ))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;; http://emacs.rubikitch.com/global-hl-line-mode-timer/
-;;eshellのときだけ行番号を表示しない
-;;;(global-linum-mode 1)
-(add-hook 'eshell-mode-hook (lambda () (linum-mode -1)))
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; orgmode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
