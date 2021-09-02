@@ -21,33 +21,33 @@
 (eval-and-compile
   (when (or load-file-name byte-compile-current-file)
     (setq user-emacs-directory
-          (expand-file-name
-           (file-name-directory (or load-file-name byte-compile-current-file))))))
+	  (expand-file-name
+	   (file-name-directory (or load-file-name byte-compile-current-file))))))
 
-  (customize-set-variable
-   'package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
-             ;;      ("melpa" . "http://melpa.milkbox.net/packages/")
-                       ("melpa" . "https://melpa.org/packages/")
-             ;;     ("melpa-stable" . "https://stable.melpa.org/packages/")
-                       ("org"   . "https://orgmode.org/elpa/")))
-  (package-initialize)
-  (unless (package-installed-p 'leaf)
-    (package-refresh-contents)
-    (package-install 'leaf))
+(customize-set-variable
+ 'package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
+		     ;;      ("melpa" . "http://melpa.milkbox.net/packages/")
+		     ("melpa" . "https://melpa.org/packages/")
+		     ;;     ("melpa-stable" . "https://stable.melpa.org/packages/")
+		     ("org"   . "https://orgmode.org/elpa/")))
+(package-initialize)
+(unless (package-installed-p 'leaf)
+  (package-refresh-contents)
+  (package-install 'leaf))
 
-  ;;
-  
-  (leaf leaf-keywords
-    :ensure t
-    :init
-    ;; optional packages if you want to use :hydra, :el-get, :blackout,,,
-    (leaf hydra :ensure t)
-    (leaf el-get :ensure t)
-    (leaf blackout :ensure t)
+;;
 
-    :config
-    ;; initialize leaf-keywords.el
-    (leaf-keywords-init))
+(leaf leaf-keywords
+      :ensure t
+      :init
+      ;; optional packages if you want to use :hydra, :el-get, :blackout,,,
+      (leaf hydra :ensure t)
+      (leaf el-get :ensure t)
+      (leaf blackout :ensure t)
+
+      :config
+      ;; initialize leaf-keywords.el
+      (leaf-keywords-init))
 
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -55,10 +55,10 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 重要　日本語Windowsの文字コード対策
-;; https://www49.atwiki.jp/ntemacs/pages/16.html 
+;; https://www49.atwiki.jp/ntemacs/pages/16.html
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; ------------------------------------------------------------------------
+					; ------------------------------------------------------------------------
 ;; @ character code (文字コード)
 ;; Setenv
 (set-language-environment "Japanese")
@@ -73,7 +73,7 @@
   (setq set-file-name-coding-system 'cp932)
   (setq set-keyboard-coding-system 'cp932)
   (setq set-terminal-coding-system 'cp932)
-)
+  )
 (require 'cl-lib)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -108,15 +108,15 @@
 ;;    :init
 ;;    (setq exec-path-from-shell-check-startup-files nil
 ;;          exec-path-from-shell-variables '("PATH" "MANPATH")
- ;;         exec-path-from-shell-arguments '("-l"))
-  ;;  (exec-path-from-shell-initialize)))
+;;         exec-path-from-shell-arguments '("-l"))
+;;  (exec-path-from-shell-initialize)))
 
 
 ;; 環境を日本語、UTF-8にする
-;(set-locale-environment nil)
+					;(set-locale-environment nil)
 (setq buffer-file-coding-system 'utf-8)
-;font 
-;(set-fontset-font t 'japanese-jisx0208 "IPAPGothic-11")
+					;font
+					;(set-fontset-font t 'japanese-jisx0208 "IPAPGothic-11")
 
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -128,17 +128,17 @@
 
 ;; Set the default font.
 (set-face-attribute 'default nil
-  :family "Source Code Pro"
-  :height 140
-  :weight 'normal
-  :width 'normal)
+		    :family "Source Code Pro"
+		    :height 140
+		    :weight 'normal
+		    :width 'normal)
 
 ;; Set the cursor color to red to match Vim in the terminal.
 (set-cursor-color "red")
 
 ;; Set the EOL whitespace to be colored in white.
 (set-face-attribute 'trailing-whitespace nil
-   :background "white")
+		    :background "white")
 
 ;; Set the default font for Japanese characters.
 (set-fontset-font t 'japanese-jisx0208 (font-spec :family "IPAPGothic"))
@@ -162,14 +162,14 @@
 (with-eval-after-load "org"
   (if (display-graphic-p)
 
-    ;; faces to set if we are in the GUI
-    (progn
-      (set-face-attribute 'org-level-2 nil :foreground "dark goldenrod" :weight 'bold)
-      (set-face-attribute 'org-level-3 nil :foreground "firebrick" :weight 'bold)
-      (set-face-attribute 'org-special-keyword nil :foreground "light gray" :weight 'light)
-      (set-face-attribute 'org-date nil :foreground "dark magenta" :underline nil :weight 'normal)
-      (set-face-attribute 'org-tag nil :foreground "cornflower blue" :weight 'light)
-    )
+      ;; faces to set if we are in the GUI
+      (progn
+	(set-face-attribute 'org-level-2 nil :foreground "dark goldenrod" :weight 'bold)
+	(set-face-attribute 'org-level-3 nil :foreground "firebrick" :weight 'bold)
+	(set-face-attribute 'org-special-keyword nil :foreground "light gray" :weight 'light)
+	(set-face-attribute 'org-date nil :foreground "dark magenta" :underline nil :weight 'normal)
+	(set-face-attribute 'org-tag nil :foreground "cornflower blue" :weight 'light)
+	)
 
     ;; faces to set if we are in the CUI
     (set-face-attribute 'org-level-2 nil :foreground "color-116" :weight 'bold)
@@ -177,8 +177,8 @@
     (set-face-attribute 'org-level-4 nil :weight 'bold)
     (set-face-attribute 'org-level-5 nil :weight 'bold)
     (set-face-attribute 'org-special-keyword nil :foreground "color-95" :weight 'light)
+    )
   )
-)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ここにいっぱい設定を書く
@@ -187,124 +187,124 @@
 
 ;;leafの :custom で設定するとinit.elにcustomが勝手に設定を追記します。 この状況になると、変数の二重管理になってしまうので、customがinit.elに追記しないように設定します。
 (leaf cus-edit
-  :doc "tools for customizing Emacs and Lisp packages"
-  :tag "builtin" "faces" "help"
-  :custom `((custom-file . ,(locate-user-emacs-file "custom.el"))))
+      :doc "tools for customizing Emacs and Lisp packages"
+      :tag "builtin" "faces" "help"
+      :custom `((custom-file . ,(locate-user-emacs-file "custom.el"))))
 
 ;;cus-start.c EmacsのC言語部分で定義されている変数をcustomで扱えるようにまとめているファイルです。 私の設定を書いておくので、取捨選択して頂ければと思います。変数の説明は F1 v で確認できます。
 
 (leaf cus-start
-  :doc "define customization properties of builtins"
-  :tag "builtin" "internal"
-  :preface
-  (defun c/redraw-frame nil
-    (interactive)
-    (redraw-frame))
+      :doc "define customization properties of builtins"
+      :tag "builtin" "internal"
+      :preface
+      (defun c/redraw-frame nil
+	(interactive)
+	(redraw-frame))
 
-  :bind (("M-ESC ESC" . c/redraw-frame))
-  :custom '(;;(user-full-name . "Naoya Yamashita")
-            ;;(user-mail-address . "conao3@gmail.com")
-            ;;(user-login-name . "conao3")
-            (create-lockfiles . nil)
-            (debug-on-error . t)
-            (init-file-debug . t)
-            (frame-resize-pixelwise . t)
-            (enable-recursive-minibuffers . t)
-            (history-length . 1000)
-            (history-delete-duplicates . t)
-            (scroll-preserve-screen-position . t)
-            (scroll-conservatively . 100)
-            (mouse-wheel-scroll-amount . '(1 ((control) . 5)))
-            (ring-bell-function . 'ignore)
-            (text-quoting-style . 'straight)
-            (truncate-lines . t)
-            ;; (use-dialog-box . nil)
-            ;; (use-file-dialog . nil)
-             (menu-bar-mode . t)
-            ;; (tool-bar-mode . nil)
-            (scroll-bar-mode . nil)
-            (indent-tabs-mode . nil))
-  :config
-  (defalias 'yes-or-no-p 'y-or-n-p)
-  (keyboard-translate ?\C-h ?\C-?))
+      :bind (("M-ESC ESC" . c/redraw-frame))
+      :custom '(;;(user-full-name . "Naoya Yamashita")
+		;;(user-mail-address . "conao3@gmail.com")
+		;;(user-login-name . "conao3")
+		(create-lockfiles . nil)
+		(debug-on-error . t)
+		(init-file-debug . t)
+		(frame-resize-pixelwise . t)
+		(enable-recursive-minibuffers . t)
+		(history-length . 1000)
+		(history-delete-duplicates . t)
+		(scroll-preserve-screen-position . t)
+		(scroll-conservatively . 100)
+		(mouse-wheel-scroll-amount . '(1 ((control) . 5)))
+		(ring-bell-function . 'ignore)
+		(text-quoting-style . 'straight)
+		(truncate-lines . t)
+		;; (use-dialog-box . nil)
+		;; (use-file-dialog . nil)
+		(menu-bar-mode . t)
+		;; (tool-bar-mode . nil)
+		(scroll-bar-mode . nil)
+		(indent-tabs-mode . nil))
+      :config
+      (defalias 'yes-or-no-p 'y-or-n-p)
+      (keyboard-translate ?\C-h ?\C-?))
 
 ;;
 (eval-and-compile
   (leaf bytecomp
-    :doc "compilation of Lisp code into byte code"
-    :tag "builtin" "lisp"
-    :custom (byte-compile-warnings . '(cl-functions))))
+	:doc "compilation of Lisp code into byte code"
+	:tag "builtin" "lisp"
+	:custom (byte-compile-warnings . '(cl-functions))))
 
 
 ;;Emacsの外でファイルが書き変わったときに自動的に読み直すマイナーモードです。 もちろん、Emacsで編集している場合は外の変更で上書きされることはありません。
 (leaf autorevert
-  :doc "revert buffers when files on disk change"
-  :tag "builtin"
-  :custom ((auto-revert-interval . 0.3)
-           (auto-revert-check-vc-info . t))
-  :global-minor-mode global-auto-revert-mode)
+      :doc "revert buffers when files on disk change"
+      :tag "builtin"
+      :custom ((auto-revert-interval . 0.3)
+	       (auto-revert-check-vc-info . t))
+      :global-minor-mode global-auto-revert-mode)
 
 
 ;;delsel
 ;;選択している状態で入力したときに、regionを削除して挿入するマイナーモードです。 おそらくこの挙動のほうが現代人の意図に合っていると思います。
 
 (leaf delsel
-  :doc "delete selection if you insert"
-  :tag "builtin"
-  :global-minor-mode delete-selection-mode)
+      :doc "delete selection if you insert"
+      :tag "builtin"
+      :global-minor-mode delete-selection-mode)
 
 
 ;;paren
 ;;対応するカッコを強調表示するマイナーモードです。
 
 (leaf paren
-  :doc "highlight matching paren"
-  :tag "builtin"
-  :custom ((show-paren-delay . 0.1))
-  :global-minor-mode show-paren-mode)
+      :doc "highlight matching paren"
+      :tag "builtin"
+      :custom ((show-paren-delay . 0.1))
+      :global-minor-mode show-paren-mode)
 
 
 ;;simple
 ;;kill-ringの数を制御したり、kill-lineの挙動を変更したりします。
 
 (leaf simple
-  :doc "basic editing commands for Emacs"
-  :tag "builtin" "internal"
-  :custom ((kill-ring-max . 100)
-           (kill-read-only-ok . t)
-           (kill-whole-line . t)
-           (eval-expression-print-length . nil)
-           (eval-expression-print-level . nil)))
+      :doc "basic editing commands for Emacs"
+      :tag "builtin" "internal"
+      :custom ((kill-ring-max . 100)
+	       (kill-read-only-ok . t)
+	       (kill-whole-line . t)
+	       (eval-expression-print-length . nil)
+	       (eval-expression-print-level . nil)))
 
 ;;files
 ;;Emacsで好みが分かれる設定として、バックアップファイルを開いているファイルと同じディレクトリに作成するという挙動があります。 実際、このバックアップファイルに助けられることもあるので、 .emacs.d 以下にディレクトリを掘って、そこに保存するようにします。
 
 (leaf files
-  :doc "file input and output commands for Emacs"
-  :tag "builtin"
-  :custom `((auto-save-timeout . 15)
-            (auto-save-interval . 60)
-            (auto-save-file-name-transforms . '((".*" ,(locate-user-emacs-file "backup/") t)))
-            (backup-directory-alist . '((".*" . ,(locate-user-emacs-file "backup"))
-                                        (,tramp-file-name-regexp . nil)))
-            (version-control . t)
-            (delete-old-versions . t)))
+      :doc "file input and output commands for Emacs"
+      :tag "builtin"
+      :custom `((auto-save-timeout . 15)
+		(auto-save-interval . 60)
+		(auto-save-file-name-transforms . '((".*" ,(locate-user-emacs-file "backup/") t)))
+		(backup-directory-alist . '((".*" . ,(locate-user-emacs-file "backup"))
+					    (,tramp-file-name-regexp . nil)))
+		(version-control . t)
+		(delete-old-versions . t)))
 
 
 ;;startup
 ;;自動保存されたファイルのリストです。 .emacs.d/backup 以下にまとめて保存するようにします。
 
 (leaf startup
-  :doc "process Emacs shell arguments"
-  :tag "builtin" "internal"
-  :custom `((auto-save-list-file-prefix . ,(locate-user-emacs-file "backup/.saves-"))))
+      :doc "process Emacs shell arguments"
+      :tag "builtin" "internal"
+      :custom `((auto-save-list-file-prefix . ,(locate-user-emacs-file "backup/.saves-"))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; add package
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;2.2 utility https://github.com/takeokunn/.emacs.d/blob/master/index.org
+					;2.2 utility https://github.com/takeokunn/.emacs.d/blob/master/index.org
 
 (leaf dash :ensure t)
 (leaf dash-functional :ensure t)
@@ -312,143 +312,143 @@
 (leaf f :ensure t)
 (leaf ht :ensure t)
 (leaf general :ensure t)
-;;(leaf org-mode :ensure t) 
+;;(leaf org-mode :ensure t)
 
-;6.14 File;;6.14.1 recentf
+					;6.14 File;;6.14.1 recentf
 
-     (leaf recentf
-       :ensure t
-       :setq-default ((recentf-max-saved-items . 10000)
-		      (recentf-auto-cleanup quote never)
-		      (recentf-save-file . "~/.emacs.d/.recentf")
-		      (recentf-exclude quote
-				       (".recentf")))
-       :config
-       (recentf-mode 1))
+(leaf recentf
+      :ensure t
+      :setq-default ((recentf-max-saved-items . 10000)
+		     (recentf-auto-cleanup quote never)
+		     (recentf-save-file . "~/.emacs.d/.recentf")
+		     (recentf-exclude quote
+				      (".recentf")))
+      :config
+      (recentf-mode 1))
 
 ;; https://emacs-jp.github.io/tips/emacs-in-2020 ;;
 ;;ivyはミニバッファの補完を強化するパッケージです。
 ;;補完が強化され、 M-x はこのような表示になります。 コマンドの断片で検索できるようになるので、あえてキーバインドを与えず、 M-x から起動する方法も便利です。 この補完では正規表現が使えるので、 ^ivy- をクエリーを入力すれば、 ivy パッケージのインタラクティブ関数が一覧できます。
 
 (leaf ivy
-  :doc "Incremental Vertical completYon"
-  :req "emacs-24.5"
-  :tag "matching" "emacs>=24.5"
-  :url "https://github.com/abo-abo/swiper"
-  :emacs>= 24.5
-  :ensure t
-  :blackout t
-  :leaf-defer nil
-  :custom ((ivy-initial-inputs-alist . nil)
-           (ivy-re-builders-alist . '((t . ivy--regex-fuzzy)
-                                      (swiper . ivy--regex-plus)))
-           (ivy-use-selectable-prompt . t))
-  :global-minor-mode t
-  :config
-  (leaf swiper
-    :doc "Isearch with an overview. Oh, man!"
-    :req "emacs-24.5" "ivy-0.13.0"
-    :tag "matching" "emacs>=24.5"
-    :url "https://github.com/abo-abo/swiper"
-    :emacs>= 24.5
-    :ensure t
-    :bind (("C-s" . swiper)))
+      :doc "Incremental Vertical completYon"
+      :req "emacs-24.5"
+      :tag "matching" "emacs>=24.5"
+      :url "https://github.com/abo-abo/swiper"
+      :emacs>= 24.5
+      :ensure t
+      :blackout t
+      :leaf-defer nil
+      :custom ((ivy-initial-inputs-alist . nil)
+	       (ivy-re-builders-alist . '((t . ivy--regex-fuzzy)
+					  (swiper . ivy--regex-plus)))
+	       (ivy-use-selectable-prompt . t))
+      :global-minor-mode t
+      :config
+      (leaf swiper
+	    :doc "Isearch with an overview. Oh, man!"
+	    :req "emacs-24.5" "ivy-0.13.0"
+	    :tag "matching" "emacs>=24.5"
+	    :url "https://github.com/abo-abo/swiper"
+	    :emacs>= 24.5
+	    :ensure t
+	    :bind (("C-s" . swiper)))
 
-  (leaf counsel
-    :doc "Various completion functions using Ivy"
-    :req "emacs-24.5" "swiper-0.13.0"
-    :tag "tools" "matching" "convenience" "emacs>=24.5"
-    :url "https://github.com/abo-abo/swiper"
-    :emacs>= 24.5
-    :ensure t
-    :blackout t
-    :bind (("C-S-s" . counsel-imenu)
-           ("C-x C-r" . counsel-recentf))
-    :custom `((counsel-yank-pop-separator . "\n----------\n")
-              (counsel-find-file-ignore-regexp . ,(rx-to-string '(or "./" "../") 'no-group)))
-    :global-minor-mode t))
+      (leaf counsel
+	    :doc "Various completion functions using Ivy"
+	    :req "emacs-24.5" "swiper-0.13.0"
+	    :tag "tools" "matching" "convenience" "emacs>=24.5"
+	    :url "https://github.com/abo-abo/swiper"
+	    :emacs>= 24.5
+	    :ensure t
+	    :blackout t
+	    :bind (("C-S-s" . counsel-imenu)
+		   ("C-x C-r" . counsel-recentf))
+	    :custom `((counsel-yank-pop-separator . "\n----------\n")
+		      (counsel-find-file-ignore-regexp . ,(rx-to-string '(or "./" "../") 'no-group)))
+	    :global-minor-mode t))
 
 (leaf ivy-rich
-  :doc "More friendly display transformer for ivy."
-  :req "emacs-24.5" "ivy-0.8.0"
-  :tag "ivy" "emacs>=24.5"
-  :emacs>= 24.5
-  :ensure t
-  :after ivy
-  :global-minor-mode t)
-    
+      :doc "More friendly display transformer for ivy."
+      :req "emacs-24.5" "ivy-0.8.0"
+      :tag "ivy" "emacs>=24.5"
+      :emacs>= 24.5
+      :ensure t
+      :after ivy
+      :global-minor-mode t)
+
 (leaf prescient
-  :doc "Better sorting and filtering"
-  :req "emacs-25.1"
-  :tag "extensions" "emacs>=25.1"
-  :url "https://github.com/raxod502/prescient.el"
-  :emacs>= 25.1
-  :ensure t
-  :commands (prescient-persist-mode)
-  :custom `((prescient-aggressive-file-save . t)
-            (prescient-save-file . ,(locate-user-emacs-file "prescient")))
-  :global-minor-mode prescient-persist-mode)
-  
+      :doc "Better sorting and filtering"
+      :req "emacs-25.1"
+      :tag "extensions" "emacs>=25.1"
+      :url "https://github.com/raxod502/prescient.el"
+      :emacs>= 25.1
+      :ensure t
+      :commands (prescient-persist-mode)
+      :custom `((prescient-aggressive-file-save . t)
+		(prescient-save-file . ,(locate-user-emacs-file "prescient")))
+      :global-minor-mode prescient-persist-mode)
+
 (leaf ivy-prescient
-  :doc "prescient.el + Ivy"
-  :req "emacs-25.1" "prescient-4.0" "ivy-0.11.0"
-  :tag "extensions" "emacs>=25.1"
-  :url "https://github.com/raxod502/prescient.el"
-  :emacs>= 25.1
-  :ensure t
-  :after prescient ivy
-  :custom ((ivy-prescient-retain-classic-highlighting . t))
-  :global-minor-mode t)
+      :doc "prescient.el + Ivy"
+      :req "emacs-25.1" "prescient-4.0" "ivy-0.11.0"
+      :tag "extensions" "emacs>=25.1"
+      :url "https://github.com/raxod502/prescient.el"
+      :emacs>= 25.1
+      :ensure t
+      :after prescient ivy
+      :custom ((ivy-prescient-retain-classic-highlighting . t))
+      :global-minor-mode t)
 
 
 ;; ;;flycheckはリアルタイムにソースのエラーやワーニングを表示するマイナーモードです。
-(leaf flycheck
-  :doc "On-the-fly syntax checking"
-  :req "dash-2.12.1" "pkg-info-0.4" "let-alist-1.0.4" "seq-1.11" "emacs-24.3"
-  :tag "minor-mode" "tools" "languages" "convenience" "emacs>=24.3"
-  :url "http://www.flycheck.org"
-  :emacs>= 24.3
-  :ensure nil
-  :bind (("M-n" . flycheck-next-error)
-         ("M-p" . flycheck-previous-error))
-  :global-minor-mode global-flycheck-mode)
+;; (leaf flycheck
+;;       :doc "On-the-fly syntax checking"
+;;       :req "dash-2.12.1" "pkg-info-0.4" "let-alist-1.0.4" "seq-1.11" "emacs-24.3"
+;;       :tag "minor-mode" "tools" "languages" "convenience" "emacs>=24.3"
+;;       :url "http://www.flycheck.org"
+;;       :emacs>= 24.3
+;;       :ensure nil
+;;       :bind (("M-n" . flycheck-next-error)
+;; 	     ("M-p" . flycheck-previous-error))
+;;       :global-minor-mode global-flycheck-mode)
 
 
 (leaf company
-  :doc "Modular text completion framework"
-  :req "emacs-24.3"
-  :tag "matching" "convenience" "abbrev" "emacs>=24.3"
-  :url "http://company-mode.github.io/"
-  :emacs>= 24.3
-  :ensure nil
-  :blackout t
-  :leaf-defer nil
-  :bind ((company-active-map
-          ("M-n" . nil)
-          ("M-p" . nil)
-          ("C-s" . company-filter-candidates)
-          ("C-n" . company-select-next)
-          ("C-p" . company-select-previous)
-          ("<tab>" . company-complete-selection))
-         (company-search-map
-          ("C-n" . company-select-next)
-          ("C-p" . company-select-previous)))
-  :custom ((company-idle-delay . 0)
-           (company-minimum-prefix-length . 1)
-           (company-transformers . '(company-sort-by-occurrence)))
-  :global-minor-mode global-company-mode)
+      :doc "Modular text completion framework"
+      :req "emacs-24.3"
+      :tag "matching" "convenience" "abbrev" "emacs>=24.3"
+      :url "http://company-mode.github.io/"
+      :emacs>= 24.3
+      :ensure nil
+      :blackout t
+      :leaf-defer nil
+      :bind ((company-active-map
+	      ("M-n" . nil)
+	      ("M-p" . nil)
+	      ("C-s" . company-filter-candidates)
+	      ("C-n" . company-select-next)
+	      ("C-p" . company-select-previous)
+	      ("<tab>" . company-complete-selection))
+	     (company-search-map
+	      ("C-n" . company-select-next)
+	      ("C-p" . company-select-previous)))
+      :custom ((company-idle-delay . 0)
+	       (company-minimum-prefix-length . 1)
+	       (company-transformers . '(company-sort-by-occurrence)))
+      :global-minor-mode global-company-mode)
 
 (leaf company-c-headers
-  :doc "Company mode backend for C/C++ header files"
-  :req "emacs-24.1" "company-0.8"
-  :tag "company" "development" "emacs>=24.1"
-  :added "2020-03-25"
-  :emacs>= 24.1
-  :ensure t
-  :after company
-  :defvar company-backends
-  :config
-  (add-to-list 'company-backends 'company-c-headers))
+      :doc "Company mode backend for C/C++ header files"
+      :req "emacs-24.1" "company-0.8"
+      :tag "company" "development" "emacs>=24.1"
+      :added "2020-03-25"
+      :emacs>= 24.1
+      :ensure t
+      :after company
+      :defvar company-backends
+      :config
+      (add-to-list 'company-backends 'company-c-headers))
 ;;companyは入力補完のためのパッケージです。
 
 
@@ -470,31 +470,31 @@
 ;;https://github.com/ncaq/.emacs.d/blob/master/init.el
 
 (leaf anzu
-  :ensure t
-  :custom (global-anzu-mode . t)
-  :bind
-  ([remap query-replace] . anzu-query-replace)
-  ([remap query-replace-regexp] . anzu-query-replace-regexp))
+      :ensure t
+      :custom (global-anzu-mode . t)
+      :bind
+      ([remap query-replace] . anzu-query-replace)
+      ([remap query-replace-regexp] . anzu-query-replace-regexp))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; orgmode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;7 Org Mode
-;7.1 Settinngs
+					;7 Org Mode
+					;7.1 Settinngs
 
 (setq-default org-use-speed-commands t
-		org-agenda-todo-ignore-with-date t
-		org-directory "~/org"
-		org-agenda-files '("~/org/" "~/Documents/organized/"  )
-		org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)"))
-		org-capture-templates '(("t" "Todo" entry (file+datetree "~/org/todo.org")
-					 "* TODO %? %U %i\n %a")
-				;;	("b" "Blog" entry (file "~/org/blog.org")
-				;;	 "* %?")
-					("m" "Memo" entry (file "~/org/memo.org")
-					 "* %? %U\n %i")))
+	      org-agenda-todo-ignore-with-date t
+	      org-directory "~/org"
+	      org-agenda-files '("~/org/"  )
+	      org-todo-keywords '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)"))
+	      org-capture-templates '(("t" "Todo" entry (file+datetree "~/org/todo.org")
+				       "* TODO %? %U %i\n %a")
+				      ;;("b" "Blog" entry (file "~/org/blog.org")
+				      ;; "* %?")
+				      ("m" "Memo" entry (file "~/org/memo.org")
+				       "* %? %U\n %i")))
 (leaf org-temp)
 
 
@@ -510,14 +510,14 @@
 
 ;; tags
 (setq org-tag-alist '(
-                      ("@office".?o)
-                      ("@home".?h)
-                      ("@blog".?b)
-                      ("notes".?n)
-                      ("awak".?a)
-                      ("7yr".?7)
-                      ("14yr".?1)
-                      ("READing".?r)))
+		      ("@office".?o)
+		      ("@home".?h)
+		      ("@blog".?b)
+		      ("notes".?n)
+		      ("awak".?a)
+		      ("7yr".?7)
+		      ("14yr".?1)
+		      ("READing".?r)))
 
 ;; ;7.2 org Keybind
 
@@ -540,70 +540,70 @@
 ;;6.1.2 all-the-icons-ivy
 
 (leaf all-the-icons-ivy
-  :ensure t
-  :after all-the-icons
-  :config
-  (all-the-icons-ivy-setup))
+      :ensure t
+      :after all-the-icons
+      :config
+      (all-the-icons-ivy-setup))
 
 ;;6.1.3 doom-modeline
 
 (leaf doom-modeline
-  :ensure t
-  :hook (after-init-hook)
-  :custom ((doom-modeline-buffer-file-name-style quote truncate-with-project)
-	   (doom-modeline-icon . t)
-	   (doom-modeline-major-mode-icon)
-	   (doom-modeline-minor-modes))
-  :config
-  (with-eval-after-load 'doom-modeline
-    (line-number-mode 0)
-    (column-number-mode 0)))
+      :ensure t
+      :hook (after-init-hook)
+      :custom ((doom-modeline-buffer-file-name-style quote truncate-with-project)
+	       (doom-modeline-icon . t)
+	       (doom-modeline-major-mode-icon)
+	       (doom-modeline-minor-modes))
+      :config
+      (with-eval-after-load 'doom-modeline
+	(line-number-mode 0)
+	(column-number-mode 0)))
 
 ;;6.1.4 doom-theme
 
 (leaf doom-themes
-  :ensure t
-  :after neotree
-  :custom-face ((doom-modeline-bar quote
-				   ((t
-				     (:background "#6272a4")))))
-  :config
-  (load-theme 'tango-dark t)
-  (doom-themes-neotree-config)
-  (doom-themes-org-config))
+      :ensure t
+      :after neotree
+      :custom-face ((doom-modeline-bar quote
+				       ((t
+					 (:background "#6272a4")))))
+      :config
+      (load-theme 'tango-dark t)
+      (doom-themes-neotree-config)
+      (doom-themes-org-config))
 
 
 ;;6.1.8 nyan-mode
 
 (leaf nyan-mode
-  :ensure t
-  :after doom-modeline
-  :hook (doom-modeline-mode-hook)
-  :custom ((nyan-cat-face-number . 4)
-	   (nyan-animate-nyancat . t)))
+      :ensure t
+      :after doom-modeline
+      :hook (doom-modeline-mode-hook)
+      :custom ((nyan-cat-face-number . 4)
+	       (nyan-animate-nyancat . t)))
 
 
-;6.17.1 ace-window
+					;6.17.1 ace-window
 
 (leaf ace-window
-  :ensure t
-  :custom ((aw-keys '(97 115 100 102 103 104 106 107 108))))
+      :ensure t
+      :custom ((aw-keys '(97 115 100 102 103 104 106 107 108))))
 
-;6.17.2 dashboard
+					;6.17.2 dashboard
 
-     (leaf dashboard
-	:ensure t
-	:config
-	(dashboard-setup-startup-hook))
+(leaf dashboard
+      :ensure t
+      :config
+      (dashboard-setup-startup-hook))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ddskk
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (leaf ddskk
-  :ensure t
-  :bind
-  ("C-x j" . skk-mode))
+      :ensure t
+      :bind
+      ("C-x j" . skk-mode))
 
 ;;(leaf skk-study  :ensure t)
 ;;(leaf skk-hint  :ensure t)
@@ -639,13 +639,13 @@
 ;;;;; yatex to latex 野鳥起動のための設定
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (leaf yatex
-  :ensure t
-  :config )
- ;; (setq auto-mode-alist
- ;; 		(cons (cons "\\.tex$" ’yatex-mode) auto-mode-alist))
- ;;  (autoload ’yatex-mode "yatex" "Yet Another LaTeX mode" t)
+      :ensure t
+      :config )
+;; (setq auto-mode-alist
+;; (cons (cons "\\.tex$" ’yatex-mode) auto-mode-alist))
+;;  (autoload ’yatex-mode "yatex" "Yet Another LaTeX mode" t)
 
-  (setq load-path (cons (expand-file-name "~/Documents/latex/yatex") load-path))  
+(setq load-path (cons (expand-file-name "~/Documents/latex/yatex") load-path))
 (autoload 'yatex-mode "yatex" "Yet Another LaTeX mode" t)
 
 ;; YaTeX-mode
@@ -671,11 +671,11 @@
 (autoload 'yatex-mode "yatex" "Yet Another LaTeX mode" t)
 (setq auto-mode-alist
       (append '(("\\.tex$" . yatex-mode)
-                ("\\.ltx$" . yatex-mode)
-                ("\\.cls$" . yatex-mode)
-                ("\\.sty$" . yatex-mode)
-                ("\\.clo$" . yatex-mode)
-                ("\\.bbl$" . yatex-mode)) auto-mode-alist))
+		("\\.ltx$" . yatex-mode)
+		("\\.cls$" . yatex-mode)
+		("\\.sty$" . yatex-mode)
+		("\\.clo$" . yatex-mode)
+		("\\.bbl$" . yatex-mode)) auto-mode-alist))
 (setq YaTeX-inhibit-prefix-letter t)
 (setq YaTeX-kanji-code nil)
 (setq YaTeX-latex-message-code 'utf-8)
@@ -683,127 +683,127 @@
 (setq YaTeX-use-AMS-LaTeX t)
 (setq YaTeX-dvi2-command-ext-alist
       '(("TeXworks\\|texworks\\|texstudio\\|mupdf\\|SumatraPDF\\|Preview\\|Skim\\|TeXShop\\|evince\\|atril\\|xreader\\|okular\\|zathura\\|qpdfview\\|Firefox\\|firefox\\|chrome\\|chromium\\|MicrosoftEdge\\|microsoft-edge\\|Adobe\\|Acrobat\\|AcroRd32\\|acroread\\|pdfopen\\|xdg-open\\|open\\|start" . ".pdf")))
-;(setq tex-command "ptex2pdf -u -l -ot '-synctex=1'")
-;(setq tex-command "lualatex -synctex=1")
+					;(setq tex-command "ptex2pdf -u -l -ot '-synctex=1'")
+					;(setq tex-command "lualatex -synctex=1")
 (setq tex-command "llmk")
-;(setq tex-command "latexmk -e '$latex=q/uplatex %O -synctex=1 %S/' -e '$bibtex=q/upbibtex %O %B/' -e '$biber=q/biber %O --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex %O -o %D %S/' -e '$dvipdf=q/dvipdfmx %O -o %D %S/' -norc -gg -pdfdvi")
-;(setq tex-command "latexmk -e '$lualatex=q/lualatex %O -synctex=1 %S/' -e '$bibtex=q/upbibtex %O %B/' -e '$biber=q/biber %O --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex %O -o %D %S/' -norc -gg -pdflua")
+					;(setq tex-command "latexmk -e '$latex=q/uplatex %O -synctex=1 %S/' -e '$bibtex=q/upbibtex %O %B/' -e '$biber=q/biber %O --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex %O -o %D %S/' -e '$dvipdf=q/dvipdfmx %O -o %D %S/' -norc -gg -pdfdvi")
+					;(setq tex-command "latexmk -e '$lualatex=q/lualatex %O -synctex=1 %S/' -e '$bibtex=q/upbibtex %O %B/' -e '$biber=q/biber %O --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex %O -o %D %S/' -norc -gg -pdflua")
 (setq bibtex-command "latexmk -e '$latex=q/uplatex %O -synctex=1 %S/' -e '$bibtex=q/upbibtex %O %B/' -e '$biber=q/biber %O --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex %O -o %D %S/' -e '$dvipdf=q/dvipdfmx %O -o %D %S/' -norc -gg -pdfdvi")
 (setq makeindex-command  "latexmk -e '$latex=q/uplatex %O -synctex=1 %S/' -e '$bibtex=q/upbibtex %O %B/' -e '$biber=q/biber %O --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex %O -o %D %S/' -e '$dvipdf=q/dvipdfmx %O -o %D %S/' -norc -gg -pdfdvi")
-;(setq dvi2-command "xdg-open")
+					;(setq dvi2-command "xdg-open")
 (setq dvi2-command "evince")
-;(setq dvi2-command "atril")
-;(setq dvi2-command "okular --unique")
-;(setq dvi2-command "zathura -x \"emacsclient --no-wait +%{line} %{input}\"")
-;(setq dvi2-command "qpdfview --unique")
-;(setq dvi2-command "texworks")
-;(setq dvi2-command "texstudio --pdf-viewer-only")
-;(setq tex-pdfview-command "xdg-open")
+					;(setq dvi2-command "atril")
+					;(setq dvi2-command "okular --unique")
+					;(setq dvi2-command "zathura -x \"emacsclient --no-wait +%{line} %{input}\"")
+					;(setq dvi2-command "qpdfview --unique")
+					;(setq dvi2-command "texworks")
+					;(setq dvi2-command "texstudio --pdf-viewer-only")
+					;(setq tex-pdfview-command "xdg-open")
 (setq tex-pdfview-command "evince")
-;(setq tex-pdfview-command "atril")
-;(setq tex-pdfview-command "okular --unique")
-;(setq tex-pdfview-command "zathura -x \"emacsclient --no-wait +%{line} %{input}\"")
-;(setq tex-pdfview-command "qpdfview --unique")
-;(setq tex-pdfview-command "texworks")
-;(setq tex-pdfview-command "texstudio --pdf-viewer-only")
-(setq dviprint-command-format "wine cmd /c start AcroRd32.exe `echo %s | sed -e \"s/\\.[^.]*$/\\.pdf/\"`")
+					;(setq tex-pdfview-command "atril")
+					;(setq tex-pdfview-command "okular --unique")
+					;(setq tex-pdfview-command "zathura -x \"emacsclient --no-wait +%{line} %{input}\"")
+					;(setq tex-pdfview-command "qpdfview --unique")
+					;(setq tex-pdfview-command "texworks")
+					;(setq tex-pdfview-command "texstudio --pdf-viewer-only")
+;; (setq dviprint-command-format "wine cmd /c start AcroRd32.exe `echo %s | sed -e \"s/\\.[^.]*$/\\.pdf/\"`")
 
-(require 'dbus)
+;; (require 'dbus)
 
-(defun un-urlify (fname-or-url)
-  "A trivial function that replaces a prefix of file:/// with just /."
-  (if (string= (substring fname-or-url 0 8) "file:///")
-      (substring fname-or-url 7)
-    fname-or-url))
+;; (defun un-urlify (fname-or-url)
+;;   "A trivial function that replaces a prefix of file:/// with just /."
+;;   (if (string= (substring fname-or-url 0 8) "file:///")
+;;       (substring fname-or-url 7)
+;;     fname-or-url))
 
-(defun evince-inverse-search (file linecol &rest ignored)
-  (let* ((fname (decode-coding-string (url-unhex-string (un-urlify file)) 'utf-8))
-         (buf (find-file fname))
-         (line (car linecol))
-         (col (cadr linecol)))
-    (if (null buf)
-        (message "[Synctex]: %s is not opened..." fname)
-      (switch-to-buffer buf)
-      (goto-line (car linecol))
-      (unless (= col -1)
-        (move-to-column col))
-      (x-focus-frame (selected-frame)))))
+;; (defun evince-inverse-search (file linecol &rest ignored)
+;;   (let* ((fname (decode-coding-string (url-unhex-string (un-urlify file)) 'utf-8))
+;; 	 (buf (find-file fname))
+;; 	 (line (car linecol))
+;; 	 (col (cadr linecol)))
+;;     (if (null buf)
+;; 	(message "[Synctex]: %s is not opened..." fname)
+;;       (switch-to-buffer buf)
+;;       (goto-line (car linecol))
+;;       (unless (= col -1)
+;; 	(move-to-column col))
+;;       (x-focus-frame (selected-frame)))))
 
-(dbus-register-signal
- :session nil "/org/gnome/evince/Window/0"
- "org.gnome.evince.Window" "SyncSource"
- 'evince-inverse-search)
+;; (dbus-register-signal
+;;  :session nil "/org/gnome/evince/Window/0"
+;;  "org.gnome.evince.Window" "SyncSource"
+;;  'evince-inverse-search)
 
-(with-eval-after-load 'yatexprc
-  (defun YaTeX-preview-jump-line ()
-    "Call jump-line function of various previewer on current main file"
-    (interactive)
-    (save-excursion
-      (save-restriction
-        (widen)
-        (let*((pf (or YaTeX-parent-file
-                      (save-excursion (YaTeX-visit-main t) (buffer-file-name))))
-              (pdir (file-name-directory pf))
-              (bnr (substring pf 0 (string-match "\\....$" pf)))
-              ;(cf (file-relative-name (buffer-file-name) pdir))
-              (cf (buffer-file-name)) ;2016-01-08
-              (buffer (get-buffer-create " *preview-jump-line*"))
-              (line (count-lines (point-min) (point-end-of-line)))
-              (previewer (YaTeX-preview-default-previewer))
-              (cmd (cond
-                    ((string-match "Skim" previewer)
-                     (format "%s %d '%s.pdf' '%s'"
-                             YaTeX-cmd-displayline line bnr cf))
-                    ((string-match "evince" previewer)
-                     (format "%s '%s.pdf' %d '%s'"
-                             "fwdevince" bnr line cf))
-                    ((string-match "sumatra" previewer)
-                     (format "%s \"%s.pdf\" -forward-search \"%s\" %d"
-                             previewer bnr cf line))
-                    ((string-match "zathura" previewer)
-                     (format "%s --synctex-forward '%d:0:%s' '%s.pdf'"
-                             previewer line cf bnr))
-                    ((string-match "qpdfview" previewer)
-                     (format "%s '%s.pdf#src:%s:%d:0'"
-                             previewer bnr cf line))
-                    ((string-match "okular" previewer)
-                     (format "%s '%s.pdf#src:%d %s'"
-                             previewer bnr line (expand-file-name cf)))
-                    )))
-          (YaTeX-system cmd "jump-line" 'noask pdir))))))
+;; (with-eval-after-load 'yatexprc
+;;   (defun YaTeX-preview-jump-line ()
+;;     "Call jump-line function of various previewer on current main file"
+;;     (interactive)
+;;     (save-excursion
+;;       (save-restriction
+;; 	(widen)
+;; 	(let*((pf (or YaTeX-parent-file
+;; 		      (save-excursion (YaTeX-visit-main t) (buffer-file-name))))
+;; 	      (pdir (file-name-directory pf))
+;; 	      (bnr (substring pf 0 (string-match "\\....$" pf)))
+;; 					;(cf (file-relative-name (buffer-file-name) pdir))
+;; 	      (cf (buffer-file-name)) ;2016-01-08
+;; 	      (buffer (get-buffer-create " *preview-jump-line*"))
+;; 	      (line (count-lines (point-min) (point-end-of-line)))
+;; 	      (previewer (YaTeX-preview-default-previewer))
+;; 	      (cmd (cond
+;; 		    ((string-match "Skim" previewer)
+;; 		     (format "%s %d '%s.pdf' '%s'"
+;; 			     YaTeX-cmd-displayline line bnr cf))
+;; 		    ((string-match "evince" previewer)
+;; 		     (format "%s '%s.pdf' %d '%s'"
+;; 			     "fwdevince" bnr line cf))
+;; 		    ((string-match "sumatra" previewer)
+;; 		     (format "%s \"%s.pdf\" -forward-search \"%s\" %d"
+;; 			     previewer bnr cf line))
+;; 		    ((string-match "zathura" previewer)
+;; 		     (format "%s --synctex-forward '%d:0:%s' '%s.pdf'"
+;; 			     previewer line cf bnr))
+;; 		    ((string-match "qpdfview" previewer)
+;; 		     (format "%s '%s.pdf#src:%s:%d:0'"
+;; 			     previewer bnr cf line))
+;; 		    ((string-match "okular" previewer)
+;; 		     (format "%s '%s.pdf#src:%d %s'"
+;; 			     previewer bnr line (expand-file-name cf)))
+;; 		    )))
+;; 	  (YaTeX-system cmd "jump-line" 'noask pdir))))))
 
-(add-hook 'yatex-mode-hook
-          '(lambda ()
-             (auto-fill-mode -1)))
+;; (add-hook 'yatex-mode-hook
+;; 	  '(lambda ()
+;; 	     (auto-fill-mode -1)))
 
 ;;
 ;; RefTeX with YaTeX
 ;;
-;(add-hook 'yatex-mode-hook 'turn-on-reftex)
+					;(add-hook 'yatex-mode-hook 'turn-on-reftex)
 (add-hook 'yatex-mode-hook
-          '(lambda ()
-             (reftex-mode 1)
-             (define-key reftex-mode-map (concat YaTeX-prefix ">") 'YaTeX-comment-region)
-             (define-key reftex-mode-map (concat YaTeX-prefix "<") 'YaTeX-uncomment-region)))
+	  '(lambda ()
+	     (reftex-mode 1)
+	     (define-key reftex-mode-map (concat YaTeX-prefix ">") 'YaTeX-comment-region)
+	     (define-key reftex-mode-map (concat YaTeX-prefix "<") 'YaTeX-uncomment-region)))
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;; ox-org : org-mode export to latex 
+;;;;; ox-org : org-mode export to latex
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'ox-latex)
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 (setq org-latex-default-class "bxjsarticle")
 (setq org-latex-pdf-process '("latexmk -e '$latex=q/uplatex %S/' -e '$bibtex=q/upbibtex %B/' -e '$biber=q/biber --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex -o %D %S/' -e '$dvipdf=q/dvipdfmx -o %D %S/' -norc -gg -pdfdvi %f"))
-;(setq org-latex-pdf-process '("latexmk -e '$lualatex=q/lualatex %S/' -e '$bibtex=q/upbibtex %B/' -e '$biber=q/biber --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex -o %D %S/' -norc -gg -pdflua %f"))
-;(setq org-export-in-background t)
+					;(setq org-latex-pdf-process '("latexmk -e '$lualatex=q/lualatex %S/' -e '$bibtex=q/upbibtex %B/' -e '$biber=q/biber --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex -o %D %S/' -norc -gg -pdflua %f"))
+					;(setq org-export-in-background t)
 (setq org-file-apps
       '(("pdf" . "evince %s")))
 
 (add-to-list 'org-latex-classes
-             '("bxjsarticle"
-               "\\documentclass[autodetect-engine,dvi=dvipdfmx,11pt,a4paper,ja=standard]{bxjsarticle}
+	     '("bxjsarticle"
+	                      "\\documentclass[autodetect-engine,dvi=dvipdfmx,11pt,a4paper,ja=standard]{bxjsarticle}
 [NO-DEFAULT-PACKAGES]
 \\usepackage{amsmath}
 \\usepackage{newtxtext,newtxmath}
@@ -823,15 +823,15 @@
     \\fi
   \\fi
 \\fi"
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\paragraph{%s}" . "\\paragraph*{%s}")
-               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+			      ("\\section{%s}" . "\\section*{%s}")
+			      ("\\subsection{%s}" . "\\subsection*{%s}")
+			      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+			      ("\\paragraph{%s}" . "\\paragraph*{%s}")
+			      ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 (add-to-list 'org-latex-classes
-             '("jlreq"
-               "\\documentclass[luatexjp,12pt,paper=a4]{jlreq}
+	     '("jlreq"
+	                      "\\documentclass[luatexjp,12pt,paper=a4]{jlreq}
 [NO-DEFAULT-PACKAGES]
 \\usepackage{amsmath}
 \\usepackage{newtxtext,newtxmath}
@@ -845,15 +845,15 @@
   \\usepackage{hyperref}
   \\hypersetup{pdfencoding=auto,colorlinks=true}
 \\fi"
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\paragraph{%s}" . "\\paragraph*{%s}")
-               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+			      ("\\section{%s}" . "\\section*{%s}")
+			      ("\\subsection{%s}" . "\\subsection*{%s}")
+			      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+			      ("\\paragraph{%s}" . "\\paragraph*{%s}")
+			      ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 (add-to-list 'org-latex-classes
-             '("jlreq-tate"
-               "\\documentclass[luatexjp,tate,12pt,paper=a4]{jlreq}
+	     '("jlreq-tate"
+	                      "\\documentclass[luatexjp,tate,12pt,paper=a4]{jlreq}
 [NO-DEFAULT-PACKAGES]
 \\usepackage{amsmath}
 \\usepackage{kocho}
@@ -868,32 +868,32 @@
   \\usepackage{hyperref}
   \\hypersetup{pdfencoding=auto,colorlinks=true}
 \\fi"
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\paragraph{%s}" . "\\paragraph*{%s}")
-               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+			      ("\\section{%s}" . "\\section*{%s}")
+			      ("\\subsection{%s}" . "\\subsection*{%s}")
+			      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+			      ("\\paragraph{%s}" . "\\paragraph*{%s}")
+			      ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; devuan PATH  ;;;;;;;;;;
 ;; (when (equal system-type 'windows-nt)
 ;; ;
 ;;  )
-  ;; (setenv "PATH"
-  ;;         (concat
-  ;; 	 ;  "C:\\ProgramData\\chocolatey\\lib\\ag\\tools;"
-  ;; 	   "/usr/bin"
-  ;; 	   "/usr/local/texlive/2019/bin/x86_64-linux"
-  ;; 	   "/bin"
-  ;; 	   "/app/bin"
-  ;; 	   (getenv "PATH")))
+;; (setenv "PATH"
+;;         (concat
+;;  ;  "C:\\ProgramData\\chocolatey\\lib\\ag\\tools;"
+;;    "/usr/bin"
+;;    "/usr/local/texlive/2019/bin/x86_64-linux"
+;;    "/bin"
+;;    "/app/bin"
+;;    (getenv "PATH")))
 
-    (setenv "PATH" (concat (getenv "PATH") ":/usr/bin"))
-    (setq exec-path (append exec-path '("/usr/bin")))
-    (setenv "PATH" (concat (getenv "PATH") ":/app/bin"))
-    (setq exec-path (append exec-path '("/app/bin")))
-    (setenv "PATH" (concat (getenv "PATH") ":/usr/local/texlive/2020/bin/x86_64-linux"))
-    (setq exec-path (append exec-path '("/usr/local/texlive/2020/bin/x86_64-linux")))
+(setenv "PATH" (concat (getenv "PATH") ":/usr/bin"))
+(setq exec-path (append exec-path '("/usr/bin")))
+(setenv "PATH" (concat (getenv "PATH") ":/app/bin"))
+(setq exec-path (append exec-path '("/app/bin")))
+(setenv "PATH" (concat (getenv "PATH") ":/usr/local/texlive/2020/bin/x86_64-linux"))
+(setq exec-path (append exec-path '("/usr/local/texlive/2020/bin/x86_64-linux")))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -951,7 +951,7 @@
 
 ;; https://github.com/abo-abo/hydra/wiki/Info
 (defhydra hydra-clock (:color blue)
-    "
+      "
     ^
     ^Clock^             ^Do^
     ^─────^─────────────^──^─────────
@@ -964,14 +964,14 @@
     ^^                  _r_ report
     ^^                  ^^
     "
-    ("q" nil)
-    ("c" org-clock-cancel :color pink)
-    ("d" org-clock-display)
-    ("e" org-clock-modify-effort-estimate)
-    ("i" org-clock-in)
-    ("j" org-clock-goto)
-    ("o" org-clock-out)
-    ("r" org-clock-report))
+      ("q" nil)
+      ("c" org-clock-cancel :color pink)
+      ("d" org-clock-display)
+      ("e" org-clock-modify-effort-estimate)
+      ("i" org-clock-in)
+      ("j" org-clock-goto)
+      ("o" org-clock-out)
+      ("r" org-clock-report))
 (global-set-key (kbd "C-c t") 'hydra-clock/body)
 
 ;;(defhydra hydra-zoom ()
@@ -984,8 +984,8 @@
 
 (define-key Info-mode-map (kbd "?") #'hydra-info/body)
 (defhydra hydra-info (:color blue
-                      :hint nil)
-      "
+			     :hint nil)
+        "
 Info-mode:
 
   ^^_]_ forward  (next logical node)       ^^_l_ast (←)        _u_p (↑)                             _f_ollow reference       _T_OC
@@ -997,52 +997,52 @@ Info-mode:
   _1_ .. _9_ Pick first .. ninth item in the node's menu.
 
 "
-      ("]"   Info-forward-node)
-      ("["   Info-backward-node)
-      ("n"   Info-next)
-      ("p"   Info-prev)
-      ("s"   Info-search)
-      ("S"   Info-search-case-sensitively)
+	("]"   Info-forward-node)
+	("["   Info-backward-node)
+	("n"   Info-next)
+	("p"   Info-prev)
+	("s"   Info-search)
+	("S"   Info-search-case-sensitively)
 
-      ("l"   Info-history-back)
-      ("r"   Info-history-forward)
-      ("H"   Info-history)
-      ("t"   Info-top-node)
-      ("<"   Info-top-node)
-      (">"   Info-final-node)
+	("l"   Info-history-back)
+	("r"   Info-history-forward)
+	("H"   Info-history)
+	("t"   Info-top-node)
+	("<"   Info-top-node)
+	(">"   Info-final-node)
 
-      ("u"   Info-up)
-      ("^"   Info-up)
-      ("m"   Info-menu)
-      ("g"   Info-goto-node)
-      ("b"   beginning-of-buffer)
-      ("e"   end-of-buffer)
+	("u"   Info-up)
+	("^"   Info-up)
+	("m"   Info-menu)
+	("g"   Info-goto-node)
+	("b"   beginning-of-buffer)
+	("e"   end-of-buffer)
 
-      ("f"   Info-follow-reference)
-      ("i"   Info-index)
-      (","   Info-index-next)
-      ("I"   Info-virtual-index)
+	("f"   Info-follow-reference)
+	("i"   Info-index)
+	(","   Info-index-next)
+	("I"   Info-virtual-index)
 
-      ("T"   Info-toc)
-      ("d"   Info-directory)
-      ("c"   Info-copy-current-node-name)
-      ("C"   clone-buffer)
-      ("a"   info-apropos)
+	("T"   Info-toc)
+	("d"   Info-directory)
+	("c"   Info-copy-current-node-name)
+	("C"   clone-buffer)
+	("a"   info-apropos)
 
-      ("1"   Info-nth-menu-item)
-      ("2"   Info-nth-menu-item)
-      ("3"   Info-nth-menu-item)
-      ("4"   Info-nth-menu-item)
-      ("5"   Info-nth-menu-item)
-      ;; ("6"   Info-nth-menu-item)
-      ;; ("7"   Info-nth-menu-item)
-      ;; ("8"   Info-nth-menu-item)
-      ;; ("9"   Info-nth-menu-item)
+	("1"   Info-nth-menu-item)
+	("2"   Info-nth-menu-item)
+	("3"   Info-nth-menu-item)
+	("4"   Info-nth-menu-item)
+	("5"   Info-nth-menu-item)
+	;; ("6"   Info-nth-menu-item)
+	;; ("7"   Info-nth-menu-item)
+	;; ("8"   Info-nth-menu-item)
+	;; ("9"   Info-nth-menu-item)
 
-      ("?"   Info-summary "Info summary")
-      ("h"   Info-help "Info help")
-      ("q"   Info-exit "Info exit")
-      ("C-g" nil "cancel" :color blue))
+	("?"   Info-summary "Info summary")
+	("h"   Info-help "Info help")
+	("q"   Info-exit "Info exit")
+	("C-g" nil "cancel" :color blue))
 ;;;;;;;;
 ;; https://github.com/abo-abo/hydra/wiki/Org-mode-block-templates
 ;;;;;;;
@@ -1179,19 +1179,19 @@ Info-mode:
   "A launcher for hydras based on the current context."
   (interactive)
   (cl-case major-mode
-    ('org-mode (let* ((elem (org-element-context))
-                      (etype (car elem))
-                      (type (org-element-property :type elem)))
-                 (cl-case etype
-                   (src-block (hydra-babel-helper/body))
-                   (link (hydra-org-link-helper/body))
-                   ((table-row table-cell) (hydra-org-table-helper/body) )
-                   (t (message "No specific hydra for %s/%s" etype type)
-                      (hydra-org-default/body))))
-               )
-    ('bibtex-mode (org-ref-bibtex-hydra/body))
-    ('ibuffer-mode (hydra-ibuffer-main/body))
-    (t (message "No hydra for this major mode: %s" major-mode))))
+	   ('org-mode (let* ((elem (org-element-context))
+			     (etype (car elem))
+			     (type (org-element-property :type elem)))
+			(cl-case etype
+				 (src-block (hydra-babel-helper/body))
+				 (link (hydra-org-link-helper/body))
+				 ((table-row table-cell) (hydra-org-table-helper/body) )
+				 (t (message "No specific hydra for %s/%s" etype type)
+				    (hydra-org-default/body))))
+		      )
+	   ('bibtex-mode (org-ref-bibtex-hydra/body))
+	   ('ibuffer-mode (hydra-ibuffer-main/body))
+	   (t (message "No hydra for this major mode: %s" major-mode))))
 
 (global-set-key (kbd "<f9> <f9>") 'dfeich/context-hydra-launcher)
 
@@ -1235,8 +1235,8 @@ Info-mode:
 ;;;;;;;;;;;;;;;;
 
 (defhydra hydra-git-gutter (:body-pre (git-gutter-mode 1)
-                            :hint nil)
-  "
+				      :hint nil)
+    "
 Git gutter:
   _j_: next hunk        _s_tage hunk     _q_uit
   _k_: previous hunk    _r_evert hunk    _Q_uit and deactivate git-gutter
@@ -1244,39 +1244,39 @@ Git gutter:
   _h_: first hunk
   _l_: last hunk        set start _R_evision
 "
-  ("j" git-gutter:next-hunk)
-  ("k" git-gutter:previous-hunk)
-  ("h" (progn (goto-char (point-min))
-              (git-gutter:next-hunk 1)))
-  ("l" (progn (goto-char (point-min))
-              (git-gutter:previous-hunk 1)))
-  ("s" git-gutter:stage-hunk)
-  ("r" git-gutter:revert-hunk)
-  ("p" git-gutter:popup-hunk)
-  ("R" git-gutter:set-start-revision)
-  ("q" nil :color blue)
-  ("Q" (progn (git-gutter-mode -1)
-              ;; git-gutter-fringe doesn't seem to
-              ;; clear the markup right away
-              (sit-for 0.1)
-              (git-gutter:clear))
-       :color blue))
+    ("j" git-gutter:next-hunk)
+    ("k" git-gutter:previous-hunk)
+    ("h" (progn (goto-char (point-min))
+		(git-gutter:next-hunk 1)))
+    ("l" (progn (goto-char (point-min))
+		(git-gutter:previous-hunk 1)))
+    ("s" git-gutter:stage-hunk)
+    ("r" git-gutter:revert-hunk)
+    ("p" git-gutter:popup-hunk)
+    ("R" git-gutter:set-start-revision)
+    ("q" nil :color blue)
+    ("Q" (progn (git-gutter-mode -1)
+		;; git-gutter-fringe doesn't seem to
+		;; clear the markup right away
+		(sit-for 0.1)
+		(git-gutter:clear))
+     :color blue))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; prog lang mode
-;;;; 
+;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;; https://github.com/takeokunn/.emacs.d/blob/35f6254f5a73c8d8969796962086f4d2a6341d03/index.org
 (leaf web-mode
-  :ensure t
-  :bind ("C-j" . web-mode-comment-indent-new-line)
-  :mode ("\\.html?\\'" "\\.erb\\'" "\\.gsp\\'" "\\.tsx\\'"))
+      :ensure t
+      :bind ("C-j" . web-mode-comment-indent-new-line)
+      :mode ("\\.html?\\'" "\\.erb\\'" "\\.gsp\\'" "\\.tsx\\'"))
 ;;4.37 yaml-mode
 (leaf yaml-mode
-  :ensure t
-  :mode ("\\.ya?ml$"))
+      :ensure t
+      :mode ("\\.ya?ml$"))
 
 ;; Org mode の C-c C-s で挿入する日付の曜日、英語曜日表記を強制する。
 
@@ -1288,25 +1288,25 @@ Git gutter:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (leaf *git
-  :emacs>= 25
-  :init
-  (leaf git-commit :ensure t)
-  (leaf gitattributes-mode :ensure t)
-  (leaf gitconfig-mode :ensure t)
-  (leaf gitignore-mode :ensure t)
-  )
+      :emacs>= 25
+      :init
+      (leaf git-commit :ensure t)
+      (leaf gitattributes-mode :ensure t)
+      (leaf gitconfig-mode :ensure t)
+      (leaf gitignore-mode :ensure t)
+      )
 
 
 ;;Git Gutter+
 (leaf git-gutter+
-  :emacs>= 25
-  :ensure t
-  :blackout `((git-gutter+-mode
-               . ,(format "%s" (all-the-icons-octicon "git-merge"))))
-  :bind ("C-x G" . global-git-gutter+-mode)
-  )
+      :emacs>= 25
+      :ensure t
+;      :blackout `((git-gutter+-mode
+;		   . ,(format "%s" (all-the-icons-octicon "git-merge"))))
+      :bind ("C-x G" . global-git-gutter+-mode)
+      )
 
-;; magit 
+;; magit
 ;; https://uwabami.github.io/cc-env/Emacs.html
 
 ;; (leaf magit
@@ -1342,11 +1342,11 @@ Git gutter:
   (interactive
    (let ((ack-command "ack --nofilter --nogroup --with-filename "))
      (list (read-shell-command "Run ack (like this): "
-                               ack-command
-                               'ack-history))))
+			       ack-command
+			       'ack-history))))
   (let ((compilation-disable-input t))
     (compilation-start (concat command-args " < " null-device)
-                       'grep-mode)))
+		       'grep-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; AWK Source Code Blocks in Org Mode
@@ -1371,36 +1371,36 @@ Git gutter:
 ;;https://emacs-jp.github.io/tips/emacs-in-2020
 ;;    対応する括弧の自動挿入
 (leaf electric
-  :doc "window maker and Command loop for `electric' modes"
-  :tag "builtin"
-  :added "2020-08-27"
-  :init (electric-pair-mode 1))
+      :doc "window maker and Command loop for `electric' modes"
+      :tag "builtin"
+      :added "2020-08-27"
+      :init (electric-pair-mode 1))
 
- ;;   ispell を aspell で使う
+;;   ispell を aspell で使う
 (leaf ispell
-  :doc "interface to spell checkers"
-  :tag "builtin"
-  :added "2020-08-27"
-  :setq-default (ispell-program-name . "aspell"))
+      :doc "interface to spell checkers"
+      :tag "builtin"
+      :added "2020-08-27"
+      :setq-default (ispell-program-name . "aspell"))
 
 
 ;;4.9 emacs-lisp-mode
 (leaf emacs-lisp-mode
-  :mode ("\\.skk$"))
+      :mode ("\\.skk$"))
 
 
 ;;cc-mode
 (leaf cc-mode
-  :doc "major mode for editing C and similar languages"
-  :tag "builtin"
-  :defvar (c-basic-offset)
-  :bind (c-mode-base-map
-         ("C-c c" . compile))
-  :mode-hook
-  (c-mode-hook . ((c-set-style "bsd")
-                  (setq c-basic-offset 4)))
-  (c++-mode-hook . ((c-set-style "bsd")
-                    (setq c-basic-offset 4))))
+      :doc "major mode for editing C and similar languages"
+      :tag "builtin"
+      :defvar (c-basic-offset)
+      :bind (c-mode-base-map
+	     ("C-c c" . compile))
+      :mode-hook
+      (c-mode-hook . ((c-set-style "bsd")
+		      (setq c-basic-offset 4)))
+      (c++-mode-hook . ((c-set-style "bsd")
+			(setq c-basic-offset 4))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ cperl-mode
@@ -1444,29 +1444,55 @@ Git gutter:
 ;;;; https://www.gnu.org/software/guile/manual/html_node/Using-Guile-in-Emacs.html
 ;;scheme-mode
 ;;
-(leaf geiser
-  :ensure t
-  :config
-  (setq geiser-active-implementations '(guile)))
+;; (leaf geiser
+;;       :ensure t
+;;       :config
+;;       (setq geiser-active-implementations '(guile)))
 
 
+;; ;;
+;; ;;https://github.com/emacsmirror/geiser-gauche
+;; (leaf geiser-gauche
+;;   :ensure t
+;;   :after geiser
+;;   :init (add-to-list 'geiser-active-implementations 'gauche))
+
+;; scheme mode
+;; https://haskell.hatenablog.com/entry/Settings-to-use-Gauche_Scheme-with-Emacs#Emacse%E3%81%A7Gauche%E3%82%92%E4%BD%BF%E3%81%86%E8%A8%AD%E5%AE%9A
+
+(setq scheme-program-name "gosh -i")
+(autoload 'scheme-mode "cmuscheme" "Major mode for scheme." t)
+(autoload 'run-scheme "cmuscheme" "Run a n inferior Scheme process." t)
+
+(defun scheme-other-window ()
+  "Run scheme on other window"
+  (interactive)
+  (switch-to-buffer-other-window
+    (get-buffer-create "*scheme*"))
+  (run-scheme scheme-program-name))
+
+(define-key global-map
+  "\C-cs" 'scheme-other-window)
+
+
+;;
 (leaf paredit
-  :ensure t
-  :commands enable-paredit-mode
-  :hook ((emacs-lisp-mode-hook . enable-paredit-mode)
-         (lisp-mode-hook . enable-paredit-mode)
-         (lisp-interacton-mode-hook . enable-paredit-mode)
-         (scheme-mode-hook . enable-paredit-mode))
-  :bind
-  ("C-<right>" . paredit-forward-slurp-sexp)
-  ("C-c f" . paredit-forward-slurp-sexp)
-  ("C-<left>" . paredit-forward-barf-sexp)
-  ("C-c b" . paredit-forward-barf-sexp))
+      :ensure t
+      :commands enable-paredit-mode
+      :hook ((emacs-lisp-mode-hook . enable-paredit-mode)
+	     (lisp-mode-hook . enable-paredit-mode)
+	     (lisp-interacton-mode-hook . enable-paredit-mode)
+	     (scheme-mode-hook . enable-paredit-mode))
+      :bind
+      ("C-<right>" . paredit-forward-slurp-sexp)
+      ("C-c f" . paredit-forward-slurp-sexp)
+      ("C-<left>" . paredit-forward-barf-sexp)
+      ("C-c b" . paredit-forward-barf-sexp))
 
 ;;5.1.2 rainbow-delimiters
 (leaf rainbow-delimiters
-  :ensure t
-  :hook (prog-mode-hook))
+      :ensure t
+      :hook (prog-mode-hook))
 
 ;; GNU-Emacsには、Lispを起動するコマンドがあります。
 ;; Lisp起動コマンドでgclを起動するには、
@@ -1508,15 +1534,16 @@ Git gutter:
 
 ;;https://www.ncaq.net/2020/04/05/22/33/21/
 
-(leaf helpful
-  :ensure t
-  :require t
-  :bind
-  ([remap describe-function] . helpful-callable)
-  ([remap describe-key]      . helpful-key)
-  ([remap describe-variable] . helpful-variable)
-  :defvar helpful-mode-map
-  :config (ncaq-set-key helpful-mode-map))
+;; (leaf helpful
+;;       :ensure t
+;;       :require t
+;;       :bind
+;;       ([remap describe-function] . helpful-callable)
+;;       ([remap describe-key]      . helpful-key)
+;;       ([remap describe-variable] . helpful-variable)
+;;       :defvar helpful-mode-map
+;;       :config (ncaq-set-key helpful-mode-map))
+
 
 ;; ;3.4 行番号を表示する
 ;; (global-linum-mode t)
@@ -1533,7 +1560,7 @@ Git gutter:
 ;;しかし, emacs26でついに行数表示のネイティブ実装であるdiplay-line-numbers-modeが実装された.
 
 (if (version<= "26.0.50" emacs-version)
-      (global-display-line-numbers-mode))
+    (global-display-line-numbers-mode))
 ;;個人的にはemacs -nwで起動したときに行数表示の色が見にくかったので以下のようにしている
 
 ;; (if (version<= "26.0.50" emacs-version)
@@ -1554,7 +1581,7 @@ Git gutter:
 ;;; マシーン依存の個別path
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; ;; Texinfo my-path 
+;; ;; Texinfo my-path
 ;; (require 'info)
 ;; (setq Info-directory-list
 ;;  (cons (expand-file-name "/home/mevius/info")
@@ -1564,8 +1591,8 @@ Git gutter:
 ;; Emacs and Other Info files
 (require 'info)
 (setq Info-default-directory-list
-  (cons (expand-file-name "/home/mevius/info/")
-    Info-default-directory-list))
+      (cons (expand-file-name "/home/mevius/info/")
+	    Info-default-directory-list))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; test  ;;;;;;;;;;;;;;;;;
 ;; https://uwabami.github.io/cc-env/Emacs.html
@@ -1638,13 +1665,13 @@ Git gutter:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (leaf exec-path-from-shell
-  :doc "Get environment variables such as $PATH from the shell"
-  :req "emacs-24.1"
-  :tag "environment" "unix" "emacs>=24.1"
-  :added "2020-08-27"
-  :url "https://github.com/purcell/exec-path-from-shell"
-  :emacs>= 24.1
-  :ensure t)
+      :doc "Get environment variables such as $PATH from the shell"
+      :req "emacs-24.1"
+      :tag "environment" "unix" "emacs>=24.1"
+      :added "2020-08-27"
+      :url "https://github.com/purcell/exec-path-from-shell"
+      :emacs>= 24.1
+      :ensure t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1661,3 +1688,4 @@ Git gutter:
 ;; End:
 
 ;;; init.el ends here
+
